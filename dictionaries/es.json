@@ -1,0 +1,70 @@
+{
+  "signup": {
+    "createAccount": "Crear una cuenta",
+    "subtitle": "Gestiona tus proyectos de renovación con facilidad, controla presupuestos y cronogramas",
+    "fullName": "Nombre completo",
+    "username": "Nombre de usuario",
+    "phoneNumber": "Número de teléfono",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signUp": "Registrarse",
+    "privacy": "Respetamos tu privacidad y nunca compartiremos tu información.",
+    "alreadyAccount": "¿Ya tienes una cuenta?",
+    "logIn": "Iniciar sesión",
+    "transformTitle": "Transforma tu proceso de renovación",
+    "benefits": [
+      "Controla tu presupuesto de renovación en tiempo real",
+      "Gestiona los horarios de los trabajadores de manera eficiente",
+      "Obtén informes detallados sobre el progreso del proyecto",
+      "Comunícate sin problemas con tu equipo"
+    ],
+    "passwordStrength": {
+      "title": "Fortaleza",
+      "veryWeak": "Muy débil",
+      "weak": "Débil",
+      "medium": "Media",
+      "strong": "Fuerte",
+      "veryStrong": "Muy fuerte",
+      "requirements": {
+        "minLength": "Mínimo 6 caracteres",
+        "uppercase": "Al menos una mayúscula",
+        "number": "Al menos un número",
+        "special": "Al menos un carácter especial"
+      }
+    },
+    "validation": {
+      "nameMin": "El nombre debe tener al menos 2 caracteres",
+      "nameMax": "El nombre no puede tener más de 30 caracteres",
+      "usernameMin": "El nombre de usuario debe tener al menos 3 caracteres",
+      "usernameMax": "El nombre de usuario no puede tener más de 20 caracteres",
+      "usernameFormat": "El nombre de usuario solo puede contener letras, números y guiones bajos",
+      "phoneFormat": "El teléfono solo puede contener números",
+      "emailFormat": "Ingresa un correo electrónico válido",
+      "passwordMin": "La contraseña debe tener al menos 6 caracteres"
+    },
+    "success": "Cuenta creada exitosamente"
+  },
+  "login": {
+    "welcomeBack": "Bienvenido de nuevo",
+    "subtitle": "Accede a tu cuenta para continuar gestionando tus proyectos de renovación",
+    "benefits": [
+      "Visualiza el progreso de tus proyectos",
+      "Revisa presupuestos y cronogramas",
+      "Comunícate con tu equipo de trabajo"
+    ],
+    "login": "Iniciar sesión",
+    "loginSubtitle": "Ingresa tus credenciales para acceder a tu cuenta",
+    "emailUsername": "Email o nombre de usuario",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "rememberMe": "Recordarme",
+    "secureAccess": "Acceso seguro a tu cuenta de SottoBudget",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate"
+  },
+  "common": {
+    "switchToSpanish": "ES",
+    "switchToEnglish": "EN",
+    "processing": "Procesando..."
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "signup": {
+    "createAccount": "Create an account",
+    "subtitle": "Manage your renovation projects with ease, track budgets and schedules",
+    "fullName": "Full Name",
+    "username": "Username",
+    "phoneNumber": "Phone Number",
+    "email": "Email",
+    "password": "Password",
+    "signUp": "Sign Up",
+    "privacy": "We respect your privacy and will never share your information.",
+    "alreadyAccount": "Already have an account?",
+    "logIn": "Log in",
+    "transformTitle": "Transform Your Renovation Process",
+    "benefits": [
+      "Track your renovation budget in real-time",
+      "Manage worker schedules efficiently",
+      "Get detailed reports on project progress",
+      "Communicate seamlessly with your team"
+    ],
+    "passwordStrength": {
+      "title": "Strength",
+      "veryWeak": "Very weak",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "veryStrong": "Very strong",
+      "requirements": {
+        "minLength": "Minimum 6 characters",
+        "uppercase": "At least one uppercase letter",
+        "number": "At least one number",
+        "special": "At least one special character"
+      }
+    },
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "nameMax": "Name cannot be longer than 30 characters",
+      "usernameMin": "Username must be at least 3 characters",
+      "usernameMax": "Username cannot be longer than 20 characters",
+      "usernameFormat": "Username can only contain letters, numbers and underscores",
+      "phoneFormat": "Phone can only contain numbers",
+      "emailFormat": "Please enter a valid email address",
+      "passwordMin": "Password must be at least 6 characters"
+    },
+    "success": "Account created successfully"
+  },
+  "login": {
+    "welcomeBack": "Welcome back",
+    "subtitle": "Access your account to continue managing your renovation projects",
+    "benefits": ["View your project progress", "Review budgets and schedules", "Communicate with your team"],
+    "login": "Log in",
+    "loginSubtitle": "Enter your credentials to access your account",
+    "emailUsername": "Email or username",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "secureAccess": "Secure access to your SottoBudget account",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  },
+  "common": {
+    "switchToSpanish": "ES",
+    "switchToEnglish": "EN",
+    "processing": "Processing..."
+  }
+}
