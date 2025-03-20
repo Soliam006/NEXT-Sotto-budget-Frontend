@@ -1,5 +1,3 @@
-import "server-only"
-
 // Definimos explícitamente los idiomas soportados
 export type Locale = "en" | "es"
 

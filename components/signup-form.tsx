@@ -24,16 +24,6 @@ const countryCodes = [
     { code: "+52", country: "MX" },
 ]
 
-export class SignupActionState {
-    status: string = "idle"
-    errors: {
-        name?: string[]
-        email?: string[]
-        password?: string[]
-    } = {}
-    message?: string
-}
-
 export default function SignUpForm({
                                        dictionary,
                                        lang,
@@ -54,14 +44,12 @@ export default function SignUpForm({
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
-    // Estado inicial que coincide con el tipo de retorno de la acción
-    const initialState: SignupActionState = {errors: {}, message: "", status: "idle" }
 
     // Crear una función que envuelve signup y pasa los mensajes de validación
-    const signupWithTranslations = (prevState: SignupActionState, formData: FormData) =>
+    const signupWithTranslations = (prevState: any, formData: FormData) =>
         signup(prevState, formData, t.validation)
 
-    const [state, formAction, pending] = useActionState(signupWithTranslations, initialState)
+    const [state, formAction, pending] = useActionState(signupWithTranslations, undefined)
 
     return (
         <div className="flex min-h-screen w-full flex-col md:flex-row bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">
@@ -85,7 +73,7 @@ export default function SignUpForm({
                             <div className="space-y-2">
                                 <Label htmlFor="name">{t.fullName}</Label>
                                 <Input id="name" name="name" placeholder="John Doe" aria-invalid={!!state?.errors?.name} />
-                                {state.status === "error" && state.errors.name && (
+                                {state?.status === "error" && state.errors?.name && (
                                     <p className="text-xs text-red-500">{state.errors.name[0]}</p>
                                 )}
                             </div>
@@ -93,7 +81,7 @@ export default function SignUpForm({
                             <div className="space-y-2">
                                 <Label htmlFor="username">{t.username}</Label>
                                 <Input id="username" name="username" placeholder="johndoe" aria-invalid={!!state?.errors?.username} />
-                                {state.status === "error" && state.errors.username && (
+                                {state?.status === "error" && state.errors?.username && (
                                     <p className="text-xs text-red-500">{state.errors.username[0]}</p>
                                 )}
                             </div>
@@ -123,7 +111,7 @@ export default function SignUpForm({
                                         aria-invalid={!!state?.errors?.phone}
                                     />
                                 </div>
-                                {state.status === "error" && state.errors.phone && (
+                                {state?.status === "error" && state.errors?.phone && (
                                     <p className="text-xs text-red-500">{state.errors.phone[0]}</p>
                                 )}
                             </div>
@@ -137,7 +125,7 @@ export default function SignUpForm({
                                     placeholder="john.doe@example.com"
                                     aria-invalid={!!state?.errors?.email}
                                 />
-                                {state.status === "error" && state.errors.email && (
+                                {state?.status === "error" && state.errors?.email && (
                                     <p className="text-xs text-red-500">{state.errors.email[0]}</p>
                                 )}
                             </div>
@@ -156,7 +144,7 @@ export default function SignUpForm({
                                     {passwordVisible ? "Ocultar" : "Mostrar"}
                                 </Button>
                                 <PasswordStrength password={password} translations={t.passwordStrength} />
-                                {state.status === "error" && state.errors.password && (
+                                {state?.status === "error" && state.errors?.password && (
                                     <p className="text-xs text-red-500">{state.errors.password[0]}</p>
                                 )}
                             </div>
@@ -165,7 +153,7 @@ export default function SignUpForm({
                                 {pending ? common.processing : t.signUp}
                             </Button>
 
-                            {state.status === "success" && <p className="text-center text-sm text-green-600">{t.success}</p>}
+                            {state?.status === "success" && <p className="text-center text-sm text-green-600">{t.success}</p>}
                         </form>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-2 text-center text-xs text-muted-foreground">
