@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import LanguageSwitcher from "./language-switcher"
+import {useActionState} from "react";
+import {logIn} from "@/app/actions/auth";
 
 export default function LoginForm({
                                       dictionary,
@@ -19,6 +21,8 @@ export default function LoginForm({
     const common = dictionary.common
 
     const switchText = lang === "en" ? common.switchToSpanish : common.switchToEnglish
+
+    const [state, formAction, pending] = useActionState( logIn, undefined );
 
     return (
         <div className="flex min-h-screen w-full flex-col md:flex-row  bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">
@@ -49,7 +53,8 @@ export default function LoginForm({
                     </ul>
                 </div>
             </div>
-            <div className="flex w-full items-center justify-center p-4 md:w-1/2 md:p-8 h-screen ">
+
+            <form action={formAction} method="POST" className="flex w-full items-center justify-center p-4 md:w-1/2 md:p-8 h-screen">
                 <Card className="w-full max-w-md shadow-lg">
                     <CardHeader className="space-y-2 text-center">
                         <div className="mx-auto flex items-center justify-center space-x-2 text-navy-700">
@@ -61,8 +66,8 @@ export default function LoginForm({
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">{t.emailUsername}</Label>
-                            <Input id="email" type="email" placeholder="john.doe@example.com" />
+                            <Label >{t.emailUsername}</Label>
+                            <Input id="email" name="email" type="text" placeholder="john.doe@example.com or JonhDoe" required />
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
@@ -70,16 +75,17 @@ export default function LoginForm({
                                 <Link href={`/${lang}/auth/forgot-password`} className="text-xs text-blue-900 hover:underline">
                                     {t.forgotPassword}
                                 </Link>
+                                {state?.errors && <p className="text-red-500 text-xs">{state.errors?.password}</p>}
                             </div>
-                            <Input id="password" type="password" />
+                            <Input id="password" name="password" type="password" required />
                         </div>
                         <div className="flex items-center space-x-2">
-                            <Checkbox id="remember" />
+                            <Checkbox id="remember" name="remember" />
                             <Label htmlFor="remember" className="text-sm font-normal">
                                 {t.rememberMe}
                             </Label>
                         </div>
-                        <Button className="w-full bg-blue-900 hover:bg-blue-800">{t.login}</Button>
+                        <Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800">{t.login}</Button>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-2 text-center text-xs text-muted-foreground">
                         <p>{t.secureAccess}</p>
@@ -91,7 +97,8 @@ export default function LoginForm({
                         </p>
                     </CardFooter>
                 </Card>
-            </div>
+            </form>
+
         </div>
     )
 }

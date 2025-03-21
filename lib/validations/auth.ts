@@ -19,6 +19,11 @@ export const createSignUpSchema = (messages: any) => {
     })
 }
 
+export const LoginSchema = z.object({
+        emailOrUsername: z.string(),
+        password: z.string().min(6),
+});
+
 export type FormState =
     | {
     errors?: {

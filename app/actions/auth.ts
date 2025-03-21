@@ -1,6 +1,7 @@
 "use server"
 
-import {createSignUpSchema} from "@/lib/validations/auth"
+import {createSignUpSchema, LoginSchema} from "@/lib/validations/auth"
+const api_URL = process.env.BASE_URL_BACK;
 
 export async function signup(prevState:any, formData: FormData, validationMessages: any) {
 
@@ -32,6 +33,28 @@ export async function signup(prevState:any, formData: FormData, validationMessag
     return {
         status: "success",
         message: "User created successfully",
+    }
+}
+
+export async function logIn(prevState:any, formData: FormData) {
+
+    // Validar con Zod
+    const validationResult = LoginSchema.safeParse({
+        emailOrUsername: formData.get("emailOrUsername"),
+        password: formData.get("password"),
+    })
+
+    // Si hay errores de validación, devolverlos
+    if (!validationResult.success) {
+        return {
+            status: "error",
+            errors: validationResult.error.flatten().fieldErrors,
+        }
+    }
+
+    return {
+        status: "success",
+        message: "User authenticated successfully",
     }
 }
 
