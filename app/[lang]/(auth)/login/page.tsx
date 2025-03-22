@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import LoginForm from "@/components/login-form";
+import LoginForm from "@/components/LoginForm";
 import { getDictionary } from "@/lib/dictionary"
 
 export default function LoginPage() {

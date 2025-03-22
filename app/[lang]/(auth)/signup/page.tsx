@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { getDictionary } from "@/lib/dictionary"
-import SignUpForm from "@/components/signup-form"
+import SignUpForm from "@/components/SignUpForm"
 
 export default function SignUpPage() {
     const params = useParams(); // Obtiene dinámicamente los parámetros de la URL

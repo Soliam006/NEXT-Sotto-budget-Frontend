@@ -40,7 +40,8 @@
       "usernameFormat": "El nombre de usuario solo puede contener letras, números y guiones bajos",
       "phoneFormat": "El teléfono solo puede contener números",
       "emailFormat": "Ingresa un correo electrónico válido",
-      "passwordMin": "La contraseña debe tener al menos 6 caracteres"
+      "passwordMin": "La contraseña debe tener al menos 6 caracteres",
+      "userTaken": "El usuario ya está en uso, intenta con otro"
     },
     "success": "Cuenta creada exitosamente"
   },
@@ -60,7 +61,10 @@
     "rememberMe": "Recordarme",
     "secureAccess": "Acceso seguro a tu cuenta de SottoBudget",
     "noAccount": "¿No tienes una cuenta?",
-    "signUp": "Regístrate"
+    "signUp": "Regístrate",
+    "validation": {
+      "invalidUser": "Nombre de usuario o contraseña inválidos"
+    }
   },
   "common": {
     "switchToSpanish": "ES",
