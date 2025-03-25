@@ -204,5 +204,9 @@
   body {
     @apply bg-background text-foreground;
   }
-}
 
+  /* Add a gradient background for dark mode */
+  .dark body {
+    background: linear-gradient(to bottom right, #000000, #0f172a);
+  }
+}

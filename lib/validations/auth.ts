@@ -14,15 +14,17 @@ export const createSignUpSchema = (messages: any) => {
 
         email: z.string().email({ message: messages.emailFormat }),
 
-        password: z.string().min(6, { message: messages.passwordMin }),
+        password: z.string().min(4, { message: messages.passwordMin }),
         countryCode: z.string()
     })
 }
 
-export const LoginSchema = z.object({
+export const LoginSchema =(messages:any) => {
+    return z.object({
         emailOrUsername: z.string(),
-        password: z.string().min(6),
-});
+        password: z.string().min(4, { message: messages.passwordMin }),
+    });
+}
 
 export type FormState =
     | {

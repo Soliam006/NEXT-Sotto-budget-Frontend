@@ -2,7 +2,7 @@
 
 import {createSignUpSchema, ExpectedType, LoginSchema} from "@/lib/validations/auth"
 
-const api_URL = process.env.BASE_URL_BACK + "users"
+const api_URL = process.env.BASE_URL_BACK + "users/"
 
 export async function signup(
     initialState: ExpectedType,
@@ -41,7 +41,7 @@ export async function signup(
         role: "client",
     }));
     try{
-        const response: any = await fetch(`${api_URL}/`, {
+        const response: any = await fetch(`${api_URL}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -92,14 +92,34 @@ export async function signup(
     }
 }
 
+function validateResult(json: any, translates: any) {
+    // statusCode, data, message
+    if (json.statusCode !== 200) {
+        if(json.statusCode === 401){
+            return {
+                status: "error",
+                message: translates.invalidUser
+            }
+        }
+        return {
+            status: "error",
+            message: json.message
+        }
+    }
+
+    return {
+        status: "success",
+        message: "User authenticated successfully",
+    }
+
+}
+
 export async function logIn(prevState:ExpectedType, formData: FormData, translates: any) {
     const emailOrUsername = formData.get("emailOrUsername")?.toString()
     const password = formData.get("password")?.toString()
 
-    console.log("Translates", translates)
-
     // Validar con Zod
-    const validationResult = LoginSchema.safeParse({
+    const validationResult = LoginSchema(translates).safeParse({
         emailOrUsername: emailOrUsername,
         password: password,
     })
@@ -111,34 +131,44 @@ export async function logIn(prevState:ExpectedType, formData: FormData, translat
             errors: validationResult.error.flatten().fieldErrors,
         }
     }
-    console.log(emailOrUsername)
 
+    try {
+        // Llamar a la función correspondiente
+        if (emailOrUsername)
+          //Verificar si es username o email
+            if (emailOrUsername.includes("@")) {
+                const response = await logInWithEmail(emailOrUsername, password || "")
+                if (!response.ok) {
+                    return {
+                        status: "error",
+                        errors: {
+                            emailOrUsername: [translates.invalidUser],
+                        },
+                    }
+                }
+            } else {
+                const response = await logInWithUsername(emailOrUsername, password || "")
+                console.log("Response", response)
+                if (!response.ok) {
+                    return {
+                        status: "error",
+                        errors: {
+                            emailOrUsername: [translates.invalidUser],
+                        },
+                    }
+                }
 
-    // Llamar a la función correspondiente
-    if( emailOrUsername) 
-        //Verificar si es username o email
-        if( emailOrUsername.includes("@") ){ 
-            const response = await logInWithEmail(emailOrUsername, password || "")
-            if (!response.ok) {
-                return {
-                    status: "error",
-                    errors: {
-                        emailOrUsername: [translates.invalidUser],
-                    },
-                }
+                const json = await response.json()
+
+                return validateResult(json, translates)
             }
-        } else {
-            const response = await logInWithUsername(emailOrUsername, password || "")
-            if (!response.ok) {
-                return {
-                    status: "error",
-                    errors: {
-                        emailOrUsername: [translates.invalidUser],
-                    },
-                }
-            }
+    } catch (error) {
+        // Manejo de errores en la conexión, etc.
+        return {
+            status: "error",
+            message: translates.serverError
         }
-
+    }
 
     return {
         status: "success",
@@ -147,7 +177,7 @@ export async function logIn(prevState:ExpectedType, formData: FormData, translat
 }
 
 function logInWithUsername(username: string, password: string) {
-    return fetch(`${api_URL}/token_username`, {
+    return fetch(`${api_URL}token_username`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -160,7 +190,7 @@ function logInWithUsername(username: string, password: string) {
 }
 
 function logInWithEmail(email: string, password: string) {
-    return fetch(`${api_URL}/token_email`, {
+    return fetch(`${api_URL}token_email`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
