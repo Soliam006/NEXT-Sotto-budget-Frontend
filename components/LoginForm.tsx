@@ -80,7 +80,6 @@ export default function LoginForm({
                                 <Link href={`/${lang}/auth/forgot-password`} className="text-xs text-blue-900 hover:underline">
                                     {t.forgotPassword}
                                 </Link>
-                                {state?.errors && <p className="text-red-500 text-xs">{state.errors?.password}</p>}
                             </div>
                             <Input id="password" name="password" type="password" required />
                         </div>
