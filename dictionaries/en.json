@@ -66,5 +66,77 @@
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
     "processing": "Processing..."
+  },
+  "profile": {
+    "edit": "Edit Profile",
+    "share": "Share",
+    "projects": "Projects",
+    "followers": "Followers",
+    "following": "Following",
+    "requests": "Requests",
+    "viewAll": "View All",
+    "joined": "Joined",
+    "noRequests": "No pending requests",
+    "viewAllRequests": "View all {count} requests",
+    "recentProjects": "Recent Projects",
+    "recentActivity": "Recent Activity",
+    "searchUsers": "Search users...",
+    "searchFollowers": "Search followers...",
+    "searchFollowing": "Search following..."
+  },
+  "projects": {
+    "completion": "Completion",
+    "location": "Location",
+    "role": "Role",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "planning": "Planning"
+    },
+    "allProjects": "All projects {name} is involved in"
+  },
+  "followers": {
+    "title": "Followers",
+    "description": "People who follow {name}",
+    "followBack": "Follow Back",
+    "following": "Following",
+    "noFollowers": "No followers yet"
+  },
+  "following": {
+    "title": "Following",
+    "description": "People {name} follows",
+    "unfollow": "Unfollow",
+    "noFollowing": "Not following anyone yet"
+  },
+  "requests": {
+    "title": "Follow Requests",
+    "description": "People who want to follow {name}",
+    "accept": "Accept",
+    "decline": "Decline",
+    "noRequests": "No pending requests"
+  },
+  "search": {
+    "title": "Search Users",
+    "description": "Find and connect with other users",
+    "placeholder": "Search by name, username, or role...",
+    "noResults": "No users found",
+    "follow": "Follow",
+    "following": "Following"
+  },
+  "nav": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "logout": "Log out",
+    "notifications": "Notifications",
+    "toggleTheme": "Toggle theme"
+  },
+  "actions": {
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "language": {
+    "en": "English",
+    "es": "Spanish"
   }
 }

@@ -127,6 +127,9 @@
 
 @layer base {
   :root {
+    --bg-color-dark: rgba(30, 41, 59, 0.5); /* bg-slate-800/50 */
+    --bg-color-light: rgba(241, 245, 249, 0.5); /* bg-slate-100/50 */
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -159,6 +162,8 @@
   }
 
   .dark {
+    --bg-color: var(--bg-color-dark);
+
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -187,6 +192,9 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+}
+.light {
+  --bg-color: var(--bg-color-light);
 }
 
 @layer base {

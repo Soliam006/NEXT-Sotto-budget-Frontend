@@ -70,5 +70,77 @@
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
     "processing": "Procesando..."
+  },
+  "profile": {
+    "edit": "Editar Perfil",
+    "share": "Compartir",
+    "projects": "Proyectos",
+    "followers": "Seguidores",
+    "following": "Siguiendo",
+    "requests": "Solicitudes",
+    "viewAll": "Ver Todo",
+    "joined": "Se unió",
+    "noRequests": "No hay solicitudes pendientes",
+    "viewAllRequests": "Ver todas las {count} solicitudes",
+    "recentProjects": "Proyectos Recientes",
+    "recentActivity": "Actividad Reciente",
+    "searchUsers": "Buscar usuarios...",
+    "searchFollowers": "Buscar seguidores...",
+    "searchFollowing": "Buscar usuarios seguidos..."
+  },
+  "projects": {
+    "completion": "Completado",
+    "location": "Ubicación",
+    "role": "Rol",
+    "status": {
+      "completed": "Completado",
+      "inProgress": "En Progreso",
+      "planning": "Planificación"
+    },
+    "allProjects": "Todos los proyectos en los que {name} está involucrado"
+  },
+  "followers": {
+    "title": "Seguidores",
+    "description": "Personas que siguen a {name}",
+    "followBack": "Seguir",
+    "following": "Siguiendo",
+    "noFollowers": "Aún no hay seguidores"
+  },
+  "following": {
+    "title": "Siguiendo",
+    "description": "Personas a las que {name} sigue",
+    "unfollow": "Dejar de seguir",
+    "noFollowing": "Aún no sigue a nadie"
+  },
+  "requests": {
+    "title": "Solicitudes de Seguimiento",
+    "description": "Personas que quieren seguir a {name}",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "noRequests": "No hay solicitudes pendientes"
+  },
+  "search": {
+    "title": "Buscar Usuarios",
+    "description": "Encuentra y conéctate con otros usuarios",
+    "placeholder": "Buscar por nombre, usuario o rol...",
+    "noResults": "No se encontraron usuarios",
+    "follow": "Seguir",
+    "following": "Siguiendo"
+  },
+  "nav": {
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "dashboard": "Panel",
+    "logout": "Cerrar sesión",
+    "notifications": "Notificaciones",
+    "toggleTheme": "Cambiar tema"
+  },
+  "actions": {
+    "accept": "Aceptar",
+    "decline": "Rechazar"
+  },
+  "language": {
+    "en": "Inglés",
+    "es": "Español"
   }
 }
