@@ -3,7 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Building2 } from "lucide-react"
-import { useActionState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -13,8 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import LanguageSwitcher from "./language-switcher"
 import PasswordStrength from "./password-strength"
 import { signup } from "@/app/actions/auth"
-import {ExpectedType} from "@/lib/validations/auth";
-
+import { ExpectedType } from "@/lib/validations/auth"
 
 const countryCodes = [
     { code: "+1", country: "US" },
@@ -40,27 +38,38 @@ export default function SignUpForm({
 
     const [countryCode, setCountryCode] = useState("+34")
     const [password, setPassword] = useState("")
-
-    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [passwordVisible, setPasswordVisible] = useState(false)
 
     const togglePasswordVisibility = () => {
-        setPasswordVisible(!passwordVisible);
-    };
-
-    // Crear una función que envuelve signup y pasa los mensajes de validación
-    const signupWithTranslations = (prevState: ExpectedType, formData: FormData) =>
-        signup(prevState, formData, t.validation)
-
-    const initialState: ExpectedType = {
-        status: "", // Valor por defecto para que sea un string
-        errors: {}
+        setPasswordVisible(!passwordVisible)
     }
 
-    const [state, formAction, pending] = useActionState(signupWithTranslations, initialState);
+    // Estado para el resultado del envío y el indicador de "pending"
+    const [formState, setFormState] = useState<ExpectedType>({
+        status: "",
+        errors: {}
+    })
+    const [pending, setPending] = useState(false)
+
+    // Manejador del envío del formulario
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setPending(true)
+
+        // Construir FormData a partir del formulario
+        const formData = new FormData(e.currentTarget)
+        // Forzar el valor de countryCode (ya que lo manejamos con estado)
+        formData.set("countryCode", countryCode)
+
+        // Llamar a la acción de signup y esperar su resultado
+        const result = await signup({ status: "", errors: {} }, formData, t.validation)
+        setFormState(result)
+        setPending(false)
+    }
 
     return (
         <div className="flex min-h-screen w-full flex-col md:flex-row bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">
-            {/* Language toggle button */}
+            {/* Botón de cambio de idioma */}
             <div className="absolute right-4 top-4 z-10">
                 <LanguageSwitcher currentLang={lang} switchText={switchText} />
             </div>
@@ -76,92 +85,112 @@ export default function SignUpForm({
                         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
                     </CardHeader>
                     <CardContent>
-											<form action={formAction} method="POST" className="space-y-4">
-													<div className="space-y-2">
-															<Label htmlFor="name">{t.fullName}</Label>
-															<Input id="name" name="name" placeholder="John Doe" aria-invalid={!!state?.errors?.name} />
-															{state?.status === "error" && state.errors?.name && (
-																	<p className="text-xs text-red-500">{state.errors.name[0]}</p>
-															)}
-													</div>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">{t.fullName}</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    placeholder="John Doe"
+                                    aria-invalid={!!formState?.errors?.name}
+                                />
+                                {formState?.status === "error" && formState.errors?.name && (
+                                    <p className="text-xs text-red-500">{formState.errors.name[0]}</p>
+                                )}
+                            </div>
 
-													<div className="space-y-2">
-															<Label htmlFor="username">{t.username}</Label>
-															<Input id="username" name="username" placeholder="johndoe" aria-invalid={!!state?.errors?.username} />
-															{state?.status === "error" && state.errors?.username && (
-																	<p className="text-xs text-red-500">{state.errors.username[0]}</p>
-															)}
-													</div>
+                            <div className="space-y-2">
+                                <Label htmlFor="username">{t.username}</Label>
+                                <Input
+                                    id="username"
+                                    name="username"
+                                    placeholder="johndoe"
+                                    aria-invalid={!!formState?.errors?.username}
+                                />
+                                {formState?.status === "error" && formState.errors?.username && (
+                                    <p className="text-xs text-red-500">{formState.errors.username[0]}</p>
+                                )}
+                            </div>
 
-													<div className="space-y-2">
-															<Label htmlFor="phone">{t.phoneNumber}</Label>
-															<div className="flex space-x-2">
-																	<input type="hidden" name="countryCode" value={countryCode} />
-																	<Select value={countryCode} onValueChange={setCountryCode}>
-																			<SelectTrigger className="w-[100px]">
-																					<SelectValue placeholder="Code" />
-																			</SelectTrigger>
-																			<SelectContent>
-																					{countryCodes.map((country) => (
-																							<SelectItem key={country.code} value={country.code}>
-																									{country.code} {country.country}
-																							</SelectItem>
-																					))}
-																			</SelectContent>
-																	</Select>
-																	<Input
-																			id="phone"
-																			name="phone"
-																			type="tel"
-																			placeholder="(555) 123-4567"
-																			className="flex-1"
-																			aria-invalid={!!state?.errors?.phone}
-																	/>
-															</div>
-															{state?.status === "error" && state.errors?.phone && (
-																	<p className="text-xs text-red-500">{state.errors.phone[0]}</p>
-															)}
-													</div>
+                            <div className="space-y-2">
+                                <Label htmlFor="phone">{t.phoneNumber}</Label>
+                                <div className="flex space-x-2">
+                                    <input type="hidden" name="countryCode" value={countryCode} />
+                                    <Select value={countryCode} onValueChange={setCountryCode}>
+                                        <SelectTrigger className="w-[100px]">
+                                            <SelectValue placeholder="Code" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {countryCodes.map((country) => (
+                                                <SelectItem key={country.code} value={country.code}>
+                                                    {country.code} {country.country}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Input
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        placeholder="(555) 123-4567"
+                                        className="flex-1"
+                                        aria-invalid={!!formState?.errors?.phone}
+                                    />
+                                </div>
+                                {formState?.status === "error" && formState.errors?.phone && (
+                                    <p className="text-xs text-red-500">{formState.errors.phone[0]}</p>
+                                )}
+                            </div>
 
-													<div className="space-y-2">
-															<Label htmlFor="email">{t.email}</Label>
-															<Input
-																	id="email"
-																	name="email"
-																	type="email"
-																	placeholder="john.doe@example.com"
-																	aria-invalid={!!state?.errors?.email}
-															/>
-															{state?.status === "error" && state.errors?.email && (
-																	<p className="text-xs text-red-500">{state.errors.email[0]}</p>
-															)}
-													</div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">{t.email}</Label>
+                                <Input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="john.doe@example.com"
+                                    aria-invalid={!!formState?.errors?.email}
+                                />
+                                {formState?.status === "error" && formState.errors?.email && (
+                                    <p className="text-xs text-red-500">{formState.errors.email[0]}</p>
+                                )}
+                            </div>
 
-													<div className="space-y-2">
-															<Label htmlFor="password">{t.password}</Label>
-															<Input
-																	id="password"
-																	name="password"
-																	type={passwordVisible ? "text" : "password"}
-																	value={password}
-																	onChange={(e) => setPassword(e.target.value)}
-																	aria-invalid={!!state?.errors?.password}
-															/>
-															<Button type="button" className="bg-blue-900 hover:bg-blue-800 cursor-pointer" onClick={togglePasswordVisibility}>
-																	{passwordVisible ? "Ocultar" : "Mostrar"}
-															</Button>
-															<PasswordStrength password={password} translations={t.passwordStrength} />
-															{state?.status === "error" && state.errors?.password && (
-																	<p className="text-xs text-red-500">{state.errors.password[0]}</p>
-															)}
-													</div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password">{t.password}</Label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type={passwordVisible ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    aria-invalid={!!formState?.errors?.password}
+                                />
+                                <Button
+                                    type="button"
+                                    className="bg-blue-900 hover:bg-blue-800 cursor-pointer"
+                                    onClick={togglePasswordVisibility}
+                                >
+                                    {passwordVisible ? "Ocultar" : "Mostrar"}
+                                </Button>
+                                <PasswordStrength password={password} translations={t.passwordStrength} />
+                                {formState?.status === "error" && formState.errors?.password && (
+                                    <p className="text-xs text-red-500">{formState.errors.password[0]}</p>
+                                )}
+                            </div>
 
-													<Button type="submit" className="w-full bg-blue-900 hover:bg-blue-800 cursor-pointer" disabled={pending}>
-															{pending ? common.processing : t.signUp}
-													</Button>
+                            <Button
+                                type="submit"
+                                className="w-full bg-blue-900 hover:bg-blue-800 cursor-pointer"
+                                disabled={pending}
+                            >
+                                {pending ? common.processing : t.signUp}
+                            </Button>
 
-													{state?.status === "success" && <p className="text-center text-sm text-green-600">{t.success}</p>}
-											</form>
+                            {formState?.status === "success" && (
+                                <p className="text-center text-sm text-green-600">{t.success}</p>
+                            )}
+                        </form>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-2 text-center text-xs text-muted-foreground">
                         <p>{t.privacy}</p>
@@ -198,4 +227,3 @@ export default function SignUpForm({
         </div>
     )
 }
-

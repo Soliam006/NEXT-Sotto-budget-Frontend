@@ -4,7 +4,10 @@ import {createSignUpSchema, ExpectedType, LoginSchema} from "@/lib/validations/a
 
 const api_URL = process.env.BASE_URL_BACK + "users"
 
-export async function signup(prevState: ExpectedType, formData: FormData, validationMessages: any)  {
+export async function signup(
+    initialState: ExpectedType,
+    formData: FormData,
+    validationMessages: any)  {
 
     console.log("ENTRANDO A SIGNUP")
     // Crear el esquema con los mensajes traducidos
