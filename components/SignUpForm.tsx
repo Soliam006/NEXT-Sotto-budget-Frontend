@@ -43,7 +43,10 @@ export default function SignUpForm({
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible)
     }
-
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value.replace(/\s/g, "");
+        setPassword(newValue);
+    };
     // Estado para el resultado del envío y el indicador de "pending"
     const [formState, setFormState] = useState<ExpectedType>({
         status: "",
@@ -163,7 +166,7 @@ export default function SignUpForm({
                                     name="password"
                                     type={passwordVisible ? "text" : "password"}
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={handlePasswordChange}
                                     aria-invalid={!!formState?.errors?.password}
                                 />
                                 <Button
