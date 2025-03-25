@@ -1,3 +1,6 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import { Building2 } from "lucide-react"
 
@@ -5,11 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import LanguageSwitcher from "./language-switcher"
-import {useActionState} from "react";
-import {logIn} from "@/app/actions/auth";
-import {ExpectedType} from "@/lib/validations/auth";
+import { logIn } from "@/app/actions/auth"
+import { ExpectedType } from "@/lib/validations/auth"
 
 export default function LoginForm({
                                       dictionary,
@@ -23,19 +24,28 @@ export default function LoginForm({
 
     const switchText = lang === "en" ? common.switchToSpanish : common.switchToEnglish
 
-    const loginActions= (prevState: ExpectedType, formData: FormData) =>
-        logIn(prevState, formData, t.validation)
-
-    const initialState: ExpectedType = {
-        status: "", // Valor por defecto para que sea un string
+    // Estado para el resultado del login y el indicador de loading
+    const [formState, setFormState] = useState<ExpectedType>({
+        status: "",
         errors: {}
+    })
+    const [pending, setPending] = useState(false)
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setPending(true)
+
+        const formData = new FormData(e.currentTarget)
+
+        // Ejecuta la acción de logIn pasando el estado inicial y los mensajes de validación
+        const result = await logIn({ status: "", errors: {} }, formData, t.validation)
+        setFormState(result)
+        setPending(false)
     }
 
-    const [state, formAction, pending] = useActionState( loginActions, initialState );
-
     return (
-        <div className="flex min-h-screen w-full flex-col md:flex-row  bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">
-            {/* Language toggle button */}
+        <div className="flex min-h-screen w-full flex-col md:flex-row bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">
+            {/* Botón de cambio de idioma */}
             <div className="absolute right-4 top-4 z-10">
                 <LanguageSwitcher currentLang={lang} switchText={switchText} />
             </div>
@@ -63,7 +73,7 @@ export default function LoginForm({
                 </div>
             </div>
 
-            <form action={formAction} className="flex w-full items-center justify-center p-4 md:w-1/2 md:p-8 h-screen">
+            <form onSubmit={handleSubmit} className="flex w-full items-center justify-center p-4 md:w-1/2 md:p-8 h-screen">
                 <Card className="w-full max-w-md shadow-lg">
                     <CardHeader className="space-y-2 text-center">
                         <div className="mx-auto flex items-center justify-center space-x-2 text-navy-700">
@@ -75,9 +85,20 @@ export default function LoginForm({
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="emailOrUsername" >{t.emailUsername}</Label>
-                            <Input id="emailOrUsername" name="emailOrUsername" type="text" placeholder="john.doe@example.com or JonhDoe" required />
-                            {state?.errors && <p className="text-red-500 text-xs">{state.errors?.emailOrUsername ? state.errors?.emailOrUsername[0] : " "}</p>}
+                            <Label htmlFor="emailOrUsername">{t.emailUsername}</Label>
+                            <Input
+                                id="emailOrUsername"
+                                name="emailOrUsername"
+                                type="text"
+                                placeholder="john.doe@example.com or JonhDoe"
+                                required
+                                aria-invalid={!!formState?.errors?.emailOrUsername}
+                            />
+                            {formState?.errors && (
+                                <p className="text-red-500 text-xs">
+                                    {formState.errors?.emailOrUsername ? formState.errors.emailOrUsername[0] : " "}
+                                </p>
+                            )}
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
@@ -86,24 +107,35 @@ export default function LoginForm({
                                     {t.forgotPassword}
                                 </Link>
                             </div>
-                            <Input id="password" name="password" type="password" required />
+                            <Input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                aria-invalid={!!formState?.errors?.password}
+                            />
+                            {formState?.errors && formState.errors?.password && (
+                                <p className="text-red-500 text-xs">{formState.errors.password[0]}</p>
+                            )}
                         </div>
-                        <Button type="submit" className="w-full bg-blue-900 cursor-pointer hover:bg-blue-800">{t.login}</Button>
+                        <Button type="submit" className="w-full bg-blue-900 cursor-pointer hover:bg-blue-800">
+                            {pending ? common.processing : t.login}
+                        </Button>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-2 text-center text-xs text-muted-foreground">
                         <p>{t.secureAccess}</p>
                         <p>
                             {t.noAccount}{" "}
-                            <Link href={`/${lang}/signup`} 
-                            className="text-blue-900 underline underline-offset-2 cursor-pointer hover:text-blue-800">
+                            <Link
+                                href={`/${lang}/signup`}
+                                className="text-blue-900 underline underline-offset-2 cursor-pointer hover:text-blue-800"
+                            >
                                 {t.signUp}
                             </Link>
                         </p>
                     </CardFooter>
                 </Card>
             </form>
-
         </div>
     )
 }
-
