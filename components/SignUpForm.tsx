@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import LanguageSwitcher from "./language-switcher"
 import PasswordStrength from "./password-strength"
 import { signup } from "@/app/actions/auth"
+import {ExpectedType} from "@/lib/validations/auth";
+
 
 const countryCodes = [
     { code: "+1", country: "US" },
@@ -46,10 +48,15 @@ export default function SignUpForm({
     };
 
     // Crear una función que envuelve signup y pasa los mensajes de validación
-    const signupWithTranslations = (prevState: any, formData: FormData) =>
+    const signupWithTranslations = (prevState: ExpectedType, formData: FormData) =>
         signup(prevState, formData, t.validation)
 
-    const [state, formAction, pending] = useActionState(signupWithTranslations, undefined)
+    const initialState: ExpectedType = {
+        status: "", // Valor por defecto para que sea un string
+        errors: {}
+    }
+
+    const [state, formAction, pending] = useActionState(signupWithTranslations, initialState);
 
     return (
         <div className="flex min-h-screen w-full flex-col md:flex-row bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">

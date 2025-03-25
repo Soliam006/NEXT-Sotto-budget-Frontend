@@ -36,8 +36,10 @@ export type FormState =
     | undefined
 
 
-export type ExpectedType = Awaited<{
-    errors: {
+export type ExpectedType = {
+    message?: string;
+    errors?: {
+        emailOrUsername?: string[];
         password?: string[];
         phone?: string[];
         name?: string[];
@@ -45,4 +47,4 @@ export type ExpectedType = Awaited<{
         username?: string[];
     };
     status: string;
-}>;
+};

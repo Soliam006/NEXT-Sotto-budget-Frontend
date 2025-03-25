@@ -1,10 +1,10 @@
 "use server"
 
-import {createSignUpSchema, LoginSchema} from "@/lib/validations/auth"
-import { Console } from "console"
+import {createSignUpSchema, ExpectedType, LoginSchema} from "@/lib/validations/auth"
+
 const api_URL = process.env.BASE_URL_BACK + "users"
 
-export async function signup(prevState:any, formData: FormData, validationMessages: any) {
+export async function signup(prevState: ExpectedType, formData: FormData, validationMessages: any)  {
 
     console.log("ENTRANDO A SIGNUP")
     // Crear el esquema con los mensajes traducidos
@@ -27,39 +27,9 @@ export async function signup(prevState:any, formData: FormData, validationMessag
             errors: validationResult.error.flatten().fieldErrors,
         }
     }
-/*
-    //Enviar los datos al servidor
-    const response:any = await fetch(`${api_URL}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        /*body: JSON.stringify({
-            name: formData.get("name"),
-            username: formData.get("username"),
-            phone: formData.get("phone"),
-            email: formData.get("email"),
-            password: formData.get("password"),
-            countryCode: formData.get("countryCode"),
-            language_preference: "es",
-            role: "client",
-        }),
-        
-        body: JSON.stringify({
-            username: formData.get("username"),
-            email: formData.get("email"),
-            password: formData.get("password"),
-            language_preference: "es",
-            role: "client",
-        }),
-    })
-    const json = await response.json()
-    console.log("JSON--------", json)
-    console.log("API_URL", api_URL)*/
 
     //Enviar los datos al servidor
     console.log("Sending request to:", api_URL);
-    console.log("Request method:", "POST");
     console.log("Request body:", JSON.stringify({
         username: formData.get("username"),
         email: formData.get("email"),
@@ -67,51 +37,59 @@ export async function signup(prevState:any, formData: FormData, validationMessag
         language_preference: "es",
         role: "client",
     }));
+    try{
+        const response: any = await fetch(`${api_URL}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: formData.get("username"),
+                email: formData.get("email"),
+                password: formData.get("password"),
+                language_preference: "es",
+                role: "client",
+            }),
+        });
 
-    const response: any = await fetch(`${api_URL}/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            username: formData.get("username"),
-            email: formData.get("email"),
-            password: formData.get("password"),
-            language_preference: "es",
-            role: "client",
-        }),
-    });
+        const json = await response.json();
+        console.log("Response JSON:", json);
+        console.log("API_URL", api_URL);
 
-    const json = await response.json();
-    console.log("Response JSON:", json);
-    console.log("API_URL", api_URL);
-
-    // Si hay un error en la petición, devolverlo
-    if (json.statusCode === 400) {
-        const message = json.message
-        if( message.includes("El usuario ya existe")){
+        // Si hay un error en la petición, devolverlo
+        if (json.statusCode === 400) {
+            const message = json.message
+            if( message.includes("El usuario ya existe")){
+                return {
+                    status: "error",
+                    errors: {
+                        username: [validationMessages.userTaken],
+                    },
+                }
+            }
             return {
                 status: "error",
                 errors: {
-                    username: validationMessages.userTaken,
+                    email:[ "Email already in use"]
                 },
             }
         }
+
+        return {
+            status: "success",
+            message: "User created successfully",
+        }
+
+    } catch (error) {
+        // Manejo de errores en la conexión, etc.
         return {
             status: "error",
-            errors: {
-                email: "Email already in use",
-            },
-        }
-    }
-
-    return {
-        status: "success",
-        message: "User created successfully",
+            message: "Error de red o servidor",
+        };
     }
 }
 
-export async function logIn(prevState:any, formData: FormData, translates: any) {
+export async function logIn(prevState:ExpectedType, formData: FormData, translates: any) {
     const emailOrUsername = formData.get("emailOrUsername")?.toString()
     const password = formData.get("password")?.toString()
 
@@ -142,7 +120,7 @@ export async function logIn(prevState:any, formData: FormData, translates: any) 
                 return {
                     status: "error",
                     errors: {
-                        emailOrUsername: translates.invalidUser,
+                        emailOrUsername: [translates.invalidUser],
                     },
                 }
             }
@@ -152,7 +130,7 @@ export async function logIn(prevState:any, formData: FormData, translates: any) 
                 return {
                     status: "error",
                     errors: {
-                        emailOrUsername: translates.invalidUser,
+                        emailOrUsername: [translates.invalidUser],
                     },
                 }
             }

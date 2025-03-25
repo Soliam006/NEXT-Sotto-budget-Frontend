@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import LanguageSwitcher from "./language-switcher"
 import {useActionState} from "react";
 import {logIn} from "@/app/actions/auth";
+import {ExpectedType} from "@/lib/validations/auth";
 
 export default function LoginForm({
                                       dictionary,
@@ -22,11 +23,15 @@ export default function LoginForm({
 
     const switchText = lang === "en" ? common.switchToSpanish : common.switchToEnglish
 
-    const loginActions= (prevState: any, formData: FormData) => 
+    const loginActions= (prevState: ExpectedType, formData: FormData) =>
         logIn(prevState, formData, t.validation)
 
+    const initialState: ExpectedType = {
+        status: "", // Valor por defecto para que sea un string
+        errors: {}
+    }
 
-    const [state, formAction, pending] = useActionState( loginActions, undefined );
+    const [state, formAction, pending] = useActionState( loginActions, initialState );
 
     return (
         <div className="flex min-h-screen w-full flex-col md:flex-row  bg-gradient-to-br from-blue-950 via-black-600 to-blue-200">
@@ -72,7 +77,7 @@ export default function LoginForm({
                         <div className="space-y-2">
                             <Label htmlFor="emailOrUsername" >{t.emailUsername}</Label>
                             <Input id="emailOrUsername" name="emailOrUsername" type="text" placeholder="john.doe@example.com or JonhDoe" required />
-                            {state?.errors && <p className="text-red-500 text-xs">{state.errors?.emailOrUsername}</p>}
+                            {state?.errors && <p className="text-red-500 text-xs">{state.errors?.emailOrUsername ? state.errors?.emailOrUsername[0] : " "}</p>}
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
