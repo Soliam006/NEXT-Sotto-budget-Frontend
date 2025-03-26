@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {useUser} from "@/app/context/UserProvider";
-
+import {getRole} from "@/app/services/auth-service";
 // Mock data for user profile
 let USER_PROFILE = {
   id: "user123",
@@ -178,18 +178,6 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   const [requests, setRequests] = useState(REQUESTS)
 
   const {user} = useUser();
-
-  useEffect(() => {
-    console.log("User", user)
-    if (user) {
-      // Update user profile
-      USER_PROFILE.username = user.username;
-      USER_PROFILE.role = user.role;
-      //USER_PROFILE.bio = user.description;
-      USER_PROFILE.email = user.email;
-     // USER_PROFILE.phone = user.phone;
-    }
-  })
 
   // Toggle theme
   const toggleTheme = () => {
@@ -362,7 +350,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">{USER_PROFILE.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">@{USER_PROFILE.username}</p>
+                      <p className="text-xs leading-none text-muted-foreground">@{user?.username}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -424,7 +412,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               <CardHeader>
                 <CardTitle className="text-2xl font-bold">{USER_PROFILE.name}</CardTitle>
                 <CardDescription className="text-slate-400">
-                  @{USER_PROFILE.username} · {USER_PROFILE.role}
+                  @{user?.username} · {user?.role}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -437,7 +425,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   </div>
                   <div className="flex items-center text-slate-400">
                     <Mail className="h-4 w-4 mr-2" />
-                    <span>{USER_PROFILE.email}</span>
+                    <span>{user?.email}</span>
                   </div>
                   <div className="flex items-center text-slate-400">
                     <Phone className="h-4 w-4 mr-2" />
@@ -972,10 +960,10 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">{user.name}</p>
-                          <p className="text-xs text-slate-400">{user.role}</p>
+                          <p className="text-xs text-slate-400">{getRole(user?.role|| "CLIENT", lang as 'es' | 'en')}</p>
                         </div>
                       </div>
-                      {user.id !== USER_PROFILE.id && (
+                      {user.id !== user?.id && (
                         <Button
                           variant={user.isFollowing ? "outline" : "default"}
                           size="sm"

@@ -1,4 +1,6 @@
 "use client";
+import {UserRole} from "@/app/context/user.types";
+
 export function setToken(token: string, rememberMe: boolean, lang:string): void {
     if (typeof window !== 'undefined') {
         console.log('Setting token:', token);
@@ -31,5 +33,34 @@ export function clearToken(): void {
     if (typeof window !== 'undefined') {
         window.sessionStorage.removeItem('access_token');
         window.localStorage.removeItem('access_token');
+    }
+}
+type Lang = 'es' | 'en';
+type Role = 'admin' | 'client' | 'worker' | 'no_role';
+
+const dictionary: Record<Lang, Record<Role, string>> = {
+    "es": {
+        admin: 'Gerente de Proyecto Senior',
+        client: 'Cliente',
+        worker: 'Trabajador',
+        no_role: 'Desconocido'
+    },
+    "en": {
+        admin: 'Senior Project Manager',
+        client: 'Client',
+        worker: 'Worker',
+        no_role: 'Unknown'
+    }
+};
+export function getRole(role: string, lang: Lang): string {
+    switch (role) {
+        case 'ADMIN':
+            return dictionary[lang].admin;
+        case 'CLIENT':
+            return dictionary[lang].client;
+        case 'WORKER':
+            return dictionary[lang].worker;
+        default:
+            return dictionary[lang].no_role;
     }
 }

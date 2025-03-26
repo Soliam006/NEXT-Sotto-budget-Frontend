@@ -7,8 +7,6 @@ import LoadingView from "@/components/loading-view";
 import useAuthMiddleware from "@/lib/token-verification";
 
 export default function  Profile() {
-  console.log('Profile');
-  useAuthMiddleware(false); // Redirige al login si no hay token
 
   const params = useParams(); // Obtiene dinámicamente los parámetros de la URL
   const [dictionary, setDictionary] = useState<any>(null);
@@ -22,6 +20,8 @@ export default function  Profile() {
     }
     fetchDictionary();
   }, [params?.lang]);
+
+  useAuthMiddleware(false); // Redirige al login si no hay token
 
   if (!dictionary) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 

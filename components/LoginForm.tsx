@@ -41,7 +41,7 @@ export default function LoginForm({ dictionary, lang, }: {
         setPasswordVisible(!passwordVisible)
     }
 
-    const { setUser } = useUser()
+    const { setUser, user } = useUser()
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -54,6 +54,7 @@ export default function LoginForm({ dictionary, lang, }: {
 
         if (result.status === "success") {
             setUser(result.data.user)
+            console.log("User", user)
             // Si el login es exitoso, redirige al dashboard
             //redirect(`/${lang}/dashboard`)
             console.log("Login exitoso")
