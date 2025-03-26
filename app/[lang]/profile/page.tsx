@@ -3,8 +3,12 @@ import ProfilePage from "@/components/profile"
 import { getDictionary } from "@/lib/dictionary"
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
+import LoadingView from "@/components/loading-view";
+import useAuthMiddleware from "@/lib/token-verification";
 
 export default function  Profile() {
+  console.log('Profile');
+  useAuthMiddleware(false); // Redirige al login si no hay token
 
   const params = useParams(); // Obtiene dinámicamente los parámetros de la URL
   const [dictionary, setDictionary] = useState<any>(null);
@@ -19,7 +23,7 @@ export default function  Profile() {
     fetchDictionary();
   }, [params?.lang]);
 
-  if (!dictionary) return <p>Loading...</p>; // Muestra un estado de carga mientras se obtiene el diccionario
+  if (!dictionary) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
   return <ProfilePage dict={dictionary} lang={params?.lang  as string} />
 }

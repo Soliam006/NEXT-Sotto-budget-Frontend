@@ -17,10 +17,7 @@ import {redirect} from "next/navigation";
 import {useUser} from "@/app/context/UserProvider";
 import {getToken, setToken} from "@/app/services/auth-service";
 
-export default function LoginForm({
-                                      dictionary,
-                                      lang,
-                                  }: {
+export default function LoginForm({ dictionary, lang, }: {
     dictionary: any
     lang: string
 }) {
@@ -46,19 +43,6 @@ export default function LoginForm({
 
     const { setUser } = useUser()
 
-    useEffect(() => {
-        const token = getToken()
-        if(token) {
-            fetchUserMe(token, t.validation).then((res) => {
-                console.log("User fetched: ", res)
-                if(res.statusCode === 200) {
-                    setUser(res.data)
-                    redirect(`/${lang}/profile`)
-                }
-            })
-        }
-    })
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setPending(true)
@@ -74,7 +58,8 @@ export default function LoginForm({
             //redirect(`/${lang}/dashboard`)
             console.log("Login exitoso")
             console.log(result.data)
-            setToken(result.data.access_token, rememberMe)
+            setToken(result.data.access_token, rememberMe, result.data.user.language_preference)
+            redirect(`/${lang}/profile`)
         }
 
         setFormState(result)
@@ -190,7 +175,7 @@ export default function LoginForm({
                       </div>
                       <Button
                         type="submit"
-                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
                         disabled={pending}
                       >
                           {pending ? common.processing : t.login}
