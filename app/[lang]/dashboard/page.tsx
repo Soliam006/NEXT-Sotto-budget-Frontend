@@ -148,18 +148,12 @@ const generateDailyExpenses = () => {
 
 export default function Dashboard() {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
-  const [systemStatus, setSystemStatus] = useState(85)
-  const [cpuUsage, setCpuUsage] = useState(42)
-  const [memoryUsage, setMemoryUsage] = useState(68)
-  const [networkStatus, setNetworkStatus] = useState(92)
-  const [securityLevel, setSecurityLevel] = useState(75)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isLoading, setIsLoading] = useState(true)
   const [selectedProject, setSelectedProject] = useState(PROJECTS[0])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dailyBudgetLimit, setDailyBudgetLimit] = useState(500)
-  const [activeIndex, setActiveIndex] = useState(0)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -178,18 +172,6 @@ export default function Dashboard() {
     const interval = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  // Simulate changing data
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCpuUsage(Math.floor(Math.random() * 30) + 30)
-      setMemoryUsage(Math.floor(Math.random() * 20) + 60)
-      setNetworkStatus(Math.floor(Math.random() * 15) + 80)
-      setSystemStatus(Math.floor(Math.random() * 10) + 80)
-    }, 3000)
 
     return () => clearInterval(interval)
   }, [])
@@ -222,7 +204,7 @@ export default function Dashboard() {
           this.x = Math.random() * canvas.width
           this.y = Math.random() * canvas.height
         }
-        this.size = Math.random() * 3 + 1
+        this.size = Math.random() * 10 + 1
         this.speedX = (Math.random() - 0.5) * 0.5
         this.speedY = (Math.random() - 0.5) * 0.5
         this.color = `rgba(${Math.floor(Math.random() * 100) + 100}, ${Math.floor(Math.random() * 100) + 150}, ${Math.floor(Math.random() * 55) + 200}, ${Math.random() * 0.5 + 0.2})`
@@ -474,7 +456,7 @@ export default function Dashboard() {
               </TooltipProvider>
 
               <Avatar>
-                <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
+                <AvatarImage src="/favicon.ico" alt="User" />
                 <AvatarFallback className="bg-slate-700 text-cyan-500">CM</AvatarFallback>
               </Avatar>
             </div>

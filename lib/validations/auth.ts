@@ -48,5 +48,6 @@ export type ExpectedType = {
         email?: string[];
         username?: string[];
     };
+    data?: any;
     status: string;
 };

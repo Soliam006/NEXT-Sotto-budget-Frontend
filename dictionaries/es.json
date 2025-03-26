@@ -65,7 +65,8 @@
     "validation": {
       "passwordMin": "La contraseña debe tener al menos 4 caracteres",
       "invalidUser": "Nombre de usuario o contraseña inválidos",
-      "serverError": "Error del servidor, por favor intenta de nuevo más tarde"
+      "serverError": "Error del servidor, por favor intenta de nuevo más tarde",
+      "required": "Campo requerido"
     }
   },
   "common": {

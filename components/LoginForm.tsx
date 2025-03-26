@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import Link from "next/link"
 import { Building2, Eye, EyeOff } from "lucide-react"
 
@@ -11,8 +11,11 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import LanguageSwitcher from "./language-switcher"
-import { logIn } from "@/app/actions/auth"
+import {fetchUserMe, logIn} from "@/app/actions/auth"
 import type { ExpectedType } from "@/lib/validations/auth"
+import {redirect} from "next/navigation";
+import {useUser} from "@/app/context/UserProvider";
+import {getToken, setToken} from "@/app/services/auth-service";
 
 export default function LoginForm({
                                       dictionary,
@@ -27,16 +30,34 @@ export default function LoginForm({
     const switchText = lang === "en" ? common.switchToSpanish : common.switchToEnglish
 
     // Estado para el resultado del login y el indicador de loading
-    const [formState, setFormState] = useState<ExpectedType>({
-        status: "",
-        errors: {},
-    })
+    const [formState, setFormState] = useState<ExpectedType>({ status: "", errors: {},})
     const [pending, setPending] = useState(false)
     const [passwordVisible, setPasswordVisible] = useState(false)
+        const [rememberMe, setRememberMe] = useState(false);
 
+    // Update the state variable when the checkbox is clicked
+    const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            setRememberMe(e.target.checked);
+    };
+    // Función para mostrar u ocultar la contraseña
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible)
     }
+
+    const { setUser } = useUser()
+
+    useEffect(() => {
+        const token = getToken()
+        if(token) {
+            fetchUserMe(token, t.validation).then((res) => {
+                console.log("User fetched: ", res)
+                if(res.statusCode === 200) {
+                    setUser(res.data)
+                    redirect(`/${lang}/profile`)
+                }
+            })
+        }
+    })
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -46,6 +67,16 @@ export default function LoginForm({
 
         // Ejecuta la acción de logIn pasando el estado inicial y los mensajes de validación
         const result = await logIn({ status: "", errors: {} }, formData, t.validation)
+
+        if (result.status === "success") {
+            setUser(result.data.user)
+            // Si el login es exitoso, redirige al dashboard
+            //redirect(`/${lang}/dashboard`)
+            console.log("Login exitoso")
+            console.log(result.data)
+            setToken(result.data.access_token, rememberMe)
+        }
+
         setFormState(result)
         setPending(false)
     }
@@ -149,6 +180,8 @@ export default function LoginForm({
                             type="checkbox"
                             id="remember"
                             name="remember"
+                            checked={rememberMe}
+                            onChange={handleRememberMeChange}
                             className="h-4 w-4 rounded border-input bg-background text-primary focus:ring-primary"
                           />
                           <Label htmlFor="remember" className="text-sm text-muted-foreground">

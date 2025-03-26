@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import {
   Activity,
   AlertCircle,
@@ -45,21 +45,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {useUser} from "@/app/context/UserProvider";
 
 // Mock data for user profile
-const USER_PROFILE = {
+let USER_PROFILE = {
   id: "user123",
   name: "Alex Johnson",
   username: "alexj_builder",
   role: "Senior Project Manager",
   avatar: "/placeholder.svg?height=200&width=200",
-  coverImage: "",
   bio: "Experienced construction project manager with over 10 years in residential and commercial projects. Specializing in sustainable building practices and efficient project delivery.",
   location: "San Francisco, CA",
   email: "alex.johnson@example.com",
   phone: "+1 (555) 123-4567",
-  website: "www.alexjohnson.build",
-  joinedDate: "January 2020",
+  created_at: "January 2020",
   stats: {
     projects: 24,
     followers: 156,
@@ -77,7 +76,7 @@ const PROJECTS = [
     status: "In Progress",
     completion: 65,
     role: "Project Manager",
-    image: "/placeholder.svg?height=150&width=300",
+    image: "https://th.bing.com/th/id/R.d284962ea61b482b58c6d65052f03a29?rik=%2fGV0UPT9hgsgqw&riu=http%3a%2f%2fguiasde.com%2fmaterialescentenario%2fwp-content%2fuploads%2f2021%2f10%2fremodelacion.jpg&ehk=aKhpFHH8%2fN0RFpFYMAlR0Fyt%2fK3ScltMbFFG7f2A6N4%3d&risl=&pid=ImgRaw&r=0",
     location: "Oakland, CA",
   },
   {
@@ -87,7 +86,7 @@ const PROJECTS = [
     status: "Completed",
     completion: 100,
     role: "Lead Manager",
-    image: "/placeholder.svg?height=150&width=300",
+    image: "https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png",
     location: "San Francisco, CA",
   },
   {
@@ -97,7 +96,7 @@ const PROJECTS = [
     status: "In Progress",
     completion: 42,
     role: "Consultant",
-    image: "/placeholder.svg?height=150&width=300",
+    image: "https://a.storyblok.com/f/88871/1254x836/6ea6ef0e4a/realkredit-modernisierung.jpg",
     location: "Berkeley, CA",
   },
   {
@@ -107,7 +106,7 @@ const PROJECTS = [
     status: "Planning",
     completion: 15,
     role: "Project Manager",
-    image: "/placeholder.svg?height=150&width=300",
+    image: "https://th.bing.com/th/id/R.d284962ea61b482b58c6d65052f03a29?rik=%2fGV0UPT9hgsgqw&riu=http%3a%2f%2fguiasde.com%2fmaterialescentenario%2fwp-content%2fuploads%2f2021%2f10%2fremodelacion.jpg&ehk=aKhpFHH8%2fN0RFpFYMAlR0Fyt%2fK3ScltMbFFG7f2A6N4%3d&risl=&pid=ImgRaw&r=0",
     location: "San Jose, CA",
   },
   {
@@ -117,7 +116,7 @@ const PROJECTS = [
     status: "Completed",
     completion: 100,
     role: "Restoration Specialist",
-    image: "/placeholder.svg?height=150&width=300",
+    image: "https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png",
     location: "San Francisco, CA",
   },
 ]
@@ -177,6 +176,20 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   const [followers, setFollowers] = useState(FOLLOWERS)
   const [following, setFollowing] = useState(FOLLOWING)
   const [requests, setRequests] = useState(REQUESTS)
+
+  const {user} = useUser();
+
+  useEffect(() => {
+    console.log("User", user)
+    if (user) {
+      // Update user profile
+      USER_PROFILE.username = user.username;
+      USER_PROFILE.role = user.role;
+      //USER_PROFILE.bio = user.description;
+      USER_PROFILE.email = user.email;
+     // USER_PROFILE.phone = user.phone;
+    }
+  })
 
   // Toggle theme
   const toggleTheme = () => {
@@ -262,13 +275,20 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
     }
   }
 
+  function generateInicials(name: string) {
+    return name
+      .split(" ")
+      .map((part) => part.charAt(0))
+      .join("").toUpperCase()
+  }
+
   return (
     <div
-      className={`${theme}  text-slate-100 relative overflow-hidden`}
+      className={`${theme} bg-background  text-primary relative overflow-hidden`}
     >
       <div className="container mx-auto p-4 relative z-10">
         {/* Header */}
-        <header className="flex items-center justify-between py-4 border-b border-slate-700/50 mb-6">
+        <header className="flex items-center justify-between py-4 border-b border-primary/50 mb-6">
           <div className="flex items-center space-x-2">
             <Construction className="h-8 w-8 text-cyan-500" />
             <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -373,7 +393,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <div className="relative mb-8">
           <div className="h-48 md:h-64 w-full rounded-xl overflow-hidden">
             <img
-              src={USER_PROFILE.coverImage || "https://mmatt.mx/wp-content/uploads/2022/06/tips-remodelacion-mmatt.jpg.webp"}
+              src={"https://mmatt.mx/wp-content/uploads/2022/06/tips-remodelacion-mmatt.jpg.webp"}
               alt="Cover"
               className="w-full h-full object-cover"
             />
@@ -381,7 +401,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
           <div className="absolute -bottom-16 left-4 md:left-8">
             <Avatar className="h-32 w-32 border-4 border-slate-900">
               <AvatarImage src={USER_PROFILE.avatar} alt={USER_PROFILE.name} />
-              <AvatarFallback className="bg-slate-700 text-cyan-500 text-4xl">AJ</AvatarFallback>
+              <AvatarFallback className="bg-slate-700 text-cyan-500 text-4xl">{generateInicials(USER_PROFILE.name)}</AvatarFallback>
             </Avatar>
           </div>
           <div className="absolute bottom-4 right-4 flex space-x-2">
@@ -426,7 +446,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   <div className="flex items-center text-slate-400">
                     <Calendar className="h-4 w-4 mr-2" />
                     <span>
-                      {dict.profile.joined} {USER_PROFILE.joinedDate}
+                      {dict.profile.joined} {USER_PROFILE.created_at}
                     </span>
                   </div>
                 </div>

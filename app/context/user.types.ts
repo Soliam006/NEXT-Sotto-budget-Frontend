@@ -8,12 +8,13 @@ export interface Availability {
 }
 
 export interface User {
-  name: string;
+  id: number;
+  name?: string;
   username: string;
-  phone: string;
+  phone?: string;
   email: string;
   language_preference: Language;
   role: UserRole;
   description?: string;
-  availabilities: Availability[];
+  availabilities?: Availability[];
 }

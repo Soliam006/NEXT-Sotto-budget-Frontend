@@ -1,6 +1,7 @@
 "use server"
 
 import {createSignUpSchema, ExpectedType, LoginSchema} from "@/lib/validations/auth"
+import {fullWidthClassName} from "react-remove-scroll-bar";
 
 const api_URL = process.env.BASE_URL_BACK + "users/"
 
@@ -92,29 +93,9 @@ export async function signup(
     }
 }
 
-function validateResult(json: any, translates: any) {
-    // statusCode, data, message
-    if (json.statusCode !== 200) {
-        if(json.statusCode === 401){
-            return {
-                status: "error",
-                message: translates.invalidUser
-            }
-        }
-        return {
-            status: "error",
-            message: json.message
-        }
-    }
+export async function logIn(prevState: ExpectedType, formData: FormData, translates: any) : Promise<ExpectedType> {
 
-    return {
-        status: "success",
-        message: "User authenticated successfully",
-    }
-
-}
-
-export async function logIn(prevState:ExpectedType, formData: FormData, translates: any) {
+    // Validate input
     const emailOrUsername = formData.get("emailOrUsername")?.toString()
     const password = formData.get("password")?.toString()
 
@@ -131,74 +112,82 @@ export async function logIn(prevState:ExpectedType, formData: FormData, translat
             errors: validationResult.error.flatten().fieldErrors,
         }
     }
-
-    try {
-        // Llamar a la función correspondiente
-        if (emailOrUsername)
-          //Verificar si es username o email
-            if (emailOrUsername.includes("@")) {
-                const response = await logInWithEmail(emailOrUsername, password || "")
-                if (!response.ok) {
-                    return {
-                        status: "error",
-                        errors: {
-                            emailOrUsername: [translates.invalidUser],
-                        },
-                    }
-                }
-            } else {
-                const response = await logInWithUsername(emailOrUsername, password || "")
-                console.log("Response", response)
-                if (!response.ok) {
-                    return {
-                        status: "error",
-                        errors: {
-                            emailOrUsername: [translates.invalidUser],
-                        },
-                    }
-                }
-
-                const json = await response.json()
-
-                return validateResult(json, translates)
-            }
-    } catch (error) {
-        // Manejo de errores en la conexión, etc.
+    if(!emailOrUsername || !password) {
         return {
             status: "error",
-            message: translates.serverError
+            errors: {emailOrUsername: [translates.required], password: [translates.required]},
         }
+    }
+
+    try {
+        const response = await fetchLogin(emailOrUsername, password);
+        const json = await response.json();
+        return validateResult(json, translates);
+    } catch (error) {
+        console.error("Network or server error:", error);
+        return {
+            status: "error",
+            message: translates.serverError,
+        };
+    }
+}
+
+function fetchLogin(emailOrUsername: string, password: string) {
+    const isEmail = emailOrUsername.includes("@");
+    const endpoint = isEmail ? "token_email" : "token_username";
+    return fetch(`${api_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            [isEmail ? "email" : "username"]: emailOrUsername,
+            password,
+        }),
+    });
+}
+
+function validateResult(json: any, translates: any) {
+    if (json.statusCode !== 200) {
+        if (json.statusCode === 401) {
+            return {
+                status: "error",
+                message: translates.invalidUser,
+            };
+        }
+        return {
+            status: "error",
+            message: json.message,
+        };
     }
 
     return {
         status: "success",
         message: "User authenticated successfully",
+        data: json.data,
+    };
+}
+
+export async function fetchUserMe(token: string, translates: any) {
+    let response
+    try {
+        // Realiza la petición GET al endpoint /me
+        response = await fetch(`${api_URL}me`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+
+    } catch (error) {
+        console.error('Error en la petición:', error);
+        return {
+            status: 'error',
+            message: translates.serverError,
+        };
     }
-}
 
-function logInWithUsername(username: string, password: string) {
-    return fetch(`${api_URL}token_username`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            username,
-            password,
-        }),
-    })
-}
-
-function logInWithEmail(email: string, password: string) {
-    return fetch(`${api_URL}token_email`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            email,
-            password,
-        }),
-    })
+    return response.json();
 }
 

@@ -61,7 +61,8 @@
     "validation": {
       "passwordMin": "Password must be at least 4 characters",
       "invalidUser": "Invalid username or password",
-      "serverError": "Server error, please try again later"
+      "serverError": "Server error, please try again later",
+      "required": "This field is required"
     }
   },
   "common": {
