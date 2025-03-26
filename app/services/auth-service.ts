@@ -35,7 +35,7 @@ export function clearToken(): void {
         window.localStorage.removeItem('access_token');
     }
 }
-type Lang = 'es' | 'en';
+type Lang = 'es' | 'en' | "ca";
 type Role = 'admin' | 'client' | 'worker' | 'no_role';
 
 const dictionary: Record<Lang, Record<Role, string>> = {
@@ -50,6 +50,12 @@ const dictionary: Record<Lang, Record<Role, string>> = {
         client: 'Client',
         worker: 'Worker',
         no_role: 'Unknown'
+    },
+    "ca": {
+        admin: 'Gerent de Projecte Senior',
+        client: 'Client',
+        worker: 'Treballador',
+        no_role: 'Desconegut'
     }
 };
 export function getRole(role: string, lang: Lang): string {

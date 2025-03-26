@@ -2,12 +2,12 @@
 'use client';
 
 import React, { createContext, useContext, useState } from 'react';
-import { User } from './user.types';
+import { User as User_Type } from './user.types';
 
 interface UserContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  updateUser: (updatedFields: Partial<User>) => void;
+  user: User_Type | null;
+  setUser: (user: User_Type | null) => void;
+  updateUser: (updatedFields: Partial<User_Type>) => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -17,9 +17,9 @@ interface Props {
 }
 
 export const UserProvider = ({ children }: Props) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User_Type | null>(null);
 
-  const updateUser = (updatedFields: Partial<User>) => {
+  const updateUser = (updatedFields: Partial<User_Type>) => {
     if (!user) return;
     setUser({ ...user, ...updatedFields });
   };

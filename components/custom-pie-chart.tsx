@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useState } from "react";
 import {PieChart, Pie, Sector, Cell} from "recharts";
-import dynamic from "next/dynamic";
 
 const renderActiveShape = (props: any) => {
   const RADIAN = Math.PI / 180;
@@ -28,7 +27,6 @@ const renderActiveShape = (props: any) => {
   const ey = my;
   const textAnchor = cos >= 0 ? "start" : "end";
 
-    if (typeof window === 'undefined') return null;
   return (
     <g className="z-9999">
       <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>

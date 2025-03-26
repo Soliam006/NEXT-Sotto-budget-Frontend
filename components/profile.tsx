@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useState} from "react"
+import { useState, useEffect } from "react"
 import {
   Activity,
   AlertCircle,
@@ -46,25 +46,36 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {useUser} from "@/app/context/UserProvider";
+import { EditProfileDialog } from "./edit-profile-dialog"
+import { AvailabilityDisplay } from "./availability-display"
 import {getRole} from "@/app/services/auth-service";
+import {User as User_Type} from "@/app/context/user.types";
+
 // Mock data for user profile
-let USER_PROFILE = {
-  id: "user123",
+const USER_PROFILE: User_Type = {
+  id: 123,
   name: "Alex Johnson",
   username: "alexj_builder",
-  role: "Senior Project Manager",
-  avatar: "/placeholder.svg?height=200&width=200",
-  bio: "Experienced construction project manager with over 10 years in residential and commercial projects. Specializing in sustainable building practices and efficient project delivery.",
-  location: "San Francisco, CA",
+  role: "ADMIN",
+  language_preference: "en",
   email: "alex.johnson@example.com",
   phone: "+1 (555) 123-4567",
-  created_at: "January 2020",
-  stats: {
-    projects: 24,
-    followers: 156,
-    following: 89,
-    requests: 7,
-  },
+  location: "San Francisco, CA",
+  description:
+    "Experienced construction project manager with over 10 years in residential and commercial projects. Specializing in sustainable building practices and efficient project delivery.",
+  created_at: "2020-01-15T00:00:00Z",
+  availabilities: [
+    {
+      id: "avail-1",
+      from: "2025-04-01T08:00:00Z",
+      to: "2025-04-15T17:00:00Z",
+    },
+    {
+      id: "avail-2",
+      from: "2025-05-10T08:00:00Z",
+      to: "2025-05-20T17:00:00Z",
+    },
+  ],
 }
 
 // Mock data for projects
@@ -146,9 +157,9 @@ const generateUsers = (count:any) => {
   }))
 }
 
-const FOLLOWERS = generateUsers(USER_PROFILE.stats.followers)
-const FOLLOWING = generateUsers(USER_PROFILE.stats.following)
-const REQUESTS = generateUsers(USER_PROFILE.stats.requests)
+const FOLLOWERS = generateUsers((USER_PROFILE.id % 100) + 56)
+const FOLLOWING = generateUsers((USER_PROFILE.id % 100) - 11)
+const REQUESTS = generateUsers((USER_PROFILE.id % 10) - 3)
 
 // Mock data for search results
 const SEARCH_RESULTS = [
@@ -162,7 +173,6 @@ const SEARCH_RESULTS = [
     isFollowing: false,
   },
 ]
-
 export default function ProfilePage({ dict, lang }: { dict: any; lang: string }) {
   const router = useRouter()
   const [theme, setTheme] = useState<"dark" | "light">("dark")
@@ -171,20 +181,35 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   const [isFollowingDialogOpen, setIsFollowingDialogOpen] = useState(false)
   const [isRequestsDialogOpen, setIsRequestsDialogOpen] = useState(false)
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState(SEARCH_RESULTS)
   const [followers, setFollowers] = useState(FOLLOWERS)
   const [following, setFollowing] = useState(FOLLOWING)
   const [requests, setRequests] = useState(REQUESTS)
-
   const {user} = useUser();
+
+  const [user_data, setUser_data] = useState<User_Type|null>(user);
 
   // Toggle theme
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-    document.body.classList.toggle("dark", theme === "light");
-    document.body.classList.toggle("light", theme === "dark");
-  };
+    const newTheme = theme === "dark" ? "light" : "dark"
+    setTheme(newTheme)
+
+    // Update the class on the document element
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+  }
+
+  // Add an effect to sync the theme state with the document class on component mount
+  useEffect(() => {
+    // Check if dark class is present on document
+    const isDarkMode = document.documentElement.classList.contains("dark")
+    setTheme(isDarkMode ? "dark" : "light")
+  }, [])
 
   // Handle language change
   const handleLanguageChange = (newLang: string) => {
@@ -216,7 +241,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
       prev.map((user) => (user.id === userId ? { ...user, isFollowing: !user.isFollowing } : user)),
     )
 
-    // Also update in following list if user is there
+    // Also update in following list if user_data is there
     setFollowing((prev) => {
       const userInFollowing = prev.find((user) => user.id === userId)
       if (userInFollowing) {
@@ -249,6 +274,28 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
     setRequests((prev) => prev.filter((user) => user.id !== userId))
   }
 
+  // Save profile changes
+  const handleSaveProfile = async (updatedUser: User_Type) => {
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Update user_data state
+      setUser_data(updatedUser)
+
+      // Show success message
+      alert(" Title : " + dict.profile.edit.successTitle + " Message : " + dict.profile.edit.successMessage)
+
+      // If language preference changed, redirect to new language
+      if (updatedUser.language_preference !== lang) {
+        router.push(`/${updatedUser.language_preference}/profile`)
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error)
+      alert(" Title : " + dict.profile.edit.errorTitle + " Message : " + dict.profile.edit.errorMessage)
+    }
+  }
+
   // Get status translation
   const getStatusTranslation = (status: string) => {
     switch (status) {
@@ -264,42 +311,47 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   }
 
   function generateInicials(name: string) {
-    return name
-      .split(" ")
-      .map((part) => part.charAt(0))
-      .join("").toUpperCase()
+    console.log(name)
+    console.log("Initials : " + name.split(" ").map((part) => part.charAt(0)).join(""))
+    return name.split(" ").map((part) => part.charAt(0)).join("")
   }
 
   return (
-    <div
-      className={`${theme} bg-background  text-primary relative overflow-hidden`}
-    >
+    <div className={`${theme} min-h-screen bg-background text-foreground relative overflow-hidden`}>
       <div className="container mx-auto p-4 relative z-10">
         {/* Header */}
-        <header className="flex items-center justify-between py-4 border-b border-primary/50 mb-6">
+        <header className="flex items-center justify-between py-4 border-b border-border mb-6">
           <div className="flex items-center space-x-2">
             <Construction className="h-8 w-8 text-cyan-500" />
             <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Sotto Budget
+              CONSTRUCTION MANAGER
             </span>
           </div>
 
           <div className="flex items-center space-x-6">
             <Button
-              variant="outline"
-              className="hidden md:flex items-center space-x-2 bg-slate-800/50 border-slate-700 hover:bg-slate-700/50"
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-muted-foreground hover:text-foreground"
               onClick={() => setIsSearchDialogOpen(true)}
             >
-              <Search className="h-4 w-4 text-slate-400" />
-              <span className="text-slate-400">{dict.profile.searchUsers}</span>
+              <Search className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              className="hidden md:flex items-center space-x-2 bg-secondary border-border hover:bg-secondary"
+              onClick={() => setIsSearchDialogOpen(true)}
+            >
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{dict.profile.searchUsers}</span>
             </Button>
 
             <div className="flex items-center space-x-3">
               <Select value={lang} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-[100px] bg-slate-800/50 border-slate-700 text-slate-300">
+                <SelectTrigger className="w-[100px] bg-secondary border-border text-muted-foreground">
                   <SelectValue placeholder={dict.language[lang]} />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectContent className="bg-popover border-border">
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="es">Español</SelectItem>
                 </SelectContent>
@@ -308,7 +360,11 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-slate-100">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="relative text-muted-foreground hover:text-foreground"
+                    >
                       <Bell className="h-5 w-5" />
                       <span className="absolute -top-1 -right-1 h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></span>
                     </Button>
@@ -326,9 +382,9 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       variant="ghost"
                       size="icon"
                       onClick={toggleTheme}
-                      className="text-slate-400 hover:text-slate-100"
+                      className="text-muted-foreground hover:text-foreground"
                     >
-                      {theme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                      {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -341,15 +397,17 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar>
-                      <AvatarImage src={USER_PROFILE.avatar} alt={USER_PROFILE.name} />
-                      <AvatarFallback className="bg-slate-700 text-cyan-500">AJ</AvatarFallback>
+                      <AvatarImage src="/placeholder.svg?height=32&width=32&text=AJ" alt={user?.name} />
+                      <AvatarFallback className="bg-slate-700 text-cyan-500">
+                        {generateInicials(user?.name || "Undefined")}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{USER_PROFILE.name}</p>
+                      <p className="text-sm font-medium leading-none">{user?.name}</p>
                       <p className="text-xs leading-none text-muted-foreground">@{user?.username}</p>
                     </div>
                   </DropdownMenuLabel>
@@ -380,24 +438,25 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         {/* Profile Header */}
         <div className="relative mb-8">
           <div className="h-48 md:h-64 w-full rounded-xl overflow-hidden">
-            <img
-              src={"https://mmatt.mx/wp-content/uploads/2022/06/tips-remodelacion-mmatt.jpg.webp"}
-              alt="Cover"
-              className="w-full h-full object-cover"
-            />
+            <img src="https://a.storyblok.com/f/88871/1254x836/6ea6ef0e4a/realkredit-modernisierung.jpg" alt="Cover" className="w-full h-full object-cover" />
           </div>
           <div className="absolute -bottom-16 left-4 md:left-8">
-            <Avatar className="h-32 w-32 border-4 border-slate-900">
-              <AvatarImage src={USER_PROFILE.avatar} alt={USER_PROFILE.name} />
-              <AvatarFallback className="bg-slate-700 text-cyan-500 text-4xl">{generateInicials(USER_PROFILE.name)}</AvatarFallback>
+            <Avatar className="h-32 w-32 border-4 border-background">
+              <AvatarImage src="/placeholder.svg?height=200&width=200&text=AJ" alt={user?.name} />
+              <AvatarFallback className="bg-slate-700 text-cyan-500 text-4xl">
+                {generateInicials(user?.name || "Undefined")}
+              </AvatarFallback>
             </Avatar>
           </div>
           <div className="absolute bottom-4 right-4 flex space-x-2">
-<Button className="bg-slate-900/60 hover:bg-slate-900/80  text-white cursor-pointer">
+            <Button
+              className="bg-secondary/90 border-border hover:bg-secondary text-primary"
+              onClick={() => setIsEditProfileOpen(true)}
+            >
               <Edit className="h-4 w-4 mr-2" />
-              {dict.profile.edit}
+              {dict.profile.edit.button}
             </Button>
-            <Button className="bg-cyan-600 hover:bg-cyan-700 text-white cursor-pointer">
+            <Button className="bg-primary hover:bg-primary/90">
               <Share2 className="h-4 w-4 mr-2" />
               {dict.profile.share}
             </Button>
@@ -408,76 +467,86 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-16">
           {/* Left Column - User Info */}
           <div className="space-y-6">
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold">{USER_PROFILE.name}</CardTitle>
-                <CardDescription className="text-slate-400">
-                  @{user?.username} · {user?.role}
+                <CardTitle className="text-2xl font-bold">{user?.name}</CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  @{user?.username} · {getRole(user?.role || "CLIENT", lang as "es" | "en" | "ca")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-slate-300">{USER_PROFILE.bio}</p>
+                <p className="text-foreground/80">{user?.description}</p>
 
                 <div className="space-y-2">
-                  <div className="flex items-center text-slate-400">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>{USER_PROFILE.location}</span>
-                  </div>
-                  <div className="flex items-center text-slate-400">
+                  {user?.location && (
+                    <div className="flex items-center text-muted-foreground">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span>{user?.location}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center text-muted-foreground">
                     <Mail className="h-4 w-4 mr-2" />
                     <span>{user?.email}</span>
                   </div>
-                  <div className="flex items-center text-slate-400">
-                    <Phone className="h-4 w-4 mr-2" />
-                    <span>{USER_PROFILE.phone}</span>
-                  </div>
-                  <div className="flex items-center text-slate-400">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>
-                      {dict.profile.joined} {USER_PROFILE.created_at}
-                    </span>
-                  </div>
+                  {user?.phone && (
+                    <div className="flex items-center text-muted-foreground">
+                      <Phone className="h-4 w-4 mr-2" />
+                      <span>{user.phone}</span>
+                    </div>
+                  )}
+                  {user?.created_at && (
+                    <div className="flex items-center text-muted-foreground">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span>
+                        {dict.profile.joined} {formatDate(user.created_at, lang)}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
               <CardFooter>
                 <div className="flex justify-between w-full">
                   <Button
                     variant="ghost"
-                    className="flex flex-col items-center hover:bg-slate-800/70"
+                    className="flex flex-col items-center hover:bg-secondary"
                     onClick={() => setIsProjectsDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{USER_PROFILE.stats.projects}</span>
-                    <span className="text-xs text-slate-400">{dict.profile.projects}</span>
+                    <span className="text-xl font-bold text-cyan-400">{PROJECTS.length}</span>
+                    <span className="text-xs text-muted-foreground">{dict.profile.projects}</span>
                   </Button>
                   <Button
                     variant="ghost"
-                    className="flex flex-col items-center hover:bg-slate-800/70"
+                    className="flex flex-col items-center hover:bg-secondary"
                     onClick={() => setIsFollowersDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{USER_PROFILE.stats.followers}</span>
-                    <span className="text-xs text-slate-400">{dict.profile.followers}</span>
+                    <span className="text-xl font-bold text-cyan-400">{followers.length}</span>
+                    <span className="text-xs text-muted-foreground">{dict.profile.followers}</span>
                   </Button>
                   <Button
                     variant="ghost"
-                    className="flex flex-col items-center hover:bg-slate-800/70"
+                    className="flex flex-col items-center hover:bg-secondary"
                     onClick={() => setIsFollowingDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{USER_PROFILE.stats.following}</span>
-                    <span className="text-xs text-slate-400">{dict.profile.following}</span>
+                    <span className="text-xl font-bold text-cyan-400">{following.length}</span>
+                    <span className="text-xs text-muted-foreground">{dict.profile.following}</span>
                   </Button>
                 </div>
               </CardFooter>
             </Card>
 
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Bell className="h-5 w-5 mr-2 text-cyan-500" />
-                  {dict.requests.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {requests.length > 0 ? (
+            {/* Availability Display */}
+            <AvailabilityDisplay availabilities={user?.availabilities || []} lang={lang} dictionary={dict} />
+
+            {/* Follow Requests */}
+            {requests.length > 0 && (
+              <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center">
+                    <Bell className="h-5 w-5 mr-2 text-cyan-500" />
+                    {dict.requests.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-4">
                     {requests.slice(0, 3).map((request) => (
                       <div key={request.id} className="flex items-center justify-between">
@@ -490,7 +559,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                           </Avatar>
                           <div>
                             <p className="text-sm font-medium">{request.name}</p>
-                            <p className="text-xs text-slate-400">{request.role}</p>
+                            <p className="text-xs text-muted-foreground">{request.role}</p>
                           </div>
                         </div>
                         <div className="flex space-x-1">
@@ -514,29 +583,25 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-center py-4 text-slate-400">
-                    <p>{dict.profile.noRequests}</p>
-                  </div>
+                </CardContent>
+                {requests.length > 3 && (
+                  <CardFooter>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
+                      onClick={() => setIsRequestsDialogOpen(true)}
+                    >
+                      {dict.profile.viewAllRequests.replace("{count}", requests.length.toString())}
+                    </Button>
+                  </CardFooter>
                 )}
-              </CardContent>
-              {requests.length > 3 && (
-                <CardFooter>
-                  <Button
-                    variant="ghost"
-                    className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-slate-800/70"
-                    onClick={() => setIsRequestsDialogOpen(true)}
-                  >
-                    {dict.profile.viewAllRequests.replace("{count}", USER_PROFILE.stats.requests)}
-                  </Button>
-                </CardFooter>
-              )}
-            </Card>
+              </Card>
+            )}
           </div>
 
           {/* Right Column - Projects and Activity */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center">
@@ -545,7 +610,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   </CardTitle>
                   <Button
                     variant="ghost"
-                    className="text-cyan-400 hover:text-cyan-300 hover:bg-slate-800/70"
+                    className="text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
                     onClick={() => setIsProjectsDialogOpen(true)}
                   >
                     {dict.profile.viewAll}
@@ -555,7 +620,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {PROJECTS.slice(0, 4).map((project) => (
-                    <Card key={project.id} className="bg-slate-800/50 border-slate-700/30 overflow-hidden">
+                    <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
                       <div className="h-32 w-full">
                         <img
                           src={project.image || "/placeholder.svg"}
@@ -565,7 +630,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       </div>
                       <CardHeader className="p-3">
                         <CardTitle className="text-base">{project.title}</CardTitle>
-                        <CardDescription className="text-xs text-slate-400 line-clamp-2">
+                        <CardDescription className="text-xs text-muted-foreground line-clamp-2">
                           {project.description}
                         </CardDescription>
                       </CardHeader>
@@ -584,7 +649,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         >
                           {getStatusTranslation(project.status)}
                         </Badge>
-                        <span className="text-xs text-slate-400">{project.role}</span>
+                        <span className="text-xs text-muted-foreground">{project.role}</span>
                       </CardFooter>
                     </Card>
                   ))}
@@ -592,7 +657,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
                   <Activity className="h-5 w-5 mr-2 text-cyan-500" />
@@ -643,22 +708,32 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         </div>
       </div>
 
+      {/* Edit Profile Dialog */}
+      <EditProfileDialog
+        user={user}
+        open={isEditProfileOpen}
+        onOpenChange={setIsEditProfileOpen}
+        onSave={handleSaveProfile}
+        dictionary={dict}
+        lang={lang}
+      />
+
       {/* Projects Dialog */}
       <Dialog open={isProjectsDialogOpen} onOpenChange={setIsProjectsDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700 text-slate-100 max-w-4xl">
+        <DialogContent className="bg-background border-border text-foreground max-w-4xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
               <Building className="mr-2 h-5 w-5 text-cyan-500" />
               {dict.profile.projects}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              {dict.projects.allProjects.replace("{name}", USER_PROFILE.name)}
+            <DialogDescription className="text-muted-foreground">
+              {dict.projects.allProjects.replace("{name}", user?.name || user?.username)}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
             {PROJECTS.map((project) => (
-              <Card key={project.id} className="bg-slate-800/50 border-slate-700/30 overflow-hidden">
+              <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
                 <div className="h-32 w-full">
                   <img
                     src={project.image || "/placeholder.svg"}
@@ -668,12 +743,12 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                 </div>
                 <CardHeader className="p-3">
                   <CardTitle className="text-base">{project.title}</CardTitle>
-                  <CardDescription className="text-xs text-slate-400 line-clamp-2">
+                  <CardDescription className="text-xs text-muted-foreground line-clamp-2">
                     {project.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-3 pt-0">
-                  <div className="flex items-center text-xs text-slate-400 mb-2">
+                  <div className="flex items-center text-xs text-muted-foreground mb-2">
                     <MapPin className="h-3 w-3 mr-1" />
                     {project.location}
                   </div>
@@ -684,7 +759,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     />
                   </div>
                   <div className="flex justify-between mt-1 text-xs">
-                    <span className="text-slate-400">{dict.projects.completion}</span>
+                    <span className="text-muted-foreground">{dict.projects.completion}</span>
                     <span className="text-cyan-400">{project.completion}%</span>
                   </div>
                 </CardContent>
@@ -703,7 +778,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   >
                     {getStatusTranslation(project.status)}
                   </Badge>
-                  <span className="text-xs text-slate-400">{project.role}</span>
+                  <span className="text-xs text-muted-foreground">{project.role}</span>
                 </CardFooter>
               </Card>
             ))}
@@ -713,21 +788,21 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 
       {/* Followers Dialog */}
       <Dialog open={isFollowersDialogOpen} onOpenChange={setIsFollowersDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700 text-slate-100 max-w-2xl">
+        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
               <Users className="mr-2 h-5 w-5 text-cyan-500" />
               {dict.followers.title}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              {dict.followers.description.replace("{name}", USER_PROFILE.name)}
+            <DialogDescription className="text-muted-foreground">
+              {dict.followers.description.replace("{name}", user?.name || user?.username)}
             </DialogDescription>
           </DialogHeader>
 
           <div className="mt-4">
             <Input
               placeholder={dict.profile.searchFollowers}
-              className="bg-slate-800/50 border-slate-700 mb-4"
+              className="bg-background border-input mb-4"
               onChange={(e) => {
                 const query = e.target.value
                 if (query.trim() === "") {
@@ -751,7 +826,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   followers.map((follower) => (
                     <div
                       key={follower.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
@@ -762,13 +837,13 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">{follower.name}</p>
-                          <p className="text-xs text-slate-400">{follower.role}</p>
+                          <p className="text-xs text-muted-foreground">{follower.role}</p>
                         </div>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-slate-800/70 border-slate-700 hover:bg-slate-700/70"
+                        className="bg-secondary/70 border-border hover:bg-secondary"
                         onClick={() => handleFollowToggle(follower.id)}
                       >
                         {follower.isFollowing ? dict.followers.following : dict.followers.followBack}
@@ -776,7 +851,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <p>{dict.followers.noFollowers}</p>
                   </div>
                 )}
@@ -788,21 +863,21 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 
       {/* Following Dialog */}
       <Dialog open={isFollowingDialogOpen} onOpenChange={setIsFollowingDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700 text-slate-100 max-w-2xl">
+        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
               <Users className="mr-2 h-5 w-5 text-cyan-500" />
               {dict.following.title}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              {dict.following.description.replace("{name}", USER_PROFILE.name)}
+            <DialogDescription className="text-muted-foreground">
+              {dict.following.description.replace("{name}", user?.name || user?.username)}
             </DialogDescription>
           </DialogHeader>
 
           <div className="mt-4">
             <Input
               placeholder={dict.profile.searchFollowing}
-              className="bg-slate-800/50 border-slate-700 mb-4"
+              className="bg-background border-input mb-4"
               onChange={(e) => {
                 const query = e.target.value
                 if (query.trim() === "") {
@@ -826,7 +901,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   following.map((follow) => (
                     <div
                       key={follow.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
@@ -837,13 +912,13 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">{follow.name}</p>
-                          <p className="text-xs text-slate-400">{follow.role}</p>
+                          <p className="text-xs text-muted-foreground">{follow.role}</p>
                         </div>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-slate-800/70 border-slate-700 hover:bg-slate-700/70"
+                        className="bg-secondary/70 border-border hover:bg-secondary"
                         onClick={() => handleFollowToggle(follow.id)}
                       >
                         {dict.following.unfollow}
@@ -851,7 +926,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <p>{dict.following.noFollowing}</p>
                   </div>
                 )}
@@ -863,14 +938,14 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 
       {/* Requests Dialog */}
       <Dialog open={isRequestsDialogOpen} onOpenChange={setIsRequestsDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700 text-slate-100 max-w-2xl">
+        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
               <UserPlus className="mr-2 h-5 w-5 text-cyan-500" />
               {dict.requests.title}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
-              {dict.requests.description.replace("{name}", USER_PROFILE.name)}
+            <DialogDescription className="text-muted-foreground">
+              {dict.requests.description.replace("{name}", user?.name || user?.username)}
             </DialogDescription>
           </DialogHeader>
 
@@ -881,7 +956,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   requests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
@@ -892,13 +967,13 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">{request.name}</p>
-                          <p className="text-xs text-slate-400">{request.role}</p>
+                          <p className="text-xs text-muted-foreground">{request.role}</p>
                         </div>
                       </div>
                       <div className="flex space-x-2">
                         <Button
                           size="sm"
-                          className="bg-cyan-600 hover:bg-cyan-700"
+                          className="bg-primary hover:bg-primary/90"
                           onClick={() => handleAcceptRequest(request.id)}
                         >
                           {dict.requests.accept}
@@ -906,7 +981,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         <Button
                           size="sm"
                           variant="outline"
-                          className="bg-slate-800/70 border-slate-700 hover:bg-slate-700/70"
+                          className="bg-secondary/70 border-border hover:bg-secondary"
                           onClick={() => handleRejectRequest(request.id)}
                         >
                           {dict.requests.decline}
@@ -915,7 +990,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <p>{dict.requests.noRequests}</p>
                   </div>
                 )}
@@ -927,19 +1002,19 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 
       {/* Search Dialog */}
       <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
-        <DialogContent className="bg-slate-900 border-slate-700 text-slate-100 max-w-2xl">
+        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
               <Search className="mr-2 h-5 w-5 text-cyan-500" />
               {dict.search.title}
             </DialogTitle>
-            <DialogDescription className="text-slate-400">{dict.search.description}</DialogDescription>
+            <DialogDescription className="text-muted-foreground">{dict.search.description}</DialogDescription>
           </DialogHeader>
 
           <div className="mt-4">
             <Input
               placeholder={dict.search.placeholder}
-              className="bg-slate-800/50 border-slate-700 mb-4"
+              className="bg-background border-input mb-4"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               autoFocus
@@ -951,7 +1026,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                   searchResults.map((user) => (
                     <div
                       key={user.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-800/50"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
@@ -960,17 +1035,17 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">{user.name}</p>
-                          <p className="text-xs text-slate-400">{getRole(user?.role|| "CLIENT", lang as 'es' | 'en')}</p>
+                          <p className="text-xs text-muted-foreground">{user.role}</p>
                         </div>
                       </div>
-                      {user.id !== user?.id && (
+                      {user.id !== "user123" && (
                         <Button
                           variant={user.isFollowing ? "outline" : "default"}
                           size="sm"
                           className={
                             user.isFollowing
-                              ? "bg-slate-800/70 border-slate-700 hover:bg-slate-700/70"
-                              : "bg-cyan-600 hover:bg-cyan-700"
+                              ? "bg-secondary/70 border-border hover:bg-secondary"
+                              : "bg-primary hover:bg-primary/90"
                           }
                           onClick={() => handleFollowToggle(user.id)}
                         >
@@ -980,7 +1055,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <p>{dict.search.noResults}</p>
                   </div>
                 )}
@@ -994,16 +1069,16 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 }
 
 // Activity item component
-function ActivityItem({ icon, title, description, time, iconColor }: any) {
+function ActivityItem({ icon, title, description, time, iconColor }:any) {
   return (
     <div className="flex items-start space-x-3">
       <div className={`mt-0.5 p-1.5 rounded-full ${iconColor}`}>{icon}</div>
       <div>
         <div className="flex items-center">
-          <div className="text-sm font-medium text-slate-200">{title}</div>
-          <div className="ml-2 text-xs text-slate-500">{time}</div>
+          <div className="text-sm font-medium text-foreground/90">{title}</div>
+          <div className="ml-2 text-xs text-muted-foreground">{time}</div>
         </div>
-        <div className="text-xs text-slate-400">{description}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
       </div>
     </div>
   )
@@ -1031,3 +1106,16 @@ function LogOut(props:any) {
   )
 }
 
+// Format date helper
+function formatDate(dateString:string, lang:string) {
+  try {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat(lang === "es" ? "es-ES" : "en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date)
+  } catch (error) {
+    return dateString
+  }
+}
