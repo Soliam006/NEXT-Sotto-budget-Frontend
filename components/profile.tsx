@@ -50,6 +50,7 @@ import { EditProfileDialog } from "./edit-profile-dialog"
 import { AvailabilityDisplay } from "./availability-display"
 import {getRole} from "@/app/services/auth-service";
 import {User as User_Type} from "@/app/context/user.types";
+import Image from "next/image";
 
 // Mock data for user profile
 const USER_PROFILE: User_Type = {
@@ -322,9 +323,10 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         {/* Header */}
         <header className="flex items-center justify-between py-4 border-b border-border mb-6">
           <div className="flex items-center space-x-2">
-            <Construction className="h-8 w-8 text-cyan-500" />
-            <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              CONSTRUCTION MANAGER
+            <Image src="/favicon.ico" alt="SottoBudget" width={50} height={50}
+                className="rounded-lg" />
+            <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:block hidden">
+              SottoBudget
             </span>
           </div>
 
@@ -348,7 +350,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 
             <div className="flex items-center space-x-3">
               <Select value={lang} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-[100px] bg-secondary border-border text-muted-foreground">
+                <SelectTrigger className="w-[70px] md:w-[100px] bg-secondary border-border text-muted-foreground">
                   <SelectValue placeholder={dict.language[lang]} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border">
