@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import {useState, useEffect} from "react"
 import {
   Activity,
   AlertCircle,
@@ -26,16 +26,16 @@ import {
   Users,
   X,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import {useRouter} from "next/navigation"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import {Badge} from "@/components/ui/badge"
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
+import {Input} from "@/components/ui/input"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import {ScrollArea} from "@/components/ui/scroll-area"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,13 +44,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {useUser} from "@/app/context/UserProvider";
-import { EditProfileDialog } from "./edit-profile-dialog"
-import { AvailabilityDisplay } from "./availability-display"
-import {getRole} from "@/app/services/auth-service";
+import {EditProfileDialog} from "./edit-profile-dialog"
+import {AvailabilityDisplay} from "./availability-display"
+import {getRole, getToken} from "@/app/services/auth-service";
 import {User as User_Type} from "@/app/context/user.types";
 import Image from "next/image";
+import {updateUserInformation} from "@/app/actions/auth";
 
 // Mock data for user profile
 const USER_PROFILE: User_Type = {
@@ -134,7 +135,7 @@ const PROJECTS = [
 ]
 
 // Mock data for followers, following, and requests
-const generateUsers = (count:any) => {
+const generateUsers = (count: any) => {
   const roles = [
     "Project Manager",
     "Architect",
@@ -148,7 +149,7 @@ const generateUsers = (count:any) => {
     "Consultant",
   ]
 
-  return Array.from({ length: count }, (_, i) => ({
+  return Array.from({length: count}, (_, i) => ({
     id: `user${i + 1}`,
     name: `User ${i + 1}`,
     username: `user${i + 1}`,
@@ -174,8 +175,12 @@ const SEARCH_RESULTS = [
     isFollowing: false,
   },
 ]
-export default function ProfilePage({ dict, lang }: { dict: any; lang: string }) {
+export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
+
   const router = useRouter()
+  const {user, setUser} = useUser();
+  const [user_data, setUser_data] = useState<User_Type | null>(user);
+
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [isProjectsDialogOpen, setIsProjectsDialogOpen] = useState(false)
   const [isFollowersDialogOpen, setIsFollowersDialogOpen] = useState(false)
@@ -188,9 +193,6 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   const [followers, setFollowers] = useState(FOLLOWERS)
   const [following, setFollowing] = useState(FOLLOWING)
   const [requests, setRequests] = useState(REQUESTS)
-  const {user} = useUser();
-
-  const [user_data, setUser_data] = useState<User_Type|null>(user);
 
   // Toggle theme
   const toggleTheme = () => {
@@ -239,7 +241,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   // Handle follow/unfollow
   const handleFollowToggle = (userId: string) => {
     setSearchResults((prev) =>
-      prev.map((user) => (user.id === userId ? { ...user, isFollowing: !user.isFollowing } : user)),
+      prev.map((user) => (user.id === userId ? {...user, isFollowing: !user.isFollowing} : user)),
     )
 
     // Also update in following list if user_data is there
@@ -250,7 +252,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
       } else {
         const userToAdd = SEARCH_RESULTS.find((user) => user.id === userId)
         if (userToAdd) {
-          return [...prev, { ...userToAdd, isFollowing: true }]
+          return [...prev, {...userToAdd, isFollowing: true}]
         }
       }
       return prev
@@ -275,28 +277,53 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
     setRequests((prev) => prev.filter((user) => user.id !== userId))
   }
 
-  // Save profile changes
-  const handleSaveProfile = async (updatedUser: User_Type) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+  /**
+   * Handle save profile
+   * @param updatedUser User data to save
+   * @throws {Error} if there is an issue saving the profile
+   */
+  const handleSaveProfile = async (updatedUser: User_Type): Promise<void> => {
+    // Simulate API call
+    const response = await updateUserInformation(updatedUser, user_data, getToken(), dict.common);
 
-      // Update user_data state
-      setUser_data(updatedUser)
-
-      // Show success message
-      alert(" Title : " + dict.profile.edit.successTitle + " Message : " + dict.profile.edit.successMessage)
-
-      // If language preference changed, redirect to new language
-      if (updatedUser.language_preference !== lang) {
-        router.push(`/${updatedUser.language_preference}/profile`)
-      }
-    } catch (error) {
-      console.error("Error saving profile:", error)
-      alert(" Title : " + dict.profile.edit.errorTitle + " Message : " + dict.profile.edit.errorMessage)
+    console.log("Response:", response);
+    if (response.status !== "success") {
+      throw new Error(response.message);
     }
-  }
 
+    if (response.data) {
+      const json = response.data;
+      if (json.statusCode === 400) {
+        throw new Error(
+          JSON.stringify({
+            email: dict.signup.validation.emailTaken || "Email slslsls already taken",
+          })
+        );
+      }
+      if (json.statusCode === 409) {
+        throw new Error(
+          JSON.stringify({
+            username: dict.signup.validation.userTaken || "Username sksksksk already taken",
+          })
+        );
+      }
+    } else {
+      throw new Error(dict.common.serverError);
+    }
+
+    console.log("GUARDANDO USUARIO", updatedUser);
+    // Update user_data state
+    setUser_data(updatedUser);
+    setUser(updatedUser);
+
+    // Show success message
+    alert(`Title: ${dict.profile.edit.successTitle} Message: ${dict.profile.edit.successMessage}`);
+
+    // If language preference changed, redirect to new language
+    if (updatedUser.language_preference !== lang) {
+      router.push(`/${updatedUser.language_preference}/profile`);
+    }
+  };
   // Get status translation
   const getStatusTranslation = (status: string) => {
     switch (status) {
@@ -312,8 +339,6 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
   }
 
   function generateInicials(name: string) {
-    console.log(name)
-    console.log("Initials : " + name.split(" ").map((part) => part.charAt(0)).join(""))
     return name.split(" ").map((part) => part.charAt(0)).join("")
   }
 
@@ -324,8 +349,9 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <header className="flex items-center justify-between py-4 border-b border-border mb-6">
           <div className="flex items-center space-x-2">
             <Image src="/favicon.ico" alt="SottoBudget" width={50} height={50}
-                className="rounded-lg" />
-            <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:block hidden">
+                   className="rounded-lg"/>
+            <span
+              className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:block hidden">
               SottoBudget
             </span>
           </div>
@@ -337,21 +363,21 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               className="md:hidden text-muted-foreground hover:text-foreground"
               onClick={() => setIsSearchDialogOpen(true)}
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-5 w-5"/>
             </Button>
             <Button
               variant="outline"
               className="hidden md:flex items-center space-x-2 bg-secondary border-border hover:bg-secondary"
               onClick={() => setIsSearchDialogOpen(true)}
             >
-              <Search className="h-4 w-4 text-muted-foreground" />
+              <Search className="h-4 w-4 text-muted-foreground"/>
               <span className="text-muted-foreground">{dict.profile.searchUsers}</span>
             </Button>
 
             <div className="flex items-center space-x-3">
               <Select value={lang} onValueChange={handleLanguageChange}>
                 <SelectTrigger className="w-[70px] md:w-[100px] bg-secondary border-border text-muted-foreground">
-                  <SelectValue placeholder={dict.language[lang]} />
+                  <SelectValue placeholder={dict.language[lang]}/>
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border">
                   <SelectItem value="en">English</SelectItem>
@@ -367,7 +393,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       size="icon"
                       className="relative text-muted-foreground hover:text-foreground"
                     >
-                      <Bell className="h-5 w-5" />
+                      <Bell className="h-5 w-5"/>
                       <span className="absolute -top-1 -right-1 h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></span>
                     </Button>
                   </TooltipTrigger>
@@ -386,7 +412,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       onClick={toggleTheme}
                       className="text-muted-foreground hover:text-foreground"
                     >
-                      {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                      {theme === "dark" ? <Sun className="h-5 w-5"/> : <Moon className="h-5 w-5"/>}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -399,7 +425,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar>
-                      <AvatarImage src="/placeholder.svg?height=32&width=32&text=AJ" alt={user?.name} />
+                      <AvatarImage src="/placeholder.svg?height=32&width=32&text=AJ" alt={user?.name}/>
                       <AvatarFallback className="bg-slate-700 text-cyan-500">
                         {generateInicials(user?.name || "Undefined")}
                       </AvatarFallback>
@@ -413,22 +439,22 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       <p className="text-xs leading-none text-muted-foreground">@{user?.username}</p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator/>
                   <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
+                    <User className="mr-2 h-4 w-4"/>
                     <span>{dict.nav.profile}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Settings className="mr-2 h-4 w-4"/>
                     <span>{dict.nav.settings}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Home className="mr-2 h-4 w-4" />
+                    <Home className="mr-2 h-4 w-4"/>
                     <span>{dict.nav.dashboard}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator/>
                   <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4"/>
                     <span>{dict.nav.logout}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -440,11 +466,12 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         {/* Profile Header */}
         <div className="relative mb-8">
           <div className="h-48 md:h-64 w-full rounded-xl overflow-hidden">
-            <img src="https://a.storyblok.com/f/88871/1254x836/6ea6ef0e4a/realkredit-modernisierung.jpg" alt="Cover" className="w-full h-full object-cover" />
+            <img src="https://a.storyblok.com/f/88871/1254x836/6ea6ef0e4a/realkredit-modernisierung.jpg" alt="Cover"
+                 className="w-full h-full object-cover"/>
           </div>
           <div className="absolute -bottom-16 left-4 md:left-8">
             <Avatar className="h-32 w-32 border-4 border-background">
-              <AvatarImage src="/placeholder.svg?height=200&width=200&text=AJ" alt={user?.name} />
+              <AvatarImage src="/placeholder.svg?height=200&width=200&text=AJ" alt={user?.name}/>
               <AvatarFallback className="bg-slate-700 text-cyan-500 text-4xl">
                 {generateInicials(user?.name || "Undefined")}
               </AvatarFallback>
@@ -455,11 +482,11 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               className="bg-secondary/90 border-border hover:bg-secondary text-primary"
               onClick={() => setIsEditProfileOpen(true)}
             >
-              <Edit className="h-4 w-4 mr-2" />
+              <Edit className="h-4 w-4 mr-2"/>
               {dict.profile.edit.button}
             </Button>
             <Button className="bg-primary hover:bg-primary/90">
-              <Share2 className="h-4 w-4 mr-2" />
+              <Share2 className="h-4 w-4 mr-2"/>
               {dict.profile.share}
             </Button>
           </div>
@@ -482,23 +509,23 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                 <div className="space-y-2">
                   {user?.location && (
                     <div className="flex items-center text-muted-foreground">
-                      <MapPin className="h-4 w-4 mr-2" />
+                      <MapPin className="h-4 w-4 mr-2"/>
                       <span>{user?.location}</span>
                     </div>
                   )}
                   <div className="flex items-center text-muted-foreground">
-                    <Mail className="h-4 w-4 mr-2" />
+                    <Mail className="h-4 w-4 mr-2"/>
                     <span>{user?.email}</span>
                   </div>
                   {user?.phone && (
                     <div className="flex items-center text-muted-foreground">
-                      <Phone className="h-4 w-4 mr-2" />
+                      <Phone className="h-4 w-4 mr-2"/>
                       <span>{user.phone}</span>
                     </div>
                   )}
                   {user?.created_at && (
                     <div className="flex items-center text-muted-foreground">
-                      <Calendar className="h-4 w-4 mr-2" />
+                      <Calendar className="h-4 w-4 mr-2"/>
                       <span>
                         {dict.profile.joined} {formatDate(user.created_at, lang)}
                       </span>
@@ -537,14 +564,14 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
             </Card>
 
             {/* Availability Display */}
-            <AvailabilityDisplay availabilities={user?.availabilities || []} lang={lang} dictionary={dict} />
+            <AvailabilityDisplay availabilities={user?.availabilities || []} lang={lang} dictionary={dict}/>
 
             {/* Follow Requests */}
             {requests.length > 0 && (
               <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center">
-                    <Bell className="h-5 w-5 mr-2 text-cyan-500" />
+                    <Bell className="h-5 w-5 mr-2 text-cyan-500"/>
                     {dict.requests.title}
                   </CardTitle>
                 </CardHeader>
@@ -554,7 +581,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                       <div key={request.id} className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar className="h-10 w-10 mr-3">
-                            <AvatarImage src={request.avatar} alt={request.name} />
+                            <AvatarImage src={request.avatar} alt={request.name}/>
                             <AvatarFallback className="bg-slate-700 text-cyan-500">
                               {request.name.charAt(0)}
                             </AvatarFallback>
@@ -571,7 +598,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                             className="h-8 w-8 p-0 text-green-500 hover:text-green-400 hover:bg-green-500/10"
                             onClick={() => handleAcceptRequest(request.id)}
                           >
-                            <Check className="h-4 w-4" />
+                            <Check className="h-4 w-4"/>
                           </Button>
                           <Button
                             size="sm"
@@ -579,7 +606,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                             className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
                             onClick={() => handleRejectRequest(request.id)}
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-4 w-4"/>
                           </Button>
                         </div>
                       </div>
@@ -607,7 +634,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center">
-                    <Building className="h-5 w-5 mr-2 text-cyan-500" />
+                    <Building className="h-5 w-5 mr-2 text-cyan-500"/>
                     {dict.profile.recentProjects}
                   </CardTitle>
                   <Button
@@ -662,42 +689,42 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
             <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center">
-                  <Activity className="h-5 w-5 mr-2 text-cyan-500" />
+                  <Activity className="h-5 w-5 mr-2 text-cyan-500"/>
                   {dict.profile.recentActivity}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <ActivityItem
-                    icon={<FileText className="h-4 w-4" />}
+                    icon={<FileText className="h-4 w-4"/>}
                     title="Updated project documentation"
                     description="Modern Residential Complex"
                     time="2 hours ago"
                     iconColor="bg-blue-500/20 text-blue-400"
                   />
                   <ActivityItem
-                    icon={<MessageSquare className="h-4 w-4" />}
+                    icon={<MessageSquare className="h-4 w-4"/>}
                     title="Commented on a task"
                     description="Electrical wiring needs to be completed by Friday"
                     time="Yesterday"
                     iconColor="bg-purple-500/20 text-purple-400"
                   />
                   <ActivityItem
-                    icon={<Check className="h-4 w-4" />}
+                    icon={<Check className="h-4 w-4"/>}
                     title="Completed milestone"
                     description="Foundation work for Eco-Friendly School Building"
                     time="3 days ago"
                     iconColor="bg-green-500/20 text-green-400"
                   />
                   <ActivityItem
-                    icon={<Users className="h-4 w-4" />}
+                    icon={<Users className="h-4 w-4"/>}
                     title="Added new team members"
                     description="3 new members added to Hospital Wing Addition"
                     time="1 week ago"
                     iconColor="bg-cyan-500/20 text-cyan-400"
                   />
                   <ActivityItem
-                    icon={<AlertCircle className="h-4 w-4" />}
+                    icon={<AlertCircle className="h-4 w-4"/>}
                     title="Reported an issue"
                     description="Material delivery delay for Commercial Office Renovation"
                     time="1 week ago"
@@ -727,7 +754,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
             <div className="flex justify-between items-start">
               <div>
                 <DialogTitle className="text-xl flex items-center">
-                  <Building className="mr-2 h-5 w-5 text-cyan-500" />
+                  <Building className="mr-2 h-5 w-5 text-cyan-500"/>
                   {dict.profile.projects}
                 </DialogTitle>
                 <DialogDescription className="text-muted-foreground">
@@ -740,54 +767,54 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
           <ScrollArea className="h-[70vh] pr-4 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {PROJECTS.map((project) => (
-                  <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
-                    <div className="h-32 w-full">
-                      <img
-                          src={project.image || "/placeholder.svg"}
-                          alt={project.title}
-                          className="h-full w-full object-cover"
+                <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
+                  <div className="h-32 w-full">
+                    <img
+                      src={project.image || "/placeholder.svg"}
+                      alt={project.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <CardHeader className="p-3">
+                    <CardTitle className="text-base">{project.title}</CardTitle>
+                    <CardDescription className="text-xs text-muted-foreground line-clamp-2">
+                      {project.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-0">
+                    <div className="flex items-center text-xs text-muted-foreground mb-2">
+                      <MapPin className="h-3 w-3 mr-1"/>
+                      {project.location}
+                    </div>
+                    <div className="w-full bg-slate-700/50 h-1.5 rounded-full">
+                      <div
+                        className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                        style={{width: `${project.completion}%`}}
                       />
                     </div>
-                    <CardHeader className="p-3">
-                      <CardTitle className="text-base">{project.title}</CardTitle>
-                      <CardDescription className="text-xs text-muted-foreground line-clamp-2">
-                        {project.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-3 pt-0">
-                      <div className="flex items-center text-xs text-muted-foreground mb-2">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {project.location}
-                      </div>
-                      <div className="w-full bg-slate-700/50 h-1.5 rounded-full">
-                        <div
-                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
-                            style={{ width: `${project.completion}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between mt-1 text-xs">
-                        <span className="text-muted-foreground">{dict.projects.completion}</span>
-                        <span className="text-cyan-400">{project.completion}%</span>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="p-3 pt-0 flex justify-between">
-                      <Badge
-                          variant="outline"
-                          className={`
+                    <div className="flex justify-between mt-1 text-xs">
+                      <span className="text-muted-foreground">{dict.projects.completion}</span>
+                      <span className="text-cyan-400">{project.completion}%</span>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="p-3 pt-0 flex justify-between">
+                    <Badge
+                      variant="outline"
+                      className={`
                   ${
-                              project.status === "Completed"
-                                  ? "bg-green-500/10 text-green-400 border-green-500/30"
-                                  : project.status === "In Progress"
-                                      ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
-                                      : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                          }
+                        project.status === "Completed"
+                          ? "bg-green-500/10 text-green-400 border-green-500/30"
+                          : project.status === "In Progress"
+                            ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                            : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                      }
                 `}
-                      >
-                        {getStatusTranslation(project.status)}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{project.role}</span>
-                    </CardFooter>
-                  </Card>
+                    >
+                      {getStatusTranslation(project.status)}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{project.role}</span>
+                  </CardFooter>
+                </Card>
               ))}
             </div>
           </ScrollArea>
@@ -800,7 +827,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
-              <Users className="mr-2 h-5 w-5 text-cyan-500" />
+              <Users className="mr-2 h-5 w-5 text-cyan-500"/>
               {dict.followers.title}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
@@ -839,7 +866,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={follower.avatar} alt={follower.name} />
+                          <AvatarImage src={follower.avatar} alt={follower.name}/>
                           <AvatarFallback className="bg-slate-700 text-cyan-500">
                             {follower.name.charAt(0)}
                           </AvatarFallback>
@@ -875,7 +902,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
-              <Users className="mr-2 h-5 w-5 text-cyan-500" />
+              <Users className="mr-2 h-5 w-5 text-cyan-500"/>
               {dict.following.title}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
@@ -914,7 +941,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={follow.avatar} alt={follow.name} />
+                          <AvatarImage src={follow.avatar} alt={follow.name}/>
                           <AvatarFallback className="bg-slate-700 text-cyan-500">
                             {follow.name.charAt(0)}
                           </AvatarFallback>
@@ -950,7 +977,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
-              <UserPlus className="mr-2 h-5 w-5 text-cyan-500" />
+              <UserPlus className="mr-2 h-5 w-5 text-cyan-500"/>
               {dict.requests.title}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
@@ -969,7 +996,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={request.avatar} alt={request.name} />
+                          <AvatarImage src={request.avatar} alt={request.name}/>
                           <AvatarFallback className="bg-slate-700 text-cyan-500">
                             {request.name.charAt(0)}
                           </AvatarFallback>
@@ -1014,7 +1041,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
         <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center">
-              <Search className="mr-2 h-5 w-5 text-cyan-500" />
+              <Search className="mr-2 h-5 w-5 text-cyan-500"/>
               {dict.search.title}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">{dict.search.description}</DialogDescription>
@@ -1039,7 +1066,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
                     >
                       <div className="flex items-center">
                         <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={user.avatar} alt={user.name} />
+                          <AvatarImage src={user.avatar} alt={user.name}/>
                           <AvatarFallback className="bg-slate-700 text-cyan-500">{user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
@@ -1078,7 +1105,7 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
 }
 
 // Activity item component
-function ActivityItem({ icon, title, description, time, iconColor }:any) {
+function ActivityItem({icon, title, description, time, iconColor}: any) {
   return (
     <div className="flex items-start space-x-3">
       <div className={`mt-0.5 p-1.5 rounded-full ${iconColor}`}>{icon}</div>
@@ -1094,7 +1121,7 @@ function ActivityItem({ icon, title, description, time, iconColor }:any) {
 }
 
 // LogOut icon component
-function LogOut(props:any) {
+function LogOut(props: any) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -1108,15 +1135,15 @@ function LogOut(props:any) {
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
     </svg>
   )
 }
 
 // Format date helper
-function formatDate(dateString:string, lang:string) {
+function formatDate(dateString: string, lang: string) {
   try {
     const date = new Date(dateString)
     return new Intl.DateTimeFormat(lang === "es" ? "es-ES" : "en-US", {

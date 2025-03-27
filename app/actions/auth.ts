@@ -2,6 +2,9 @@
 
 import {createSignUpSchema, ExpectedType, LoginSchema} from "@/lib/validations/auth"
 import {fullWidthClassName} from "react-remove-scroll-bar";
+import {User} from "@/app/context/user.types";
+import {redirect} from "next/navigation";
+import isEqual from "lodash.isequal";
 
 const api_URL = process.env.BASE_URL_BACK + "users/"
 
@@ -18,10 +21,9 @@ export async function signup(
     const validationResult = signUpSchema.safeParse({
             name: formData.get("name"),
             username: formData.get("username"),
-            phone: formData.get("phone"),
             email: formData.get("email"),
             password: formData.get("password"),
-            countryCode: formData.get("countryCode"),
+            phone: formData.get("phone"),
     })
 
     // Si hay errores de validación, devolverlos
@@ -31,15 +33,18 @@ export async function signup(
             errors: validationResult.error.flatten().fieldErrors,
         }
     }
+    const countryCode = formData.get("countryCode")
+    // Forzar el valor de countryCode (ya que lo manejamos con estado)
+    formData.get("phone") && formData.set("phone", `${countryCode} ${formData.get("phone")}`)
 
     //Enviar los datos al servidor
     console.log("Sending request to:", api_URL);
     console.log("Request body:", JSON.stringify({
+        name: formData.get("name"),
         username: formData.get("username"),
         email: formData.get("email"),
         password: formData.get("password"),
-        language_preference: "es",
-        role: "client",
+        phone: formData.get("phone")
     }));
     try{
         const response: any = await fetch(`${api_URL}`, {
@@ -48,11 +53,11 @@ export async function signup(
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
+                name: formData.get("name"),
                 username: formData.get("username"),
                 email: formData.get("email"),
                 password: formData.get("password"),
-                language_preference: "es",
-                role: "client",
+                phone: formData.get("phone"),
             }),
         });
 
@@ -61,7 +66,7 @@ export async function signup(
         console.log("API_URL", api_URL);
 
         // Si hay un error en la petición, devolverlo
-        if (json.statusCode === 400) {
+        if (json.statusCode === 400 || json.statusCode === 409) {
             const message = json.message
             if( message.includes("El usuario ya existe")){
                 return {
@@ -74,7 +79,7 @@ export async function signup(
             return {
                 status: "error",
                 errors: {
-                    email:[ "Email already in use"]
+                    email:[ validationMessages.emailTaken],
                 },
             }
         }
@@ -189,5 +194,49 @@ export async function fetchUserMe(token: string, translates: any) {
     }
 
     return response.json();
+}
+
+export async function updateUserInformation(updateData: User, actual_user:User|null, token: string |null, translates: any) {
+    let response
+
+    let body: Partial<User> = {};
+
+    if(actual_user === null){
+        body = updateData;
+    }else {
+        if (updateData.name !== actual_user.name) body.name = updateData.name;
+        if (updateData.username !== actual_user.username) body.username = updateData.username;
+        if (updateData.email !== actual_user.email) body.email = updateData.email;
+        if (updateData.phone !== actual_user.phone) body.phone = updateData.phone;
+        if (updateData.location !== actual_user.location) body.location = updateData.location;
+        if (updateData.description !== actual_user.description) body.description = updateData.description;
+        if (!isEqual(updateData.availabilities, actual_user.availabilities)) body.availabilities = updateData.availabilities;
+    }
+
+    console.log("updateData SENDED IN PUT", body);
+    try {
+        // Realiza la petición PUT al endpoint /me
+        response = await fetch(`${api_URL}${updateData.id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+
+    } catch (error) {
+        return {
+            status: 'error',
+            data: null,
+            message: translates.serverError,
+        };
+    }
+    const json = await response.json();
+    console.log("JSON RESPONSE", json)
+
+    if(json.detail) redirect(`/es/login`)
+
+    return {status: 'success', message: 'User updated successfully', data: json};
 }
 

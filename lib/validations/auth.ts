@@ -14,8 +14,7 @@ export const createSignUpSchema = (messages: any) => {
 
         email: z.string().email({ message: messages.emailFormat }),
 
-        password: z.string().min(4, { message: messages.passwordMin }),
-        countryCode: z.string()
+        password: z.string().min(4, { message: messages.passwordMin })
     })
 }
 

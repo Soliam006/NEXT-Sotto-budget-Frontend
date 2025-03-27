@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useRef, type FormEvent } from "react"
-import { z } from "zod"
-import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react"
-import { format, parseISO } from "date-fns"
-import { es, enUS } from "date-fns/locale"
+import {useState, useRef, type FormEvent} from "react"
+import {z} from "zod"
+import {CalendarIcon, PlusCircle, Trash2} from "lucide-react"
+import {format, parseISO} from "date-fns"
+import {es, enUS} from "date-fns/locale"
 
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -15,13 +15,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Label } from "@/components/ui/label"
+import {Input} from "@/components/ui/input"
+import {Textarea} from "@/components/ui/textarea"
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
+import {Calendar} from "@/components/ui/calendar"
+import {Badge} from "@/components/ui/badge"
+import {ScrollArea} from "@/components/ui/scroll-area"
+import {Label} from "@/components/ui/label"
 
 // Tipos
 export type Language = "en" | "es"
@@ -42,7 +42,9 @@ const createProfileSchema = (translates: any) => {
     language_preference: z.enum(["en", "es"]),
   })
 }
-import { User, Availability } from "@/app/context/user.types"
+import {User, Availability} from "@/app/context/user.types"
+
+import isEqual from 'lodash.isequal';
 
 export function EditProfileDialog({
                                     user,
@@ -61,12 +63,14 @@ export function EditProfileDialog({
 }) {
   if (!user) return null
   const t = dictionary.profile.edit
+  const t_validation = dictionary.signup.validation
   const formRef = useRef<HTMLFormElement>(null)
   const [availabilities, setAvailabilities] = useState<Availability[]>(user.availabilities || [])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [noChangeDetected, setNoChangeDetected] = useState(true)
   const [newAvailability, setNewAvailability] = useState<{
-    from: Date  | undefined
-    to: Date  | undefined
+    from: Date | undefined
+    to: Date | undefined
   }>({
     from: undefined,
     to: undefined,
@@ -86,13 +90,13 @@ export function EditProfileDialog({
       // Validar disponibilidades
       const validAvailabilities = validateAvailabilities(availabilities)
       if (!validAvailabilities.valid) {
-        setErrors({ availabilities: validAvailabilities.message })
+        setErrors({availabilities: validAvailabilities.message})
         setIsSubmitting(false)
         return
       }
 
       // Validar datos del formulario con Zod
-      const profileSchema = createProfileSchema(t.validation || {})
+      const profileSchema = createProfileSchema(t_validation || {})
       const validationResult = profileSchema.safeParse({
         name: formData.get("name")?.toString() || "",
         username: formData.get("username")?.toString() || "",
@@ -120,12 +124,29 @@ export function EditProfileDialog({
         ...validationResult.data,
         availabilities,
       }
+      try {
+        await onSave(updatedUser)
+      } catch (error: any) {
+        const parsed = JSON.parse(error.message);
+        const formattedErrors: Record<string, string> = {}
+        if (parsed.email) {
+          formattedErrors["email"] = parsed.email
+        }
+        if (parsed.username) {
+          formattedErrors["username"] = parsed.username
+        }
+        setErrors({
+          ...formattedErrors,
+        });
+        alert("No se pudo guardar el perfil");
+        return;
+      }
 
-      await onSave(updatedUser)
-      onOpenChange(false)
+      onOpenChange(false) // Si el update sale bien, cerrar el diálogo
     } catch (error) {
       console.error("Error saving profile:", error)
-      setErrors({ form: t.errorGeneral || "An error occurred while saving your profile." })
+      setErrors({form: t.errorGeneral || "An error occurred while saving your profile."})
+      return;
     } finally {
       setIsSubmitting(false)
     }
@@ -144,7 +165,7 @@ export function EditProfileDialog({
         }
       }
     }
-    return { valid: true, message: "" }
+    return {valid: true, message: ""}
   }
 
   // Agregar nueva disponibilidad
@@ -167,23 +188,52 @@ export function EditProfileDialog({
       to: toDate.toISOString(),
     }
 
-    setAvailabilities([...availabilities, newItem])
-    setNewAvailability({ from: undefined, to: undefined })
-    setErrors({ ...errors, newAvailability: undefined })
+    const updated = [...availabilities, newItem]
+    setAvailabilities(updated)
+    setNewAvailability({from: undefined, to: undefined})
+    setErrors({...errors, newAvailability: undefined})
+    handleChanges(updated) // <-- pasamos el array actualizado
   }
 
   // Eliminar disponibilidad
   const removeAvailability = (id: string) => {
-    setAvailabilities(availabilities.filter((a) => a.id !== id))
+    const newAvailabilities = availabilities.filter((a) => a.id !== id);
+    setAvailabilities(newAvailabilities);
+    handleChanges(newAvailabilities); // pásalo como argumento
   }
 
   // Formatear fecha según el idioma
   const formatDate = (dateString: string) => {
     try {
       const date = parseISO(dateString)
-      return format(date, "PPP", { locale: lang === "es" ? es : enUS })
+      return format(date, "PPP", {locale: lang === "es" ? es : enUS})
     } catch (error) {
       return dateString
+    }
+  }
+  function handleChanges(currentAvailabilities = availabilities) {
+    const formData = new FormData(formRef.current!)
+    const name = formData.get("name")?.toString() || ""
+    const username = formData.get("username")?.toString() || ""
+    const email = formData.get("email")?.toString() || ""
+    const phone = formData.get("phone")?.toString() || ""
+    const location = formData.get("location")?.toString() || ""
+    const description = formData.get("description")?.toString() || ""
+    const language_preference = (formData.get("language_preference")?.toString() as Language) || "en"
+
+    if (
+      name !== user?.name ||
+      username !== user.username ||
+      email !== user.email ||
+      phone !== user.phone ||
+      location !== user.location ||
+      description !== user.description ||
+      language_preference !== user.language_preference ||
+      (!isEqual(currentAvailabilities, user?.availabilities))
+    ) {
+      setNoChangeDetected(false)
+    } else {
+      setNoChangeDetected(true)
     }
   }
 
@@ -206,6 +256,7 @@ export function EditProfileDialog({
                 name="name"
                 defaultValue={user.name || ""}
                 placeholder={t.namePlaceholder}
+                onChange={() => handleChanges(availabilities)}
                 className={`bg-background border-input text-foreground ${errors.name ? "border-destructive" : ""}`}
               />
               {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
@@ -220,6 +271,7 @@ export function EditProfileDialog({
                 name="username"
                 defaultValue={user.username}
                 placeholder={t.usernamePlaceholder}
+                onChange={() => handleChanges(availabilities)}
                 className={`bg-background border-input text-foreground ${errors.username ? "border-destructive" : ""}`}
                 required
               />
@@ -236,6 +288,7 @@ export function EditProfileDialog({
                 type="email"
                 defaultValue={user.email}
                 placeholder={t.emailPlaceholder}
+                onChange={() => handleChanges(availabilities)}
                 className={`bg-background border-input text-foreground ${errors.email ? "border-destructive" : ""}`}
                 required
               />
@@ -251,6 +304,7 @@ export function EditProfileDialog({
                 name="phone"
                 defaultValue={user.phone || ""}
                 placeholder={t.phonePlaceholder}
+                onChange={() => handleChanges(availabilities)}
                 className={`bg-background border-input text-foreground ${errors.phone ? "border-destructive" : ""}`}
               />
               {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
@@ -265,6 +319,7 @@ export function EditProfileDialog({
                 name="location"
                 defaultValue={user.location || ""}
                 placeholder={t.locationPlaceholder}
+                onChange={() => handleChanges(availabilities)}
                 className={`bg-background border-input text-foreground ${errors.location ? "border-destructive" : ""}`}
               />
               {errors.location && <p className="text-sm text-destructive">{errors.location}</p>}
@@ -279,6 +334,7 @@ export function EditProfileDialog({
                 name="description"
                 defaultValue={user.description || ""}
                 placeholder={t.descriptionPlaceholder}
+                onChange={() => handleChanges(availabilities)}
                 className={`bg-background border-input text-foreground resize-none ${errors.description ? "border-destructive" : ""}`}
               />
               {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
@@ -292,6 +348,7 @@ export function EditProfileDialog({
                     type="radio"
                     name="language_preference"
                     value="en"
+                    onChange={() => handleChanges(availabilities)}
                     defaultChecked={user.language_preference === "en"}
                     className="h-4 w-4"
                   />
@@ -302,6 +359,7 @@ export function EditProfileDialog({
                     type="radio"
                     name="language_preference"
                     value="es"
+                    onChange={() => handleChanges(availabilities)}
                     defaultChecked={user.language_preference === "es"}
                     className="h-4 w-4"
                   />
@@ -344,7 +402,7 @@ export function EditProfileDialog({
                           onClick={() => removeAvailability(availability.id!)}
                           className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4"/>
                         </Button>
                       </div>
                     ))}
@@ -366,9 +424,9 @@ export function EditProfileDialog({
                           variant="outline"
                           className="w-full justify-start text-left font-normal bg-background border-input text-foreground"
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="mr-2 h-4 w-4"/>
                           {newAvailability.from ? (
-                            format(newAvailability.from, "PPP", { locale: lang === "es" ? es : enUS })
+                            format(newAvailability.from, "PPP", {locale: lang === "es" ? es : enUS})
                           ) : (
                             <span className="text-muted-foreground">{t.selectStartDate}</span>
                           )}
@@ -378,7 +436,7 @@ export function EditProfileDialog({
                         <Calendar
                           mode="single"
                           selected={newAvailability.from}
-                          onSelect={(date:any) => setNewAvailability({ ...newAvailability, from: date })}
+                          onSelect={(date: any) => setNewAvailability({...newAvailability, from: date})}
                           initialFocus
                           locale={lang === "es" ? es : enUS}
                         />
@@ -394,9 +452,9 @@ export function EditProfileDialog({
                           variant="outline"
                           className="w-full justify-start text-left font-normal bg-background border-input text-foreground"
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="mr-2 h-4 w-4"/>
                           {newAvailability.to ? (
-                            format(newAvailability.to, "PPP", { locale: lang === "es" ? es : enUS })
+                            format(newAvailability.to, "PPP", {locale: lang === "es" ? es : enUS})
                           ) : (
                             <span className="text-muted-foreground">{t.selectEndDate}</span>
                           )}
@@ -406,7 +464,7 @@ export function EditProfileDialog({
                         <Calendar
                           mode="single"
                           selected={newAvailability.to}
-                          onSelect={(date:any) => setNewAvailability({ ...newAvailability, to: date })}
+                          onSelect={(date: any) => setNewAvailability({...newAvailability, to: date})}
                           initialFocus
                           locale={lang === "es" ? es : enUS}
                         />
@@ -420,7 +478,7 @@ export function EditProfileDialog({
                     disabled={!newAvailability.from || !newAvailability.to}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    <PlusCircle className="h-4 w-4 mr-2" />
+                    <PlusCircle className="h-4 w-4 mr-2"/>
                     {t.add}
                   </Button>
                 </div>
@@ -445,7 +503,7 @@ export function EditProfileDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || noChangeDetected}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isSubmitting ? t.saving : t.save}

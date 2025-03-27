@@ -8,7 +8,9 @@ import LoadingView from "@/components/loading-view";
 import useAuthMiddleware from "@/lib/token-verification";
 
 export default function LoginPage() {
-    useAuthMiddleware(true); // Redirige al login si no hay token
+    const [isLoadding, setIsLoadding] = useState(true);
+    useAuthMiddleware(true, setIsLoadding); // Redirige al login si no hay token
+
     const params = useParams(); // Obtiene dinámicamente los parámetros de la URL
     const [dictionary, setDictionary] = useState<any>(null);
 

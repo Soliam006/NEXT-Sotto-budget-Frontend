@@ -26,6 +26,7 @@ dynamic(() => import("@/components/custom-pie-chart"), { ssr: false })
 import dynamic from "next/dynamic";
 import CustomPieChart from "@/components/custom-pie-chart";
 import useAuthMiddleware from "@/lib/token-verification";
+import LoadingView from "@/components/loading-view";
 
 // Mock data for projects
 const PROJECTS = [
@@ -148,8 +149,11 @@ const generateDailyExpenses = () => {
 }
 
 export default function Dashboard() {
+  const [isLoadding, setIsLoadding]= useState(true);
 
-  useAuthMiddleware(false); // Redirige al login si no hay token
+  useAuthMiddleware(false, setIsLoadding); // Redirige al login si no hay token
+
+  if(isLoadding) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [currentTime, setCurrentTime] = useState(new Date())

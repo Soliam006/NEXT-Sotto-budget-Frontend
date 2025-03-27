@@ -10,6 +10,7 @@ export default function  Profile() {
 
   const params = useParams(); // Obtiene dinámicamente los parámetros de la URL
   const [dictionary, setDictionary] = useState<any>(null);
+  const [isLoadding, setIsLoadding]= useState(true);
 
   useEffect(() => {
     async function fetchDictionary() {
@@ -21,9 +22,11 @@ export default function  Profile() {
     fetchDictionary();
   }, [params?.lang]);
 
-  useAuthMiddleware(false); // Redirige al login si no hay token
+  // Redirige al login si no hay token
+  useAuthMiddleware(false, setIsLoadding);
 
-  if (!dictionary) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
+
+  if (!dictionary || isLoadding) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
   return <ProfilePage dict={dictionary} lang={params?.lang  as string} />
 }

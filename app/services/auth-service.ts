@@ -60,11 +60,11 @@ const dictionary: Record<Lang, Record<Role, string>> = {
 };
 export function getRole(role: string, lang: Lang): string {
     switch (role) {
-        case 'ADMIN':
+        case 'admin':
             return dictionary[lang].admin;
-        case 'CLIENT':
+        case 'client':
             return dictionary[lang].client;
-        case 'WORKER':
+        case 'worker':
             return dictionary[lang].worker;
         default:
             return dictionary[lang].no_role;

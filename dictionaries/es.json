@@ -41,7 +41,8 @@
       "phoneFormat": "El teléfono solo puede contener números",
       "emailFormat": "Ingresa un correo electrónico válido",
       "passwordMin": "La contraseña debe tener al menos 4 caracteres",
-      "userTaken": "El usuario ya está en uso, intenta con otro"
+      "userTaken": "El usuario ya está en uso, intenta con otro",
+      "emailTaken": "El correo electrónico ya está en uso, intenta con otro"
     },
     "success": "Cuenta creada exitosamente"
   },
@@ -72,7 +73,8 @@
   "common": {
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
-    "processing": "Procesando..."
+    "processing": "Procesando...",
+    "serverError": "Error del servidor, por favor intenta de nuevo más tarde"
   },
   "profile": {
     "edit": {

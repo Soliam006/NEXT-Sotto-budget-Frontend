@@ -41,7 +41,8 @@
       "phoneFormat": "Phone can only contain numbers",
       "emailFormat": "Please enter a valid email address",
       "passwordMin": "Password must be at least 4 characters",
-      "userTaken": "The user is already taken, try another one"
+      "userTaken": "The user is already taken, try another one",
+      "emailTaken": "The email is already taken, try another one"
     },
     "success": "Account created successfully"
   },
@@ -68,7 +69,8 @@
   "common": {
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "serverError": "Server error, please try again later"
   },
   "profile": {
     "edit": {
