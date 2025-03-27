@@ -724,69 +724,76 @@ export default function ProfilePage({ dict, lang }: { dict: any; lang: string })
       <Dialog open={isProjectsDialogOpen} onOpenChange={setIsProjectsDialogOpen}>
         <DialogContent className="bg-background border-border text-foreground max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-xl flex items-center">
-              <Building className="mr-2 h-5 w-5 text-cyan-500" />
-              {dict.profile.projects}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              {dict.projects.allProjects.replace("{name}", user?.name || user?.username)}
-            </DialogDescription>
+            <div className="flex justify-between items-start">
+              <div>
+                <DialogTitle className="text-xl flex items-center">
+                  <Building className="mr-2 h-5 w-5 text-cyan-500" />
+                  {dict.profile.projects}
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  {dict.projects.allProjects.replace("{name}", user?.name || user?.username)}
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {PROJECTS.map((project) => (
-              <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
-                <div className="h-32 w-full">
-                  <img
-                    src={project.image || "/placeholder.svg"}
-                    alt={project.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <CardHeader className="p-3">
-                  <CardTitle className="text-base">{project.title}</CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground line-clamp-2">
-                    {project.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-3 pt-0">
-                  <div className="flex items-center text-xs text-muted-foreground mb-2">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {project.location}
-                  </div>
-                  <div className="w-full bg-slate-700/50 h-1.5 rounded-full">
-                    <div
-                      className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
-                      style={{ width: `${project.completion}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs">
-                    <span className="text-muted-foreground">{dict.projects.completion}</span>
-                    <span className="text-cyan-400">{project.completion}%</span>
-                  </div>
-                </CardContent>
-                <CardFooter className="p-3 pt-0 flex justify-between">
-                  <Badge
-                    variant="outline"
-                    className={`
-                      ${
-                      project.status === "Completed"
-                        ? "bg-green-500/10 text-green-400 border-green-500/30"
-                        : project.status === "In Progress"
-                          ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
-                          : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                    }
-                    `}
-                  >
-                    {getStatusTranslation(project.status)}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{project.role}</span>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          <ScrollArea className="h-[70vh] pr-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {PROJECTS.map((project) => (
+                  <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
+                    <div className="h-32 w-full">
+                      <img
+                          src={project.image || "/placeholder.svg"}
+                          alt={project.title}
+                          className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <CardHeader className="p-3">
+                      <CardTitle className="text-base">{project.title}</CardTitle>
+                      <CardDescription className="text-xs text-muted-foreground line-clamp-2">
+                        {project.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0">
+                      <div className="flex items-center text-xs text-muted-foreground mb-2">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        {project.location}
+                      </div>
+                      <div className="w-full bg-slate-700/50 h-1.5 rounded-full">
+                        <div
+                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                            style={{ width: `${project.completion}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1 text-xs">
+                        <span className="text-muted-foreground">{dict.projects.completion}</span>
+                        <span className="text-cyan-400">{project.completion}%</span>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="p-3 pt-0 flex justify-between">
+                      <Badge
+                          variant="outline"
+                          className={`
+                  ${
+                              project.status === "Completed"
+                                  ? "bg-green-500/10 text-green-400 border-green-500/30"
+                                  : project.status === "In Progress"
+                                      ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                                      : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                          }
+                `}
+                      >
+                        {getStatusTranslation(project.status)}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">{project.role}</span>
+                    </CardFooter>
+                  </Card>
+              ))}
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
+
 
       {/* Followers Dialog */}
       <Dialog open={isFollowersDialogOpen} onOpenChange={setIsFollowersDialogOpen}>
