@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import CustomPieChart from "@/components/custom-pie-chart";
+import {ProjectsSelector} from "@/components/projects-selector";
 
 // Mock data for projects
 const PROJECTS = [
@@ -219,47 +220,14 @@ export function DashboardOverview({dict, lang}: { dict: any; lang: string }) {
       <div className="col-span-12 lg:col-span-9 space-y-6">
         <h1 className="text-2xl font-bold">{dict.dashboard?.overview || "Dashboard Overview"}</h1>
 
-        {/* Project selector */}
-        <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle>{dict.dashboard?.selectProject || "Select Project"}</CardTitle>
-              <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
-                {PROJECTS.length} {dict.dashboard?.projects || "Projects"}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {PROJECTS.map((project) => (
-                <button
-                  key={project.id}
-                  className={`h-auto py-3 px-4 border rounded-md ${
-                    selectedProject.id === project.id
-                      ? "bg-muted/70 border-primary/50"
-                      : "bg-card/50 border-border hover:bg-muted/50"
-                  } flex flex-col items-start justify-center space-y-2 w-full text-left`}
-                  onClick={() => setSelectedProject(project)}
-                >
-                  <div className="flex items-center w-full">
-                    <span className="text-sm font-medium truncate">{project.title}</span>
-                  </div>
-                  <div className="w-full">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>
-                        {dict.dashboard?.budget || "Budget"}: ${project.limitBudget}
-                      </span>
-                      <span>
-                        {dict.dashboard?.spent || "Spent"}: ${project.currentSpent}
-                      </span>
-                    </div>
-                    <Progress value={(project.currentSpent / project.limitBudget) * 100} className="h-1 mt-1" />
-                  </div>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+
+        {/* Project selector component */}
+        <ProjectsSelector
+          projects={PROJECTS}
+          selectedProject={selectedProject}
+          setSelectedProject={setSelectedProject}
+          dict={dict}
+        />
 
         {/* Project overview */}
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm overflow-hidden">
