@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import CustomPieChart from "@/components/custom-pie-chart";
-import {ProjectsSelector} from "@/components/projects-selector";
+import {ProjectsSelector} from "@/components/dashboard/projects-selector";
 
 // Mock data for projects
 const PROJECTS = [
@@ -284,7 +284,7 @@ export function DashboardOverview({dict, lang}: { dict: any; lang: string }) {
               />
             </div>
 
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="mt-8 grid grid-cols-1 gap-6">
               {/* Progress Pie Chart */}
               <div className="bg-muted/30 rounded-lg border border-border/50 overflow-hidden">
                 <div className="p-4 border-b border-border/50">

@@ -1,4 +1,3 @@
-"use client";
 import React, { useCallback, useState } from "react";
 import {PieChart, Pie, Sector, Cell} from "recharts";
 

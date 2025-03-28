@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { useState } from "react"
 import { Building, ClipboardList, Package, Users, Search, Filter, ArrowUpDown } from "lucide-react"
@@ -8,9 +8,9 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PieChart, Pie, Cell, ResponsiveContainer } from "@/components/ui/chat"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import CustomPieChart from "@/components/custom-pie-chart";
 
 // Mock data for projects
 const PROJECTS = [
@@ -180,13 +180,13 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "COMPLETED":
-        return "bg-green-500/20 text-green-400 border-green-500/50"
+        return "bg-success/20 text-success border-success/50"
       case "IN_PROGRESS":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/50"
+        return "bg-info/20 text-info border-info/50"
       case "PENDING":
-        return "bg-amber-500/20 text-amber-400 border-amber-500/50"
+        return "bg-warning/20 text-warning border-warning/50"
       default:
-        return "bg-slate-500/20 text-slate-400 border-slate-500/50"
+        return "bg-muted/20 text-muted-foreground border-muted/50"
     }
   }
 
@@ -194,37 +194,37 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
   const getMaterialStatusColor = (status: string) => {
     switch (status) {
       case "Delivered":
-        return "bg-green-500/20 text-green-400 border-green-500/50"
+        return "bg-success/20 text-success border-success/50"
       case "Partially Delivered":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/50"
+        return "bg-info/20 text-info border-info/50"
       case "Ordered":
-        return "bg-purple-500/20 text-purple-400 border-purple-500/50"
+        return "bg-primary/20 text-primary border-primary/50"
       case "Pending":
-        return "bg-amber-500/20 text-amber-400 border-amber-500/50"
+        return "bg-warning/20 text-warning border-warning/50"
       default:
-        return "bg-slate-500/20 text-slate-400 border-slate-500/50"
+        return "bg-muted/20 text-muted-foreground border-muted/50"
     }
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-slate-100">{dict.projects?.title || "Project Management"}</h1>
+        <h1 className="text-2xl font-bold">{dict.projects?.title || "Project Management"}</h1>
 
         <div className="flex items-center gap-2">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              className="bg-slate-800/50 border-slate-700 pl-10"
+              className="bg-muted/50 border-border pl-10"
               placeholder={dict.projects?.searchProjects || "Search projects..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button variant="outline" size="icon" className="bg-slate-800/50 border-slate-700 text-slate-400">
+          <Button variant="outline" size="icon" className="bg-muted/50 border-border text-muted-foreground">
             <Filter className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" className="bg-slate-800/50 border-slate-700 text-slate-400">
+          <Button variant="outline" size="icon" className="bg-muted/50 border-border text-muted-foreground">
             <ArrowUpDown className="h-4 w-4" />
           </Button>
         </div>
@@ -236,35 +236,35 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
           {filteredProjects.map((project) => (
             <Card
               key={project.id}
-              className={`bg-slate-900/50 border-slate-700/50 backdrop-blur-sm cursor-pointer transition-colors hover:bg-slate-800/50 ${
-                selectedProject.id === project.id ? "border-cyan-500/50" : ""
+              className={`bg-card/50 border-border/50 backdrop-blur-sm cursor-pointer transition-colors hover:bg-muted/50 ${
+                selectedProject.id === project.id ? "border-primary/50" : ""
               }`}
               onClick={() => setSelectedProject(project)}
             >
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-medium text-slate-100">{project.title}</h3>
+                  <h3 className="text-lg font-medium">{project.title}</h3>
                   <Badge
                     variant="outline"
                     className={
                       project.status === "Completed"
-                        ? "bg-green-500/10 text-green-400 border-green-500/30"
-                        : "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                        ? "bg-success/10 text-success border-success/30"
+                        : "bg-info/10 text-info border-info/30"
                     }
                   >
                     {project.status}
                   </Badge>
                 </div>
 
-                <p className="text-sm text-slate-400 mb-3 line-clamp-2">{project.description}</p>
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{project.description}</p>
 
-                <div className="flex justify-between text-xs text-slate-500 mb-1">
+                <div className="flex justify-between text-xs text-muted-foreground mb-1">
                   <span>{dict.projects?.progress || "Progress"}</span>
                   <span>
                     {Math.round(
                       (project.progress.done /
                         (project.progress.done + project.progress.inProgress + project.progress.todo)) *
-                        100,
+                      100,
                     )}
                     %
                   </span>
@@ -278,7 +278,7 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                   className="h-1.5 mb-3"
                 >
                   <div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
                     style={{
                       width: `${
                         (project.progress.done /
@@ -292,9 +292,9 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                 <div className="flex justify-between items-center">
                   <div className="flex -space-x-2">
                     {project.team.slice(0, 3).map((member) => (
-                      <Avatar key={member.id} className="h-6 w-6 border-2 border-slate-900">
+                      <Avatar key={member.id} className="h-6 w-6 border-2 border-background">
                         <AvatarImage src={member.avatar} alt={member.name} />
-                        <AvatarFallback className="bg-slate-700 text-cyan-500 text-xs">
+                        <AvatarFallback className="bg-muted text-primary text-xs">
                           {member.name
                             .split(" ")
                             .map((n) => n[0])
@@ -303,13 +303,13 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                       </Avatar>
                     ))}
                     {project.team.length > 3 && (
-                      <div className="h-6 w-6 rounded-full bg-slate-700 border-2 border-slate-900 flex items-center justify-center text-xs text-slate-300">
+                      <div className="h-6 w-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs text-muted-foreground">
                         +{project.team.length - 3}
                       </div>
                     )}
                   </div>
 
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-muted-foreground">
                     {project.startDate} - {project.endDate}
                   </div>
                 </div>
@@ -318,9 +318,9 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
           ))}
 
           {filteredProjects.length === 0 && (
-            <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
-                <p className="text-slate-400">
+                <p className="text-muted-foreground">
                   {dict.projects?.noResults || "No projects found matching your search."}
                 </p>
               </CardContent>
@@ -330,19 +330,19 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
 
         {/* Project details - 8 columns on large screens */}
         <div className="col-span-12 lg:col-span-8 space-y-6">
-          <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
-            <CardHeader className="border-b border-slate-700/50 pb-3">
+          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+            <CardHeader className="border-b border-border/50 pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-slate-100 flex items-center">
-                  <Building className="mr-2 h-5 w-5 text-cyan-500" />
+                <CardTitle className="flex items-center">
+                  <Building className="mr-2 h-5 w-5 text-primary" />
                   {selectedProject.title}
                 </CardTitle>
                 <Badge
                   variant="outline"
                   className={
                     selectedProject.status === "Completed"
-                      ? "bg-green-500/10 text-green-400 border-green-500/30"
-                      : "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                      ? "bg-success/10 text-success border-success/30"
+                      : "bg-info/10 text-info border-info/30"
                   }
                 >
                   {selectedProject.status}
@@ -351,28 +351,28 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
             </CardHeader>
             <CardContent className="p-0">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full justify-start rounded-none border-b border-slate-700/50 bg-transparent p-0">
+                <TabsList className="w-full justify-start rounded-none border-b border-border/50 bg-transparent p-0">
                   <TabsTrigger
                     value="overview"
-                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
                     {dict.projects?.overview || "Overview"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="tasks"
-                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
                     {dict.projects?.tasks || "Tasks"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="team"
-                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
                     {dict.projects?.team || "Team"}
                   </TabsTrigger>
                   <TabsTrigger
                     value="materials"
-                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-cyan-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                   >
                     {dict.projects?.materials || "Materials"}
                   </TabsTrigger>
@@ -382,87 +382,116 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Project Info */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-100">
-                        {dict.projects?.projectInfo || "Project Information"}
-                      </h3>
+                      <h3 className="text-lg font-medium">{dict.projects?.projectInfo || "Project Information"}</h3>
 
                       <div className="space-y-3">
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.manager || "Manager"}:</span>
+                          <span className="text-muted-foreground">{dict.projects?.manager || "Manager"}:</span>
                           <div className="flex items-center">
                             <Avatar className="h-5 w-5 mr-2">
                               <AvatarImage src={selectedProject.adminAvatar} alt={selectedProject.admin} />
-                              <AvatarFallback className="bg-slate-700 text-cyan-500 text-xs">
+                              <AvatarFallback className="bg-muted text-primary text-xs">
                                 {selectedProject.admin
                                   .split(" ")
                                   .map((n) => n[0])
                                   .join("")}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-slate-200">{selectedProject.admin}</span>
+                            <span>{selectedProject.admin}</span>
                           </div>
                         </div>
 
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.location || "Location"}:</span>
-                          <span className="text-slate-200">{selectedProject.location}</span>
+                          <span className="text-muted-foreground">{dict.projects?.location || "Location"}:</span>
+                          <span>{selectedProject.location}</span>
                         </div>
 
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.startDate || "Start Date"}:</span>
-                          <span className="text-slate-200">{selectedProject.startDate}</span>
+                          <span className="text-muted-foreground">{dict.projects?.startDate || "Start Date"}:</span>
+                          <span>{selectedProject.startDate}</span>
                         </div>
 
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.endDate || "End Date"}:</span>
-                          <span className="text-slate-200">{selectedProject.endDate}</span>
+                          <span className="text-muted-foreground">{dict.projects?.endDate || "End Date"}:</span>
+                          <span>{selectedProject.endDate}</span>
                         </div>
 
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.budget || "Budget"}:</span>
-                          <span className="text-slate-200">${selectedProject.limitBudget.toLocaleString()}</span>
+                          <span className="text-muted-foreground">{dict.projects?.budget || "Budget"}:</span>
+                          <span>${selectedProject.limitBudget.toLocaleString()}</span>
                         </div>
 
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.spent || "Spent"}:</span>
-                          <span className="text-slate-200">${selectedProject.currentSpent.toLocaleString()}</span>
+                          <span className="text-muted-foreground">{dict.projects?.spent || "Spent"}:</span>
+                          <span>${selectedProject.currentSpent.toLocaleString()}</span>
                         </div>
 
                         <div className="flex justify-between">
-                          <span className="text-slate-400">{dict.projects?.remaining || "Remaining"}:</span>
-                          <span className="text-slate-200">
-                            ${(selectedProject.limitBudget - selectedProject.currentSpent).toLocaleString()}
-                          </span>
+                          <span className="text-muted-foreground">{dict.projects?.remaining || "Remaining"}:</span>
+                          <span>${(selectedProject.limitBudget - selectedProject.currentSpent).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Progress Chart */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-slate-100">
-                        {dict.projects?.progressOverview || "Progress Overview"}
-                      </h3>
+                      <h3 className="text-lg font-medium">{dict.projects?.progressOverview || "Progress Overview"}</h3>
 
                       <div className="h-64 w-full relative">
-                        <CustomPieChart selectedProject={selectedProject} />
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                {
+                                  name: dict.projects?.done || "Done",
+                                  value: selectedProject.progress.done,
+                                  fill: "#10b981",
+                                },
+                                {
+                                  name: dict.projects?.inProgress || "In Progress",
+                                  value: selectedProject.progress.inProgress,
+                                  fill: "#3b82f6",
+                                },
+                                {
+                                  name: dict.projects?.todo || "To Do",
+                                  value: selectedProject.progress.todo,
+                                  fill: "#f59e0b",
+                                },
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={80}
+                              dataKey="value"
+                              label={({ name, percent }:any) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                              labelLine={false}
+                            >
+                              {[{ color: "#10b981" }, { color: "#3b82f6" }, { color: "#f59e0b" }].map(
+                                (entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ),
+                              )}
+                            </Pie>
+                          </PieChart>
+                        </ResponsiveContainer>
                       </div>
 
                       <div className="flex justify-between">
                         <div className="flex items-center">
-                          <div className="h-3 w-3 rounded-full bg-green-500 mr-2"></div>
-                          <span className="text-sm text-slate-300">
+                          <div className="h-3 w-3 rounded-full bg-success mr-2"></div>
+                          <span className="text-sm">
                             {dict.projects?.done || "Done"}: {selectedProject.progress.done}
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <div className="h-3 w-3 rounded-full bg-blue-500 mr-2"></div>
-                          <span className="text-sm text-slate-300">
+                          <div className="h-3 w-3 rounded-full bg-info mr-2"></div>
+                          <span className="text-sm">
                             {dict.projects?.inProgress || "In Progress"}: {selectedProject.progress.inProgress}
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <div className="h-3 w-3 rounded-full bg-amber-500 mr-2"></div>
-                          <span className="text-sm text-slate-300">
+                          <div className="h-3 w-3 rounded-full bg-warning mr-2"></div>
+                          <span className="text-sm">
                             {dict.projects?.todo || "To Do"}: {selectedProject.progress.todo}
                           </span>
                         </div>
@@ -471,41 +500,43 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-slate-100">
-                      {dict.projects?.description || "Description"}
-                    </h3>
-                    <p className="text-slate-300">{selectedProject.description}</p>
+                    <h3 className="text-lg font-medium">{dict.projects?.description || "Description"}</h3>
+                    <p>{selectedProject.description}</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="tasks" className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-slate-100">{dict.projects?.taskList || "Task List"}</h3>
-                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
-                        <ClipboardList className="h-4 w-4 mr-2" />
+                      <h3 className="text-lg font-medium">{dict.projects?.taskList || "Task List"}</h3>
+                      <Button size="sm" className="bg-primary hover:bg-primary/90">
+                        {/*<ClipboardList className="h-4 w-4 mr-2" />*/}
                         {dict.projects?.addTask || "Add Task"}
                       </Button>
                     </div>
 
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-slate-700">
-                          <TableHead className="text-slate-400">{dict.projects?.taskName || "Task"}</TableHead>
-                          <TableHead className="text-slate-400">{dict.projects?.assignee || "Assignee"}</TableHead>
-                          <TableHead className="text-slate-400">{dict.projects?.status || "Status"}</TableHead>
-                          <TableHead className="text-slate-400">{dict.projects?.dueDate || "Due Date"}</TableHead>
+                        <TableRow className="border-border">
+                          <TableHead className="text-muted-foreground">{dict.projects?.taskName || "Task"}</TableHead>
+                          <TableHead className="text-muted-foreground">
+                            {dict.projects?.assignee || "Assignee"}
+                          </TableHead>
+                          <TableHead className="text-muted-foreground">{dict.projects?.status || "Status"}</TableHead>
+                          <TableHead className="text-muted-foreground">
+                            {dict.projects?.dueDate || "Due Date"}
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {selectedProject.tasks.map((task) => (
-                          <TableRow key={task.id} className="border-slate-700">
-                            <TableCell className="text-slate-300">{task.title}</TableCell>
-                            <TableCell className="text-slate-300">{task.assignee}</TableCell>
+                        {selectedProject.tasks.map((task):any => (
+                          <TableRow key={task.id} className="border-border">
+                            <TableCell>{task.title}</TableCell>
+                            <TableCell>{task.assignee}</TableCell>
                             <TableCell>
                               <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
                             </TableCell>
-                            <TableCell className="text-slate-300">{task.dueDate}</TableCell>
+                            <TableCell>{task.dueDate}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -516,24 +547,22 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                 <TabsContent value="team" className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-slate-100">
-                        {dict.projects?.teamMembers || "Team Members"}
-                      </h3>
-                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
+                      <h3 className="text-lg font-medium">{dict.projects?.teamMembers || "Team Members"}</h3>
+                      <Button size="sm" className="bg-primary hover:bg-primary/90">
                         <Users className="h-4 w-4 mr-2" />
                         {dict.projects?.addMember || "Add Member"}
                       </Button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedProject.team.map((member) => (
+                      {selectedProject.team.map((member):any => (
                         <div
                           key={member.id}
-                          className="bg-slate-800/50 rounded-lg border border-slate-700/50 p-4 flex items-center"
+                          className="bg-muted/50 rounded-lg border border-border/50 p-4 flex items-center"
                         >
                           <Avatar className="h-12 w-12 mr-4">
                             <AvatarImage src={member.avatar} alt={member.name} />
-                            <AvatarFallback className="bg-slate-700 text-cyan-500">
+                            <AvatarFallback className="bg-muted text-primary">
                               {member.name
                                 .split(" ")
                                 .map((n) => n[0])
@@ -541,8 +570,8 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <h4 className="text-slate-200 font-medium">{member.name}</h4>
-                            <p className="text-slate-400 text-sm">{member.role}</p>
+                            <h4 className="font-medium">{member.name}</h4>
+                            <p className="text-muted-foreground text-sm">{member.role}</p>
                           </div>
                         </div>
                       ))}
@@ -553,10 +582,8 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
                 <TabsContent value="materials" className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-slate-100">
-                        {dict.projects?.materialsList || "Materials List"}
-                      </h3>
-                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
+                      <h3 className="text-lg font-medium">{dict.projects?.materialsList || "Materials List"}</h3>
+                      <Button size="sm" className="bg-primary hover:bg-primary/90">
                         <Package className="h-4 w-4 mr-2" />
                         {dict.projects?.addMaterial || "Add Material"}
                       </Button>
@@ -564,21 +591,25 @@ export function ProjectsView({ dict, lang }: ProjectsViewProps) {
 
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-slate-700">
-                          <TableHead className="text-slate-400">{dict.projects?.materialName || "Material"}</TableHead>
-                          <TableHead className="text-slate-400">{dict.projects?.quantity || "Quantity"}</TableHead>
-                          <TableHead className="text-slate-400">{dict.projects?.cost || "Cost"}</TableHead>
-                          <TableHead className="text-slate-400">{dict.projects?.status || "Status"}</TableHead>
+                        <TableRow className="border-border">
+                          <TableHead className="text-muted-foreground">
+                            {dict.projects?.materialName || "Material"}
+                          </TableHead>
+                          <TableHead className="text-muted-foreground">
+                            {dict.projects?.quantity || "Quantity"}
+                          </TableHead>
+                          <TableHead className="text-muted-foreground">{dict.projects?.cost || "Cost"}</TableHead>
+                          <TableHead className="text-muted-foreground">{dict.projects?.status || "Status"}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {selectedProject.materials.map((material) => (
-                          <TableRow key={material.id} className="border-slate-700">
-                            <TableCell className="text-slate-300">{material.name}</TableCell>
-                            <TableCell className="text-slate-300">
+                        {selectedProject.materials.map((material):any => (
+                          <TableRow key={material.id} className="border-border">
+                            <TableCell>{material.name}</TableCell>
+                            <TableCell>
                               {material.quantity} {material.unit}
                             </TableCell>
-                            <TableCell className="text-slate-300">${material.cost.toLocaleString()}</TableCell>
+                            <TableCell>${material.cost.toLocaleString()}</TableCell>
                             <TableCell>
                               <Badge className={getMaterialStatusColor(material.status)}>{material.status}</Badge>
                             </TableCell>

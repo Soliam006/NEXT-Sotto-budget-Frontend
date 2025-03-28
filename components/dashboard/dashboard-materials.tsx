@@ -135,16 +135,16 @@ export function DashboardMaterials({ dict, lang }: DashboardMaterialsProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-100">{dict.materials?.title || "Materials Inventory"}</h1>
+      <h1 className="text-2xl font-bold text-foreground">{dict.materials?.title || "Materials Inventory"}</h1>
 
-      <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-slate-100 flex items-center text-base">
+            <CardTitle className="text-foreground flex items-center text-base">
               <Package className="mr-2 h-5 w-5 text-cyan-500" />
               {dict.materials?.inventory || "Inventory"}
             </CardTitle>
-            <Badge variant="outline" className="bg-slate-800/50 text-cyan-400 border-cyan-500/50">
+            <Badge variant="outline" className="bg-card text-cyan-400 border-cyan-500/50">
               {MATERIALS.length} {dict.materials?.items || "Items"}
             </Badge>
           </div>
@@ -152,12 +152,12 @@ export function DashboardMaterials({ dict, lang }: DashboardMaterialsProps) {
         <CardContent>
           <div className="mb-4 relative">
             <Input
-              className="bg-slate-800/50 border-slate-700 pl-10"
+              className="bg-card border-border pl-10"
               placeholder={dict.materials?.searchMaterials || "Search materials..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           </div>
 
           <div className="space-y-4">
@@ -166,7 +166,7 @@ export function DashboardMaterials({ dict, lang }: DashboardMaterialsProps) {
             ))}
 
             {filteredMaterials.length === 0 && (
-              <div className="text-center py-8 text-slate-400">
+              <div className="text-center py-8 text-muted-foreground">
                 {dict.materials?.noResults || "No materials found matching your search."}
               </div>
             )}
@@ -212,17 +212,17 @@ function MaterialCard({ material, dict }: { material: any; dict: any }) {
   const percentage = material.total > 0 ? Math.round((material.used / material.total) * 100) : 0
 
   return (
-    <div className="bg-slate-800/50 rounded-lg border border-slate-700/50 p-4">
+    <div className="bg-card rounded-lg border border-border/50 p-4">
       <div className="flex flex-col md:flex-row md:items-center gap-4">
         <div className="flex-grow">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
             <div>
-              <h3 className="text-lg font-medium text-slate-200">{material.name}</h3>
+              <h3 className="text-lg font-medium text-foreground">{material.name}</h3>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className="bg-slate-700/50 text-slate-300 border-slate-600">
+                <Badge variant="outline" className="bg-card border-border/80 text-foreground/80">
                   {material.category}
                 </Badge>
-                <span className="text-xs text-slate-400">{material.project}</span>
+                <span className="text-xs text-muted-foreground">{material.project}</span>
               </div>
             </div>
             {getStatusBadge()}
@@ -231,41 +231,41 @@ function MaterialCard({ material, dict }: { material: any; dict: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">{dict.materials?.supplier || "Supplier"}:</span>
-                <span className="text-slate-300">{material.supplier}</span>
+                <span className="text-muted-foreground">{dict.materials?.supplier || "Supplier"}:</span>
+                <span className="text-foreground/80">{material.supplier}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">{dict.materials?.unitCost || "Unit Cost"}:</span>
-                <span className="text-slate-300">
+                <span className="text-muted-foreground">{dict.materials?.unitCost || "Unit Cost"}:</span>
+                <span className="text-foreground/80">
                   ${material.unitCost}/{material.unit}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">{dict.materials?.totalCost || "Total Cost"}:</span>
-                <span className="text-slate-300">${material.total}</span>
+                <span className="text-muted-foreground">{dict.materials?.totalCost || "Total Cost"}:</span>
+                <span className="text-foreground/80">${material.total}</span>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">{dict.materials?.used || "Used"}:</span>
-                <span className="text-slate-300">${material.used}</span>
+                <span className="text-muted-foreground">{dict.materials?.used || "Used"}:</span>
+                <span className="text-foreground/80">${material.used}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">{dict.materials?.remaining || "Remaining"}:</span>
-                <span className="text-slate-300">${material.remaining}</span>
+                <span className="text-muted-foreground">{dict.materials?.remaining || "Remaining"}:</span>
+                <span className="text-foreground/80">${material.remaining}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">{dict.materials?.usage || "Usage"}:</span>
-                <span className="text-slate-300">{percentage}%</span>
+                <span className="text-muted-foreground">{dict.materials?.usage || "Usage"}:</span>
+                <span className="text-foreground/80">{percentage}%</span>
               </div>
             </div>
           </div>
 
           <div className="mt-3">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-slate-400">{dict.materials?.progress || "Progress"}:</span>
-              <span className="text-slate-400">{percentage}%</span>
+              <span className="text-muted-foreground">{dict.materials?.progress || "Progress"}:</span>
+              <span className="text-muted-foreground">{percentage}%</span>
             </div>
             <Progress value={percentage} className="h-1.5">
               <div
@@ -276,11 +276,7 @@ function MaterialCard({ material, dict }: { material: any; dict: any }) {
           </div>
 
           <div className="mt-3 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-slate-700 bg-slate-800/50 hover:bg-slate-700/50 text-xs"
-            >
+            <Button variant="outline" size="sm" className="border-border bg-card hover:bg-muted text-xs">
               {dict.materials?.viewDetails || "View Details"}
             </Button>
           </div>

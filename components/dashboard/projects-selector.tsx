@@ -7,27 +7,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Building } from "lucide-react"
 
 interface Project {
-  id: number
-  title: string
-  limitBudget: number
-  currentSpent: number
-  description: string
-  admin: string
+  id: number;
+  title: string;
+  description: string;
+  admin: string;
+  limitBudget: number;
+  currentSpent: number;
   progress: {
-    done: number
-    inProgress: number
-    todo: number
-  }
-  location: string
-  startDate: string
-  endDate: string
-  status: string
+    done: number;
+    inProgress: number;
+    todo: number;
+  };
+  location: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  expenses?: {
+    id: number;
+    date: string;
+    category: string;
+    description: string;
+    amount: number;
+    status: string;
+  }[];
+  expenseCategories?: {
+    [key: string]: number;
+  };
 }
-
 interface ProjectsSelectorProps {
   projects: Project[]
   selectedProject: Project
-  setSelectedProject: (project: Project) => void
+  setSelectedProject: (project: any) => void
   dict: any
 }
 
