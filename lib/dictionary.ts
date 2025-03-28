@@ -13,6 +13,7 @@ export const getDictionary = async (locale: string) => {
         console.warn(`Locale '${locale}' not supported, falling back to 'en'`)
         locale = "en"
     }
+    console.log(`Loading dictionary for locale '${locale}'`)
 
     // Ahora podemos estar seguros de que locale es 'en' o 'es'
     return dictionaries[locale as Locale]()

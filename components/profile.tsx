@@ -1,6 +1,6 @@
 "use client"
 
-import {useState, useEffect} from "react"
+import {useState} from "react"
 import {
   Activity,
   AlertCircle,
@@ -8,20 +8,13 @@ import {
   Building,
   Calendar,
   Check,
-  Construction,
   Edit,
   FileText,
-  Home,
   Mail,
   MapPin,
   MessageSquare,
-  Moon,
   Phone,
-  Search,
-  Settings,
   Share2,
-  Sun,
-  User,
   UserPlus,
   Users,
   X,
@@ -34,23 +27,12 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Badge} from "@/components/ui/badge"
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import {Input} from "@/components/ui/input"
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
 import {ScrollArea} from "@/components/ui/scroll-area"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {useUser} from "@/app/context/UserProvider";
 import {EditProfileDialog} from "./edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
 import {getRole, getToken} from "@/app/services/auth-service";
 import {User as User_Type} from "@/app/context/user.types";
-import Image from "next/image";
 import {updateUserInformation} from "@/app/actions/auth";
 
 // Mock data for user profile
@@ -181,62 +163,15 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   const {user, setUser} = useUser();
   const [user_data, setUser_data] = useState<User_Type | null>(user);
 
-  const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [isProjectsDialogOpen, setIsProjectsDialogOpen] = useState(false)
   const [isFollowersDialogOpen, setIsFollowersDialogOpen] = useState(false)
   const [isFollowingDialogOpen, setIsFollowingDialogOpen] = useState(false)
   const [isRequestsDialogOpen, setIsRequestsDialogOpen] = useState(false)
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState(SEARCH_RESULTS)
   const [followers, setFollowers] = useState(FOLLOWERS)
   const [following, setFollowing] = useState(FOLLOWING)
   const [requests, setRequests] = useState(REQUESTS)
-
-  // Toggle theme
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark"
-    setTheme(newTheme)
-
-    // Update the class on the document element
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-    }
-  }
-
-  // Add an effect to sync the theme state with the document class on component mount
-  useEffect(() => {
-    // Check if dark class is present on document
-    const isDarkMode = document.documentElement.classList.contains("dark")
-    setTheme(isDarkMode ? "dark" : "light")
-  }, [])
-
-  // Handle language change
-  const handleLanguageChange = (newLang: string) => {
-    if (newLang !== lang) {
-      router.push(`/${newLang}/profile`)
-    }
-  }
-
-  // Handle search
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    if (query.trim() === "") {
-      setSearchResults(SEARCH_RESULTS)
-      return
-    }
-
-    const filtered = SEARCH_RESULTS.filter(
-      (user) =>
-        user.name.toLowerCase().includes(query.toLowerCase()) ||
-        user.username.toLowerCase().includes(query.toLowerCase()) ||
-        user.role.toLowerCase().includes(query.toLowerCase()),
-    )
-    setSearchResults(filtered)
-  }
 
   // Handle follow/unfollow
   const handleFollowToggle = (userId: string) => {
@@ -343,125 +278,8 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   }
 
   return (
-    <div className={`${theme} min-h-screen bg-background text-foreground relative overflow-hidden`}>
+    <div className={`min-h-screen bg-background text-foreground relative overflow-hidden`}>
       <div className="container mx-auto p-4 relative z-10">
-        {/* Header */}
-        <header className="flex items-center justify-between py-4 border-b border-border mb-6">
-          <div className="flex items-center space-x-2">
-            <Image src="/favicon.ico" alt="SottoBudget" width={50} height={50}
-                   className="rounded-lg"/>
-            <span
-              className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:block hidden">
-              SottoBudget
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden text-muted-foreground hover:text-foreground"
-              onClick={() => setIsSearchDialogOpen(true)}
-            >
-              <Search className="h-5 w-5"/>
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden md:flex items-center space-x-2 bg-secondary border-border hover:bg-secondary"
-              onClick={() => setIsSearchDialogOpen(true)}
-            >
-              <Search className="h-4 w-4 text-muted-foreground"/>
-              <span className="text-muted-foreground">{dict.profile.searchUsers}</span>
-            </Button>
-
-            <div className="flex items-center space-x-3">
-              <Select value={lang} onValueChange={handleLanguageChange}>
-                <SelectTrigger className="w-[70px] md:w-[100px] bg-secondary border-border text-muted-foreground">
-                  <SelectValue placeholder={dict.language[lang]}/>
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border">
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="relative text-muted-foreground hover:text-foreground"
-                    >
-                      <Bell className="h-5 w-5"/>
-                      <span className="absolute -top-1 -right-1 h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{dict.nav.notifications}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleTheme}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      {theme === "dark" ? <Sun className="h-5 w-5"/> : <Moon className="h-5 w-5"/>}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{dict.nav.toggleTheme}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar>
-                      <AvatarImage src="/placeholder.svg?height=32&width=32&text=AJ" alt={user?.name}/>
-                      <AvatarFallback className="bg-slate-700 text-cyan-500">
-                        {generateInicials(user?.name || "Undefined")}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">@{user?.username}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator/>
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4"/>
-                    <span>{dict.nav.profile}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4"/>
-                    <span>{dict.nav.settings}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Home className="mr-2 h-4 w-4"/>
-                    <span>{dict.nav.dashboard}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator/>
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4"/>
-                    <span>{dict.nav.logout}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </header>
 
         {/* Profile Header */}
         <div className="relative mb-8">
@@ -1028,71 +846,6 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <p>{dict.requests.noRequests}</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Search Dialog */}
-      <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
-        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center">
-              <Search className="mr-2 h-5 w-5 text-cyan-500"/>
-              {dict.search.title}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">{dict.search.description}</DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-4">
-            <Input
-              placeholder={dict.search.placeholder}
-              className="bg-background border-input mb-4"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              autoFocus
-            />
-
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-4">
-                {searchResults.length > 0 ? (
-                  searchResults.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
-                    >
-                      <div className="flex items-center">
-                        <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={user.avatar} alt={user.name}/>
-                          <AvatarFallback className="bg-slate-700 text-cyan-500">{user.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium">{user.name}</p>
-                          <p className="text-xs text-muted-foreground">{user.role}</p>
-                        </div>
-                      </div>
-                      {user.id !== "user123" && (
-                        <Button
-                          variant={user.isFollowing ? "outline" : "default"}
-                          size="sm"
-                          className={
-                            user.isFollowing
-                              ? "bg-secondary/70 border-border hover:bg-secondary"
-                              : "bg-primary hover:bg-primary/90"
-                          }
-                          onClick={() => handleFollowToggle(user.id)}
-                        >
-                          {user.isFollowing ? dict.search.following : dict.search.follow}
-                        </Button>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>{dict.search.noResults}</p>
                   </div>
                 )}
               </div>

@@ -1,11 +1,11 @@
 "use client";
 import { getDictionary } from "@/lib/dictionary"
-import { DashboardOverview } from "@/components/dashboard/dashboard-overview"
+import { ProjectsView } from "@/components/dashboard/projects-view"
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
 
-export default function DashboardPage() {
+export default function ProjectsPage() {
   const params = useParams();
   const [dictionary, setDictionary] = useState<any>(null);
 
@@ -18,8 +18,8 @@ export default function DashboardPage() {
     }
     fetchDictionary();
   }, [params?.lang]);
+  if (!dictionary) return <LoadingView/>;
 
-    if (!dictionary) return <LoadingView/>;
-
-  return <DashboardOverview dict={dictionary} lang={params.lang as string} />
+  return <ProjectsView dict={dictionary} lang={params.lang as string} />
 }
+

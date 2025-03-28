@@ -159,6 +159,10 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    /* Custom colors for dashboard */
+    --success: #10b981;
+    --info: #3b82f6;
+    --warning: #f59e0b;
   }
 
   .dark {
@@ -191,6 +195,11 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Custom colors for dashboard */
+    --success: #22c55e;
+    --info: #60a5fa;
+    --warning: #fbbf24;
   }
 }
 .light {
@@ -208,5 +217,30 @@
   /* Add a gradient background for dark mode */
   .dark body {
     background: linear-gradient(to bottom right, #000000, #0f172a);
+  }
+
+  /* Utility classes for custom colors */
+  .text-success {
+    color: var(--success);
+  }
+
+  .text-info {
+    color: var(--info);
+  }
+
+  .text-warning {
+    color: var(--warning);
+  }
+
+  .bg-success {
+    background-color: var(--success);
+  }
+
+  .bg-info {
+    background-color: var(--info);
+  }
+
+  .bg-warning {
+    background-color: var(--warning);
   }
 }
