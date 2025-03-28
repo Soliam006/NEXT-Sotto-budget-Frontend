@@ -73,7 +73,7 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
     <div className="min-h-screen bg-background text-foreground">
         <TopBarWrapper user={user} dictionary={dictionary} lang={lang}
                        onNavigate={handleNavigate} />
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 py-6 md:pt-16">
         <div className="flex flex-col md:flex-row gap-6 mt-6">
           {/* Sidebar - visible on md screens and up */}
           <div className="hidden md:block w-64 flex-shrink-0">

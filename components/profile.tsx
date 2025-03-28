@@ -168,16 +168,12 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   const [isFollowingDialogOpen, setIsFollowingDialogOpen] = useState(false)
   const [isRequestsDialogOpen, setIsRequestsDialogOpen] = useState(false)
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState(SEARCH_RESULTS)
   const [followers, setFollowers] = useState(FOLLOWERS)
   const [following, setFollowing] = useState(FOLLOWING)
   const [requests, setRequests] = useState(REQUESTS)
 
   // Handle follow/unfollow
   const handleFollowToggle = (userId: string) => {
-    setSearchResults((prev) =>
-      prev.map((user) => (user.id === userId ? {...user, isFollowing: !user.isFollowing} : user)),
-    )
 
     // Also update in following list if user_data is there
     setFollowing((prev) => {
@@ -297,13 +293,13 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
           </div>
           <div className="absolute bottom-4 right-4 flex space-x-2">
             <Button
-              className="bg-secondary/90 border-border hover:bg-secondary text-primary"
+              className="bg-secondary/90 border-border hover:bg-secondary text-primary cursor-pointer"
               onClick={() => setIsEditProfileOpen(true)}
             >
               <Edit className="h-4 w-4 mr-2"/>
               {dict.profile.edit.button}
             </Button>
-            <Button className="bg-primary hover:bg-primary/90">
+            <Button className="bg-primary hover:bg-primary/90 cursor-pointer">
               <Share2 className="h-4 w-4 mr-2"/>
               {dict.profile.share}
             </Button>
@@ -567,8 +563,8 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
       {/* Projects Dialog */}
       <Dialog open={isProjectsDialogOpen} onOpenChange={setIsProjectsDialogOpen}>
-        <DialogContent className="bg-background border-border text-foreground max-w-4xl">
-          <DialogHeader>
+        <DialogContent className="bg-background border-border text-foreground w-md-[50vw]">
+        <DialogHeader>
             <div className="flex justify-between items-start">
               <div>
                 <DialogTitle className="text-xl flex items-center">
@@ -582,7 +578,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
             </div>
           </DialogHeader>
 
-          <ScrollArea className="h-[70vh] pr-4 mt-4">
+          <ScrollArea className="h-[70vh] pr-4 mt-4 w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {PROJECTS.map((project) => (
                 <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">

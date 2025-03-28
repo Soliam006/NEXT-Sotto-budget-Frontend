@@ -34,7 +34,7 @@ export default function  Profile() {
   return (
       <div className="min-h-screen bg-background">
         <TopBarWrapper user={user} dictionary={dictionary} lang={params.lang as string} />
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-6 md:pt-16">
           <ProfilePage dict={dictionary} lang={params.lang as string} />
         </div>
       </div>
