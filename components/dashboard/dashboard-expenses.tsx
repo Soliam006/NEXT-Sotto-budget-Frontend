@@ -306,15 +306,22 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
       {/* Expense Overview */}
       <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
         <CardHeader className="border-b border-border/50 pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+            <CardTitle className="flex items-center text-lg sm:text-xl">
               <DollarSign className="mr-2 h-5 w-5 text-primary" />
               {dict.expenses?.expenseOverview || "Expense Overview"}
             </CardTitle>
-            <Button variant="outline" size="sm" className="bg-muted/50 border-border text-muted-foreground">
-              <Download className="h-4 w-4 mr-2" />
-              {dict.expenses?.exportReport || "Export Report"}
-            </Button>
+
+            <div className="self-start sm:self-auto">
+              <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-muted/50 border-border text-muted-foreground"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {dict.expenses?.exportReport || "Export Report"}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -475,7 +482,7 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
 
             <TabsContent value="list" className="p-6">
               <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <div className="relative flex-1 md:w-64">
                       <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -486,17 +493,10 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
-                    <Button variant="outline" size="icon" className="bg-muted/50 border-border text-muted-foreground">
-                      <Filter className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="bg-muted/50 border-border text-muted-foreground">
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
                   </div>
-
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
                     <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger className="w-[150px] bg-muted/50 border-border">
+                      <SelectTrigger className="w-full sm:w-[150px] bg-muted/50 border-border">
                         <SelectValue placeholder={dict.expenses?.category || "Category"} />
                       </SelectTrigger>
                       <SelectContent>
@@ -509,7 +509,7 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
                     </Select>
 
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-[150px] bg-muted/50 border-border">
+                      <SelectTrigger className="w-full sm:w-[150px] bg-muted/50 border-border">
                         <SelectValue placeholder={dict.expenses?.status || "Status"} />
                       </SelectTrigger>
                       <SelectContent>
@@ -520,7 +520,7 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
                       </SelectContent>
                     </Select>
 
-                    <Button className="bg-primary hover:bg-primary/90">
+                    <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90">
                       <DollarSign className="h-4 w-4 mr-2" />
                       {dict.expenses?.addExpense || "Add Expense"}
                     </Button>

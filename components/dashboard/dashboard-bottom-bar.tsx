@@ -1,6 +1,6 @@
 "use client"
 
-import { CalendarIcon, Command, Package, Users, Building } from "lucide-react"
+import {CalendarIcon, Command, Package, Users, Building, DollarSign} from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface DashboardBottomBarProps {
@@ -40,6 +40,12 @@ export function DashboardBottomBar({ dictionary, currentSection, onNavigate }: D
       label: dictionary.nav?.materials || "Materials",
       icon: Package,
       path: "/dashboard/materials",
+    },
+    {
+      id: "expenses",
+      label: dictionary.nav?.expenses || "Expenses",
+      icon: DollarSign,
+      path: "/dashboard/expenses",
     },
   ]
 

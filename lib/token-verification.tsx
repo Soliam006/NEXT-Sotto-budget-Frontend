@@ -5,8 +5,10 @@ import {useUser} from "@/app/context/UserProvider";
 import {fetchUserMe} from "@/app/actions/auth";
 
 
-const useAuthMiddleware = (isAuthPath:boolean, setIsLoadding: Dispatch<SetStateAction<boolean>>) => {
+const useAuthMiddleware = (isAuthPath:boolean,
+                           setIsLoadding: Dispatch<SetStateAction<boolean>>, lang_route?:string) => {
 
+  console.log("useAuthMiddleware LANG_ROUTE", lang_route);
   const router = useRouter();
   const {user, setUser} = useUser();
 
@@ -18,7 +20,7 @@ const useAuthMiddleware = (isAuthPath:boolean, setIsLoadding: Dispatch<SetStateA
       console.log('Token:', token, "Lang:", lang);
       if (!token) {
         setUser(null); // Limpia el usuario si no hay token
-        router.push(`/${lang}/login`); // Redirige al login si no hay token
+        router.push(`/${lang_route? lang_route : lang}/login`); // Redirige al login si no hay token
         setIsLoadding(false); // Finaliza el estado de carga
       } else {
         // Cargar al usuario si no está cargado
@@ -30,17 +32,17 @@ const useAuthMiddleware = (isAuthPath:boolean, setIsLoadding: Dispatch<SetStateA
               setUser(res.data); // Guarda el usuario en el contexto
             } else {
               clearToken(); // Limpia el token si no fue posible cargar el usuario
-              router.push(`/${lang}/login`); // Redirige al login si no fue posible cargar el usuario
+              router.push(`/${lang_route? lang_route : lang}/login`); // Redirige al login si no fue posible cargar el usuario
             }
           } catch (err) {
             console.error(err); // Muestra un error en la consola
             clearToken(); // Limpia el token si no fue posible cargar el usuario
-            router.push(`/${lang}/login`);
+            router.push(`/${lang_route? lang_route : lang}/login`);
           }
         }
 
         if (isAuthPath) { // Redirige al perfil si ya hay token y User
-          router.push(`/${lang}/profile`);
+          router.push(`/${lang_route? lang_route : lang}/profile`);
         }
         setIsLoadding(false); // Finaliza el estado de carga
       }
