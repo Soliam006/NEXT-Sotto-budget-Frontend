@@ -1,7 +1,6 @@
 "use server"
 
 import {createSignUpSchema, ExpectedType, LoginSchema} from "@/lib/validations/auth"
-import {fullWidthClassName} from "react-remove-scroll-bar";
 import {User} from "@/app/context/user.types";
 import {redirect} from "next/navigation";
 import isEqual from "lodash.isequal";
