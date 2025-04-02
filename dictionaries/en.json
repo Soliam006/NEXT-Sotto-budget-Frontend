@@ -173,7 +173,54 @@
       "inProgress": "In Progress",
       "planning": "Planning"
     },
-    "allProjects": "All projects {name} is involved in"
+    "allProjects": "All projects {name} is involved in",
+    "taskStatus": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    },
+    "taskPriority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "taskActions": {
+      "edit": "Edit Task",
+      "delete": "Delete Task",
+      "markComplete": "Mark as Complete",
+      "markInProgress": "Mark as In Progress",
+      "markPending": "Mark as Pending",
+      "assignTo": "Assign to"
+    },
+    "taskDetails": {
+      "title": "Task Details",
+      "description": "Description",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "priority": "Priority",
+      "status": "Status",
+      "assignedTo": "Assigned To",
+      "attachments": "Attachments",
+      "comments": "Comments",
+      "addComment": "Add Comment",
+      "noComments": "No comments yet"
+    },
+    "taskForm": {
+      "title": "Task Title",
+      "titlePlaceholder": "Enter task title",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter task description",
+      "startDate": "Start Date",
+      "endDate": "Due Date",
+      "priority": "Priority",
+      "status": "Status",
+      "assignTo": "Assign To",
+      "attachments": "Attachments",
+      "addAttachment": "Add Attachment",
+      "save": "Save Task",
+      "cancel": "Cancel"
+    }
   },
   "dashboard": {
     "overview": "Dashboard Overview",
@@ -386,3 +433,4 @@
     "es": "Spanish"
   }
 }
+

@@ -177,7 +177,54 @@
     "noResults": "No se encontraron proyectos que coincidan con tu búsqueda",
     "completion": "Completado",
     "role": "Rol",
-    "allProjects": "Todos los proyectos en los que {name} está involucrado"
+    "allProjects": "Todos los proyectos en los que {name} está involucrado",
+    "taskStatus": {
+      "completed": "Completada",
+      "inProgress": "En Progreso",
+      "pending": "Pendiente",
+      "cancelled": "Cancelada"
+    },
+    "taskPriority": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "taskActions": {
+      "edit": "Editar Tarea",
+      "delete": "Eliminar Tarea",
+      "markComplete": "Marcar como Completada",
+      "markInProgress": "Marcar como En Progreso",
+      "markPending": "Marcar como Pendiente",
+      "assignTo": "Asignar a"
+    },
+    "taskDetails": {
+      "title": "Detalles de la Tarea",
+      "description": "Descripción",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Finalización",
+      "priority": "Prioridad",
+      "status": "Estado",
+      "assignedTo": "Asignada a",
+      "attachments": "Archivos Adjuntos",
+      "comments": "Comentarios",
+      "addComment": "Añadir Comentario",
+      "noComments": "Aún no hay comentarios"
+    },
+    "taskForm": {
+      "title": "Título de la Tarea",
+      "titlePlaceholder": "Ingresa el título de la tarea",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingresa la descripción de la tarea",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Vencimiento",
+      "priority": "Prioridad",
+      "status": "Estado",
+      "assignTo": "Asignar a",
+      "attachments": "Archivos Adjuntos",
+      "addAttachment": "Añadir Archivo",
+      "save": "Guardar Tarea",
+      "cancel": "Cancelar"
+    }
   },
   "dashboard": {
     "overview": "Panel de Control",

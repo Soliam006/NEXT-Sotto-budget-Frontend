@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Building } from "lucide-react"
 
-interface Project {
+export interface Project {
   id: number;
   title: string;
   description: string;
@@ -22,6 +22,10 @@ interface Project {
   startDate: string;
   endDate: string;
   status: string;
+  tasks?: any;
+  team?: any;
+  materials?: any;
+  workers?: any;
   expenses?: {
     id: number;
     date: string;
