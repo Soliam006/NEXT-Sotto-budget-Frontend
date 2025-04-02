@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { createSwapy, Swapy } from "swapy" // Asegúrate de que la ruta o paquete sea el correcto
+import { useState, useEffect } from "react"
 import { TaskCard } from "@/components/tasks/task-card"
 import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Save, Loader2 } from "lucide-react"
+import { isEqual } from "lodash"
 
 interface Task {
     id: string
@@ -14,8 +14,8 @@ interface Task {
     assignee: string
     assigneeAvatar?: string
     status: "PENDING" | "IN_PROGRESS" | "COMPLETED"
-    created_at: string
     dueDate?: string
+    created_at: string
     updated_at: string
     project_id?: string | number
     worker_id?: string
@@ -35,6 +35,7 @@ const exampleTasks: Task[] = [
         title: "Instalar ventanas en el segundo piso",
         description: "Completar la instalación de todas las ventanas del segundo piso según las especificaciones",
         assignee: "Mike Johnson",
+        dueDate: new Date().toISOString(),
         status: "PENDING",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -47,6 +48,7 @@ const exampleTasks: Task[] = [
         description: "Verificar que todos los circuitos funcionan correctamente",
         assignee: "Sarah Williams",
         status: "IN_PROGRESS",
+        dueDate: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         project_id: "1",
@@ -58,6 +60,7 @@ const exampleTasks: Task[] = [
         description: "Usar la pintura aprobada por el cliente",
         assignee: "David Smith",
         status: "COMPLETED",
+        dueDate: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         project_id: "1",
@@ -68,112 +71,102 @@ const exampleTasks: Task[] = [
 export function TaskBoard({ initialTasks = [], projectId, dict, lang }: TaskBoardProps) {
     // Estado para las tareas y cambios
     const [tasks, setTasks] = useState<Task[]>(initialTasks.length > 0 ? initialTasks : exampleTasks)
+    const [originalTasks, setOriginalTasks] = useState<Task[]>(initialTasks.length > 0 ? initialTasks : exampleTasks)
     const [changedTasks, setChangedTasks] = useState<{ id: string; status: string }[]>([])
     const [isSaving, setIsSaving] = useState(false)
+    const [hasChanges, setHasChanges] = useState(false)
 
-    // Usamos un único contenedor para Swapy
-    const containerRef = useRef<HTMLDivElement>(null)
-    const swapyRef = useRef<Swapy | null>(null)
+    // Comprobar si hay cambios en las tareas
+    useEffect(() => {
+        // Verificar si las tareas actuales son diferentes de las originales
+        const tasksChanged = !isEqual(
+          tasks.map((t) => ({
+              id: t.id,
+              title: t.title,
+              description: t.description,
+              assignee: t.assignee,
+              status: t.status,
+              dueDate: t.dueDate,
+          })),
+          originalTasks.map((t) => ({
+              id: t.id,
+              title: t.title,
+              description: t.description,
+              assignee: t.assignee,
+              status: t.status,
+              dueDate: t.dueDate,
+          })),
+        )
+
+        // Verificar si hay tareas nuevas (no presentes en las originales)
+        const hasNewTasks = tasks.some((task) => !originalTasks.find((t) => t.id === task.id))
+
+        setHasChanges(tasksChanged || hasNewTasks || changedTasks.length > 0)
+    }, [tasks, originalTasks, changedTasks])
 
     // Función para añadir una nueva tarea
     const handleAddTask = (newTask: Task) => {
-        setTasks([...tasks, newTask])
+        setTasks((prevTasks) => [...prevTasks, newTask])
     }
 
-    // Función para simular el guardado de cambios
+    // Función para editar una tarea existente
+    const handleEditTask = (taskId: string, updatedTask: Partial<Task>) => {
+        setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, ...updatedTask } : task)))
+    }
+
+    // Función para eliminar una tarea
+    const handleDeleteTask = (taskId: string) => {
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId))
+    }
+
+    // Función para manejar el cambio de estado de una tarea
+    const handleStatusChange = (taskId: string, newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") => {
+        // Actualizar el estado de la tarea
+        setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task)))
+
+        // Registrar el cambio para guardar
+        setChangedTasks((prev) => {
+            // Verificar si ya existe un cambio para esta tarea
+            const existingIndex = prev.findIndex((item) => item.id === taskId)
+            if (existingIndex >= 0) {
+                // Actualizar el cambio existente
+                const updated = [...prev]
+                updated[existingIndex] = { id: taskId, status: newStatus }
+                return updated
+            } else {
+                // Añadir nuevo cambio
+                return [...prev, { id: taskId, status: newStatus }]
+            }
+        })
+    }
+
+    // Función para guardar los cambios
     const saveChanges = async () => {
-        if (changedTasks.length === 0) {
-            alert(`${dict.tasks?.noChanges || "No changes to save"}`)
+        if (!hasChanges) {
+            console.log("No changes to save")
             return
         }
 
         setIsSaving(true)
-        console.log("Saving changes:", changedTasks)
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-        alert(`${dict.tasks?.changesSaved || "Changes saved"},
-            description: ${changedTasks.length} ${dict.tasks?.taskUpdated || "tasks updated"} successfully`)
 
+        // Simular envío al backend
+        console.log("Saving changes:", {
+            updatedTasks: tasks,
+            statusChanges: changedTasks,
+        })
+
+        // Simular delay
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+
+        // Simular éxito
+        console.log("Changes saved successfully")
+
+        // Actualizar las tareas originales con el estado actual
+        setOriginalTasks([...tasks])
+
+        // Limpiar cambios
         setChangedTasks([])
         setIsSaving(false)
-    }
-
-    // Función para leer el estado de cada slot y actualizar las tareas
-    const updateTasksFromSwapy = () => {
-        if (!containerRef.current) return
-        // Recorremos cada slot (cada div con data-swapy-slot)
-        const slotElements = containerRef.current.querySelectorAll("[data-swapy-slot]")
-        // Creamos una copia de las tareas para actualizarlas
-        let updatedTasks = [...tasks]
-        slotElements.forEach((slotEl) => {
-            const status = slotEl.getAttribute("data-status")
-            // Buscamos el hijo que es el item
-            const itemEl = slotEl.querySelector("[data-swapy-item]")
-            if (itemEl && status) {
-                const taskId = itemEl.getAttribute("data-swapy-item")
-                if (taskId) {
-                    updatedTasks = updatedTasks.map((task) => {
-                        if (task.id === taskId && task.status !== status) {
-                            // Registrar cambio si el status cambió
-                            if (!changedTasks.find((c) => c.id === task.id)) {
-                                setChangedTasks((prev) => [...prev, { id: task.id, status }])
-                            }
-                            return { ...task, status: status as "PENDING" | "IN_PROGRESS" | "COMPLETED" }
-                        }
-                        return task
-                    })
-                }
-            }
-        })
-        setTasks(updatedTasks)
-    }
-
-    // Inicializamos Swapy en el contenedor y definimos sus callbacks
-    useEffect(() => {
-        if (containerRef.current) {
-            swapyRef.current = createSwapy(containerRef.current, {
-                swapMode: "drop",
-                // Puedes agregar más opciones de configuración según la documentación de Swapy
-            })
-
-            swapyRef.current.onBeforeSwap((event) => {
-                console.log("beforeSwap", event)
-                return true
-            })
-
-            swapyRef.current.onSwapStart((event) => {
-                console.log("swapStart", event)
-            })
-
-            swapyRef.current.onSwap((event) => {
-                console.log("swap", event)
-            })
-
-            swapyRef.current.onSwapEnd((event) => {
-                console.log("swapEnd", event)
-                updateTasksFromSwapy()
-                alert(`title: ${dict.tasks?.changesSaved || "Swapped"},
-                    description: Task swap completed`)
-            })
-        }
-
-        return () => {
-            swapyRef.current?.destroy()
-        }
-        // Se reinicializa cuando cambian las tareas para reflejar la estructura
-    }, [tasks])
-
-    // Función auxiliar para asignar un color (o estilo) a cada status
-    const statusColor = (status: string) => {
-        switch (status) {
-            case "PENDING":
-                return "text-warning"
-            case "IN_PROGRESS":
-                return "text-info"
-            case "COMPLETED":
-                return "text-success"
-            default:
-                return "text-muted"
-        }
     }
 
     // Filtrar tareas por estado
@@ -181,81 +174,142 @@ export function TaskBoard({ initialTasks = [], projectId, dict, lang }: TaskBoar
     const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS")
     const completedTasks = tasks.filter((task) => task.status === "COMPLETED")
 
-    // Renderizamos cada columna con sus respectivos slots
-    const renderColumn = (
-        status: "PENDING" | "IN_PROGRESS" | "COMPLETED",
-        tasksForStatus: Task[]
-    ) => {
-        return (
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h3 className={`font-medium ${statusColor(status)}`}>
-                        {dict.tasks?.[`status${status}`] || status}
-                    </h3>
-                    <span className="text-xs bg-muted/20 px-2 py-1 rounded-full">{tasksForStatus.length}</span>
-                </div>
-                <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30">
-                    {tasksForStatus.length > 0 ? (
-                        tasksForStatus.map((task, index) => (
-                            <div
-                                key={`${status}-${task.id}`}
-                                className="slot mb-3 last:mb-0"
-                                data-swapy-slot={`${status}-${index}`}
-                                data-status={status}
-                            >
-                                <div data-swapy-item={task.id}>
-                                    <TaskCard task={task} dict={dict} />
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div
-                            className="slot flex items-center justify-center h-[100px] text-muted-foreground"
-                            data-swapy-slot={`${status}-empty`}
-                            data-status={status}
-                        >
-                            <p className="text-sm">{dict.tasks?.dragHere || "Drag tasks here"}</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-        )
-    }
-
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">{dict.tasks?.taskBoard || "Task Board"}</h2>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={saveChanges}
-                        disabled={isSaving || changedTasks.length === 0}
-                    >
-                        {isSaving ? (
-                            <>
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                {dict.tasks?.saving || "Saving..."}
-                            </>
-                        ) : (
-                            <>
-                                <Save className="h-4 w-4 mr-2" />
-                                {dict.tasks?.saveChanges || "Save Changes"}
-                                {changedTasks.length > 0 && ` (${changedTasks.length})`}
-                            </>
-                        )}
-                    </Button>
-                    <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} projectId={projectId} />
-                </div>
-            </div>
+      <div className="space-y-6">
+          <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">{dict.tasks?.taskBoard || "Task Board"}</h2>
+              <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={saveChanges}
+                    disabled={isSaving || !hasChanges}
+                    className={hasChanges ? "animate-pulse font-bold cursor-pointer" : ""}
+                  >
+                      {isSaving ? (
+                        <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            {dict.tasks?.saving || "Saving..."}
+                        </>
+                      ) : (
+                        <>
+                            <Save className="h-4 w-4 mr-2" />
+                            {dict.tasks?.saveChanges || "Save Changes"}
+                            {changedTasks.length > 0 && ` (${changedTasks.length})`}
+                        </>
+                      )}
+                  </Button>
+                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} projectId={projectId} />
+              </div>
+          </div>
 
-            {/* Contenedor único para Swapy */}
-            <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {renderColumn("PENDING", pendingTasks)}
-                {renderColumn("IN_PROGRESS", inProgressTasks)}
-                {renderColumn("COMPLETED", completedTasks)}
-            </div>
-        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Columna Pendiente */}
+              <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-warning">{dict.tasks?.statusPending || "Pending"}</h3>
+                      <span className="text-xs bg-warning/20 text-warning px-2 py-1 rounded-full">{pendingTasks.length}</span>
+                  </div>
+
+                  <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
+                      {pendingTasks.map((task) => (
+                        <div key={`pending-${task.id}`}>
+                            <TaskCard
+                              task={task}
+                              dict={dict}
+                              lang={lang}
+                              onStatusChange={handleStatusChange}
+                              onEditTask={handleEditTask}
+                              onDeleteTask={handleDeleteTask}
+                            />
+                        </div>
+                      ))}
+
+                      {pendingTasks.length === 0 && (
+                        <div className="flex flex-col items-center justify-center h-[100px] text-muted-foreground">
+                            <p className="text-sm mb-2">{dict.tasks?.noTasks || "No tasks yet"}</p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-xs"
+                              onClick={() => {
+                                  const newTask:any = {
+                                      id: `task-${Date.now()}`,
+                                      title: dict.tasks?.newTask || "New Task",
+                                      assignee: "Unassigned",
+                                      status: "PENDING",
+                                      created_at: new Date().toISOString(),
+                                      updated_at: new Date().toISOString(),
+                                  }
+                                  handleAddTask(newTask)
+                              }}
+                            >
+                                <PlusCircle className="h-4 w-4 mr-1" />
+                                {dict.tasks?.addTask || "Add Task"}
+                            </Button>
+                        </div>
+                      )}
+                  </div>
+              </div>
+
+              {/* Columna En Progreso */}
+              <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-info">{dict.tasks?.statusInProgress || "In Progress"}</h3>
+                      <span className="text-xs bg-info/20 text-info px-2 py-1 rounded-full">{inProgressTasks.length}</span>
+                  </div>
+
+                  <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
+                      {inProgressTasks.map((task) => (
+                        <div key={`progress-${task.id}`}>
+                            <TaskCard
+                              task={task}
+                              dict={dict}
+                              lang={lang}
+                              onStatusChange={handleStatusChange}
+                              onEditTask={handleEditTask}
+                              onDeleteTask={handleDeleteTask}
+                            />
+                        </div>
+                      ))}
+
+                      {inProgressTasks.length === 0 && (
+                        <div className="flex items-center justify-center h-[100px] text-muted-foreground">
+                            <p className="text-sm">{dict.tasks?.noTasksInProgress || "No tasks in progress"}</p>
+                        </div>
+                      )}
+                  </div>
+              </div>
+
+              {/* Columna Completado */}
+              <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-success">{dict.tasks?.statusCompleted || "Completed"}</h3>
+                      <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full">{completedTasks.length}</span>
+                  </div>
+
+                  <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
+                      {completedTasks.map((task) => (
+                        <div key={`completed-${task.id}`}>
+                            <TaskCard
+                              task={task}
+                              dict={dict}
+                              lang={lang}
+                              onStatusChange={handleStatusChange}
+                              onEditTask={handleEditTask}
+                              onDeleteTask={handleDeleteTask}
+                            />
+                        </div>
+                      ))}
+
+                      {completedTasks.length === 0 && (
+                        <div className="flex items-center justify-center h-[100px] text-muted-foreground">
+                            <p className="text-sm">{dict.tasks?.noTasksCompleted || "No completed tasks"}</p>
+                        </div>
+                      )}
+                  </div>
+              </div>
+          </div>
+      </div>
     )
 }

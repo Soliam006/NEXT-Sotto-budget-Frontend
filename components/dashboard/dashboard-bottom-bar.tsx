@@ -18,12 +18,6 @@ export function DashboardBottomBar({ dictionary, currentSection, onNavigate }: D
       path: "/dashboard",
     },
     {
-      id: "projects",
-      label: dictionary.nav?.projects || "Projects",
-      icon: Building,
-      path: "/dashboard/projects",
-    },
-    {
       id: "calendar",
       label: dictionary.nav?.calendar || "Calendar",
       icon: CalendarIcon,
@@ -64,7 +58,7 @@ export function DashboardBottomBar({ dictionary, currentSection, onNavigate }: D
               onClick={() => onNavigate(item.path)}
             >
               <item.icon className="h-5 w-5" />
-              <span className="text-xs mt-1">{item.label}</span>
+              {currentSection === item.id && <span className="text-xs mt-1">{item.label}</span>}
             </Button>
           ))}
         </div>

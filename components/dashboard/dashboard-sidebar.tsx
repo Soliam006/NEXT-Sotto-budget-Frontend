@@ -2,7 +2,8 @@
 
 import { CalendarIcon, Command, DollarSign, Package, Settings, Users, Building } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {useEffect, useState} from "react";
 
 interface DashboardSidebarProps {
   dictionary: any
@@ -11,18 +12,21 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ dictionary, currentSection, onNavigate }: DashboardSidebarProps) {
+  const [currentTime, setCurrentTime] = useState(new Date())  // Update time
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   const navItems = [
     {
       id: "dashboard",
       label: dictionary.nav?.dashboard || "Dashboard",
       icon: Command,
       path: "/dashboard",
-    },
-    {
-      id: "projects",
-      label: dictionary.nav?.projects || "Projects",
-      icon: Building,
-      path: "/dashboard/projects",
     },
     {
       id: "calendar",
@@ -55,10 +59,49 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
       path: "/dashboard/settings",
     },
   ]
+  // Format time
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+  }
+
+  // Format date
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+  }
+  // Right sidebar content
+  const TimeView = () => (
+    <div className="space-y-6">
+      {/* System time */}
+      <Card className="bg-card/50 border border-border/50 backdrop-blur-sm overflow-hidden">
+        <CardContent className="p-0">
+          <div className="bg-gradient-to-br from-muted to-card p-6 border-b border-border/50">
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground mb-1 font-mono">SYSTEM TIME</div>
+              <div className="text-3xl font-mono text-primary mb-1">{formatTime(currentTime)}</div>
+              <div className="text-sm text-muted-foreground">{formatDate(currentTime)}</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
 
   return (
     <Card className="bg-card/50 border-border/50 backdrop-blur-sm h-full">
       <div className="p-4">
+        {/* Top Time View - only visible on larger screens */}
+        <div className="hidden lg:block">
+          <TimeView />
+        </div>
         <nav className="space-y-2">
           {navItems.map((item) => (
             <Button

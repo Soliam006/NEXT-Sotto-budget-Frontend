@@ -58,6 +58,7 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
     if (pathname?.includes("/dashboard/workers")) return "workers"
     if (pathname?.includes("/dashboard/materials")) return "materials"
     if (pathname?.includes("/dashboard/projects")) return "projects"
+    if (pathname?.includes("/dashboard/expenses")) return "expenses"
     return "dashboard"
   }
   const [isLoadding, setIsLoadding]= useState(true);
