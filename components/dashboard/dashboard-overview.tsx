@@ -36,33 +36,40 @@ const PROJECTS: Project[] = [
     tasks: [
       {
         id: "task-1",
-        title: "Install kitchen cabinets",
+        title: "Instalar ventanas en el segundo piso",
+        description: "Completar la instalación de todas las ventanas del segundo piso según las especificaciones",
         assignee: "Mike Johnson",
-        dueDate: "2024-01-15",
-        status: "COMPLETED",
-        created_at: "2024-01-01",
-        updated_at: "2024-01-02",
+        dueDate: new Date().toISOString(),
+        status: "PENDING",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        project_id: "1",
+        worker_id: "1",
       },
       {
         id: "task-2",
-        title: "Electrical wiring",
-        description: "Complete all electrical wiring in the kitchen area",
+        title: "Revisar instalación eléctrica",
+        description: "Verificar que todos los circuitos funcionan correctamente",
         assignee: "Sarah Williams",
-        dueDate: "2024-01-20",
         status: "IN_PROGRESS",
-        created_at: "2024-01-02",
-        updated_at: "2024-01-03",
+        dueDate: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        project_id: "1",
+        worker_id: "2",
       },
       {
         id: "task-3",
-        title: "Plumbing installation",
-        description: "Install all plumbing fixtures and connections",
-        assignee: "John Smith",
-        dueDate: "2024-01-25",
-        status: "PENDING",
-        created_at: "2024-01-03",
-        updated_at: "2024-01-04",
-      },
+        title: "Pintar paredes de la sala principal",
+        description: "Usar la pintura aprobada por el cliente",
+        assignee: "David Smith",
+        status: "COMPLETED",
+        dueDate: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        project_id: "1",
+        worker_id: "3",
+      }
     ],
     team: [
       {
@@ -213,6 +220,7 @@ export function DashboardOverview({ dict, lang }: DashboardOverviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [activeTab, setActiveTab] = useState("overview")
   const [searchTerm, setSearchTerm] = useState("")
+  const [hasChanges, setHasChanges] = useState(false)
 
   // Simulate data loading
   useEffect(() => {
@@ -261,6 +269,7 @@ export function DashboardOverview({ dict, lang }: DashboardOverviewProps) {
         selectedProject={selectedProject}
         setSelectedProject={setSelectedProject}
         dict={dict}
+        hasChanges={hasChanges}
       />
 
       {/* Main content */}
@@ -307,7 +316,7 @@ export function DashboardOverview({ dict, lang }: DashboardOverviewProps) {
 
             {/* Tasks Tab Content */}
             <TabsContent value="tasks">
-              <TasksTab dict={dict} lang={lang} selectedProject={selectedProject} />
+              <TasksTab dict={dict} lang={lang} selectedProject={selectedProject} hasChanges={hasChanges} setHasChanges={setHasChanges} />
             </TabsContent>
 
             {/* Team Tab Content */}

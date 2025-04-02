@@ -6,6 +6,7 @@ import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Save, Loader2 } from "lucide-react"
 import { isEqual } from "lodash"
+import {Project} from "@/components/dashboard/projects-selector";
 
 interface Task {
     id: string
@@ -22,10 +23,11 @@ interface Task {
 }
 
 interface TaskBoardProps {
-    initialTasks?: Task[]
-    projectId?: string | number
+    selectedProject: Project,
     dict: any
     lang: string
+    hasChanges: boolean
+    setHasChanges: (hasChanges: boolean) => void
 }
 
 // Datos de ejemplo para mostrar en el tablero
@@ -68,13 +70,23 @@ const exampleTasks: Task[] = [
     },
 ]
 
-export function TaskBoard({ initialTasks = [], projectId, dict, lang }: TaskBoardProps) {
+export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChanges}: TaskBoardProps) {
     // Estado para las tareas y cambios
-    const [tasks, setTasks] = useState<Task[]>(initialTasks.length > 0 ? initialTasks : exampleTasks)
-    const [originalTasks, setOriginalTasks] = useState<Task[]>(initialTasks.length > 0 ? initialTasks : exampleTasks)
+    const [tasks, setTasks] = useState<Task[]>(selectedProject.tasks)
+    const [originalTasks, setOriginalTasks] = useState<Task[]>(selectedProject.tasks)
     const [changedTasks, setChangedTasks] = useState<{ id: string; status: string }[]>([])
     const [isSaving, setIsSaving] = useState(false)
-    const [hasChanges, setHasChanges] = useState(false)
+
+    useEffect(() => {
+        const resetTasks = () => {
+            setTasks(selectedProject.tasks);
+            setOriginalTasks(selectedProject.tasks);
+            setChangedTasks([]);
+            setHasChanges(false);
+        };
+
+        resetTasks();
+    }, [selectedProject]);
 
     // Comprobar si hay cambios en las tareas
     useEffect(() => {
@@ -199,7 +211,7 @@ export function TaskBoard({ initialTasks = [], projectId, dict, lang }: TaskBoar
                         </>
                       )}
                   </Button>
-                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} projectId={projectId} />
+                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} projectId={selectedProject.id} />
               </div>
           </div>
 

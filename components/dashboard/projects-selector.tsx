@@ -42,14 +42,21 @@ interface ProjectsSelectorProps {
   projects: Project[]
   selectedProject: Project
   setSelectedProject: (project: any) => void
-  dict: any
+  dict: any,
+  hasChanges: boolean
 }
 
-export function ProjectsSelector({ projects, selectedProject, setSelectedProject, dict }: ProjectsSelectorProps) {
+export function ProjectsSelector({ projects, selectedProject, setSelectedProject, dict, hasChanges }: ProjectsSelectorProps) {
   const handleProjectChange = (projectId: string) => {
     const project = projects.find((p) => p.id.toString() === projectId)
     if (project) {
-      setSelectedProject(project)
+      if(hasChanges) {
+        if(confirm("Are you sure you want to change the project? All unsaved changes will be lost.")) {
+          setSelectedProject(project)
+        }
+      }else {
+        setSelectedProject(project)
+      }
     }
   }
 
