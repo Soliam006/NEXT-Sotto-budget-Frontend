@@ -212,7 +212,8 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeTab, setActiveTab] = useState("overview")
-
+  const [hasChanges, setHasChanges] = useState(false)
+  
   // Filter expenses based on search term and filters
   const filteredExpenses = selectedProject.expenses.filter((expense) => {
     const matchesSearch =
@@ -301,6 +302,7 @@ export function DashboardExpenses({ dict, lang }: DashboardExpensesProps) {
         selectedProject={selectedProject}
         setSelectedProject={setSelectedProject}
         dict={dict}
+        hasChanges={hasChanges}
       />
 
       {/* Expense Overview */}
