@@ -9,6 +9,8 @@ import {OverviewTab} from "@/components/dashboard/tabs/overview-tab"
 import {TasksTab} from "@/components/dashboard/tabs/tasks-tab"
 import {TeamTab} from "@/components/dashboard/tabs/team-tab"
 import {MaterialsTab} from "@/components/dashboard/tabs/materials-tab"
+import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
+import {useProject} from "@/contexts/project-context";
 
 interface DashboardOverviewProps {
   dict: any // Replace 'any' with the actual type of your dictionary
@@ -18,6 +20,7 @@ interface DashboardOverviewProps {
 export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
+  const {hasChanges, saveChanges, discardChanges, isSaving} = useProject()
 
   // Simulate data loading
   useEffect(() => {
@@ -58,6 +61,8 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
       <ProjectsSelector
         dict={dict}
       />
+      {/* Save changes bar - only visible when there are changes */}
+      {<SaveChangesBar dict={dict}/>}
 
       {/* Main content */}
       <div className="flex flex-col lg:flex-row gap-6 pt-6">

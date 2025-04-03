@@ -160,7 +160,13 @@ const SEARCH_RESULTS = [
 export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
   const router = useRouter()
-  const {user, setUser} = useUser();
+  const {user, setUser,    updateUser,
+    saveProfile,
+    addFollower,
+    removeFollower,
+    updateAvailability,
+    isSaving} = useUser();
+
   const [user_data, setUser_data] = useState<User_Type | null>(user);
 
   const [isProjectsDialogOpen, setIsProjectsDialogOpen] = useState(false)
@@ -168,15 +174,16 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   const [isFollowingDialogOpen, setIsFollowingDialogOpen] = useState(false)
   const [isRequestsDialogOpen, setIsRequestsDialogOpen] = useState(false)
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
-  const [followers, setFollowers] = useState(FOLLOWERS)
-  const [following, setFollowing] = useState(FOLLOWING)
-  const [requests, setRequests] = useState(REQUESTS)
+  const [followers, setFollowers] = useState(user?.followers)
+  const [following, setFollowing] = useState(user?.following)
+  const [requests, setRequests] = useState(user?.requests)
 
   // Handle follow/unfollow
   const handleFollowToggle = (userId: string) => {
 
     // Also update in following list if user_data is there
     setFollowing((prev) => {
+      if(!prev) return []
       const userInFollowing = prev.find((user) => user.id === userId)
       if (userInFollowing) {
         return prev.filter((user) => user.id !== userId)
@@ -189,25 +196,23 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
       return prev
     })
   }
-
   // Handle accept request
   const handleAcceptRequest = (userId: string) => {
     // Remove from requests
-    setRequests((prev) => prev.filter((user) => user.id !== userId))
+    setRequests((prev) => prev ? prev.filter((user) => user.id !== userId) : [])
 
     // Add to followers
     const userToAdd = REQUESTS.find((user) => user.id === userId)
     if (userToAdd) {
-      setFollowers((prev) => [...prev, userToAdd])
+      setFollowers((prev) => prev ? [...prev, userToAdd] : [userToAdd])
     }
   }
 
   // Handle reject request
   const handleRejectRequest = (userId: string) => {
     // Remove from requests
-    setRequests((prev) => prev.filter((user) => user.id !== userId))
+    setRequests((prev) => prev ? prev.filter((user) => user.id !== userId) : [])
   }
-
   /**
    * Handle save profile
    * @param updatedUser User data to save
@@ -351,7 +356,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                 <div className="flex justify-between w-full">
                   <Button
                     variant="ghost"
-                    className="flex flex-col items-center hover:bg-secondary"
+                    className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsProjectsDialogOpen(true)}
                   >
                     <span className="text-xl font-bold text-cyan-400">{PROJECTS.length}</span>
@@ -359,18 +364,18 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                   </Button>
                   <Button
                     variant="ghost"
-                    className="flex flex-col items-center hover:bg-secondary"
+                    className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsFollowersDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{followers.length}</span>
+                    <span className="text-xl font-bold text-cyan-400">{followers?.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.followers}</span>
                   </Button>
                   <Button
                     variant="ghost"
-                    className="flex flex-col items-center hover:bg-secondary"
+                    className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsFollowingDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{following.length}</span>
+                    <span className="text-xl font-bold text-cyan-400">{following?.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.following}</span>
                   </Button>
                 </div>
@@ -381,7 +386,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
             <AvailabilityDisplay availabilities={user?.availabilities || []} lang={lang} dictionary={dict}/>
 
             {/* Follow Requests */}
-            {requests.length > 0 && (
+            {requests &&( requests.length > 0 ) && (
               <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center">
@@ -672,7 +677,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {followers.length > 0 ? (
+                {followers&&followers.length > 0 ? (
                   followers.map((follower) => (
                     <div
                       key={follower.id}
@@ -696,7 +701,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                         className="bg-secondary/70 border-border hover:bg-secondary"
                         onClick={() => handleFollowToggle(follower.id)}
                       >
-                        {follower.isFollowing ? dict.followers.following : dict.followers.followBack}
+                        {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
                       </Button>
                     </div>
                   ))
@@ -747,7 +752,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {following.length > 0 ? (
+                {following&&following.length > 0 ? (
                   following.map((follow) => (
                     <div
                       key={follow.id}
@@ -802,7 +807,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
           <div className="mt-4">
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {requests.length > 0 ? (
+                {requests&&requests.length > 0 ? (
                   requests.map((request) => (
                     <div
                       key={request.id}

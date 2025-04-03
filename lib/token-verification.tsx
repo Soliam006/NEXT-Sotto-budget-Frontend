@@ -28,7 +28,7 @@ const useAuthMiddleware = (isAuthPath:boolean,
           try {
             const res = await fetchUserMe(token, lang);
             if (res.statusCode === 200) {
-              res.data.availabilities = res.data.availabilities || [];
+              console.log("User datafetch ME:", res.data);
               setUser(res.data); // Guarda el usuario en el contexto
             } else {
               clearToken(); // Limpia el token si no fue posible cargar el usuario

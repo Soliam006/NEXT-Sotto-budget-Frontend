@@ -14,6 +14,7 @@ export interface UserFollower {
   username: string
   role: string
   avatar?: string
+  isFollowing: boolean
 }
 
 export interface User {
