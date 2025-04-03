@@ -1,7 +1,7 @@
 import {useRouter} from "next/navigation";
 import {Dispatch, SetStateAction, useEffect} from "react";
 import {clearToken, getLang, getToken} from "@/app/services/auth-service";
-import {useUser} from "@/app/context/UserProvider";
+import {useUser} from "@/contexts/UserProvider";
 import {fetchUserMe} from "@/app/actions/auth";
 
 

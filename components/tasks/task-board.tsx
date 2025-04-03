@@ -1,190 +1,43 @@
 "use client"
-
-import { useState, useEffect } from "react"
 import { TaskCard } from "@/components/tasks/task-card"
 import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Save, Loader2 } from "lucide-react"
-import { isEqual } from "lodash"
-import {Project} from "@/components/dashboard/projects-selector";
-
-interface Task {
-    id: string
-    title: string
-    description?: string
-    assignee: string
-    assigneeAvatar?: string
-    status: "PENDING" | "IN_PROGRESS" | "COMPLETED"
-    dueDate?: string
-    created_at: string
-    updated_at: string
-    project_id?: string | number
-    worker_id?: string
-}
+import { useProject } from "@/contexts/project-context"
 
 interface TaskBoardProps {
-    selectedProject: Project,
     dict: any
     lang: string
-    hasChanges: boolean
-    setHasChanges: (hasChanges: boolean) => void
 }
 
-// Datos de ejemplo para mostrar en el tablero
-const exampleTasks: Task[] = [
-    {
-        id: "task-1",
-        title: "Instalar ventanas en el segundo piso",
-        description: "Completar la instalación de todas las ventanas del segundo piso según las especificaciones",
-        assignee: "Mike Johnson",
-        dueDate: new Date().toISOString(),
-        status: "PENDING",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        project_id: "1",
-        worker_id: "3",
-    },
-    {
-        id: "task-2",
-        title: "Revisar instalación eléctrica",
-        description: "Verificar que todos los circuitos funcionan correctamente",
-        assignee: "Sarah Williams",
-        status: "IN_PROGRESS",
-        dueDate: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        project_id: "1",
-        worker_id: "4",
-    },
-    {
-        id: "task-3",
-        title: "Pintar paredes de la sala principal",
-        description: "Usar la pintura aprobada por el cliente",
-        assignee: "David Smith",
-        status: "COMPLETED",
-        dueDate: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        project_id: "1",
-        worker_id: "5",
-    },
-]
+export function TaskBoard({ dict, lang }: TaskBoardProps) {
+    const { selectedProject, addTask, updateTask, deleteTask, updateTaskStatus, saveChanges, hasChanges, isSaving } =
+      useProject()
 
-export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChanges}: TaskBoardProps) {
-    // Estado para las tareas y cambios
-    const [tasks, setTasks] = useState<Task[]>(selectedProject.tasks)
-    const [originalTasks, setOriginalTasks] = useState<Task[]>(selectedProject.tasks)
-    const [changedTasks, setChangedTasks] = useState<{ id: string; status: string }[]>([])
-    const [isSaving, setIsSaving] = useState(false)
+    // Filtrar tareas por estado
+    const pendingTasks = selectedProject.tasks?.filter((task:any) => task.status === "PENDING") || []
+    const inProgressTasks = selectedProject.tasks?.filter((task:any) => task.status === "IN_PROGRESS") || []
+    const completedTasks = selectedProject.tasks?.filter((task:any) => task.status === "COMPLETED") || []
 
-    useEffect(() => {
-        const resetTasks = () => {
-            setTasks(selectedProject.tasks);
-            setOriginalTasks(selectedProject.tasks);
-            setChangedTasks([]);
-            setHasChanges(false);
-        };
-
-        resetTasks();
-    }, [selectedProject]);
-
-    // Comprobar si hay cambios en las tareas
-    useEffect(() => {
-        // Verificar si las tareas actuales son diferentes de las originales
-        const tasksChanged = !isEqual(
-          tasks.map((t) => ({
-              id: t.id,
-              title: t.title,
-              description: t.description,
-              assignee: t.assignee,
-              status: t.status,
-              dueDate: t.dueDate,
-          })),
-          originalTasks.map((t) => ({
-              id: t.id,
-              title: t.title,
-              description: t.description,
-              assignee: t.assignee,
-              status: t.status,
-              dueDate: t.dueDate,
-          })),
-        )
-
-        // Verificar si hay tareas nuevas (no presentes en las originales)
-        const hasNewTasks = tasks.some((task) => !originalTasks.find((t) => t.id === task.id))
-
-        setHasChanges(tasksChanged || hasNewTasks || changedTasks.length > 0)
-    }, [tasks, originalTasks, changedTasks])
-
-    // Función para añadir una nueva tarea
-    const handleAddTask = (newTask: Task) => {
-        setTasks((prevTasks) => [...prevTasks, newTask])
+    // Función para manejar el cambio de estado de una tarea
+    const handleStatusChange = (taskId: string, newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") => {
+        updateTaskStatus(taskId, newStatus)
     }
 
     // Función para editar una tarea existente
-    const handleEditTask = (taskId: string, updatedTask: Partial<Task>) => {
-        setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, ...updatedTask } : task)))
+    const handleEditTask = (taskId: string, updatedTask: Partial<any>) => {
+        updateTask(taskId, updatedTask)
     }
 
     // Función para eliminar una tarea
     const handleDeleteTask = (taskId: string) => {
-        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId))
+        deleteTask(taskId)
     }
 
-    // Función para manejar el cambio de estado de una tarea
-    const handleStatusChange = (taskId: string, newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") => {
-        // Actualizar el estado de la tarea
-        setTasks((prevTasks) => prevTasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task)))
-
-        // Registrar el cambio para guardar
-        setChangedTasks((prev) => {
-            // Verificar si ya existe un cambio para esta tarea
-            const existingIndex = prev.findIndex((item) => item.id === taskId)
-            if (existingIndex >= 0) {
-                // Actualizar el cambio existente
-                const updated = [...prev]
-                updated[existingIndex] = { id: taskId, status: newStatus }
-                return updated
-            } else {
-                // Añadir nuevo cambio
-                return [...prev, { id: taskId, status: newStatus }]
-            }
-        })
+    // Función para añadir una nueva tarea
+    const handleAddTask = (newTask: any) => {
+        addTask(newTask)
     }
-
-    // Función para guardar los cambios
-    const saveChanges = async () => {
-        if (!hasChanges) {
-            console.log("No changes to save")
-            return
-        }
-
-        setIsSaving(true)
-
-        // Simular envío al backend
-        console.log("Saving changes:", {
-            updatedTasks: tasks,
-            statusChanges: changedTasks,
-        })
-
-        // Simular delay
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-
-        // Simular éxito
-        console.log("Changes saved successfully")
-
-        // Actualizar las tareas originales con el estado actual
-        setOriginalTasks([...tasks])
-
-        // Limpiar cambios
-        setChangedTasks([])
-        setIsSaving(false)
-    }
-
-    // Filtrar tareas por estado
-    const pendingTasks = tasks.filter((task) => task.status === "PENDING")
-    const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS")
-    const completedTasks = tasks.filter((task) => task.status === "COMPLETED")
 
     return (
       <div className="space-y-6">
@@ -207,11 +60,10 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                         <>
                             <Save className="h-4 w-4 mr-2" />
                             {dict.tasks?.saveChanges || "Save Changes"}
-                            {changedTasks.length > 0 && ` (${changedTasks.length})`}
                         </>
                       )}
                   </Button>
-                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} projectId={selectedProject.id} />
+                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} teamMembers={selectedProject.team || []} />
               </div>
           </div>
 
@@ -224,7 +76,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                   </div>
 
                   <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
-                      {pendingTasks.map((task) => (
+                      {pendingTasks.map((task:any) => (
                         <div key={`pending-${task.id}`}>
                             <TaskCard
                               task={task}
@@ -233,6 +85,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                               onStatusChange={handleStatusChange}
                               onEditTask={handleEditTask}
                               onDeleteTask={handleDeleteTask}
+                              team={selectedProject.team}
                             />
                         </div>
                       ))}
@@ -245,7 +98,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                               size="sm"
                               className="text-xs"
                               onClick={() => {
-                                  const newTask:any = {
+                                  const newTask = {
                                       id: `task-${Date.now()}`,
                                       title: dict.tasks?.newTask || "New Task",
                                       assignee: "Unassigned",
@@ -272,7 +125,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                   </div>
 
                   <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
-                      {inProgressTasks.map((task) => (
+                      {inProgressTasks.map((task:any) => (
                         <div key={`progress-${task.id}`}>
                             <TaskCard
                               task={task}
@@ -281,6 +134,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                               onStatusChange={handleStatusChange}
                               onEditTask={handleEditTask}
                               onDeleteTask={handleDeleteTask}
+                              team={selectedProject.team}
                             />
                         </div>
                       ))}
@@ -301,7 +155,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                   </div>
 
                   <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
-                      {completedTasks.map((task) => (
+                      {completedTasks.map((task:any) => (
                         <div key={`completed-${task.id}`}>
                             <TaskCard
                               task={task}
@@ -310,6 +164,7 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
                               onStatusChange={handleStatusChange}
                               onEditTask={handleEditTask}
                               onDeleteTask={handleDeleteTask}
+                              team={selectedProject.team}
                             />
                         </div>
                       ))}
@@ -325,3 +180,4 @@ export function TaskBoard({ selectedProject, dict, lang, setHasChanges, hasChang
       </div>
     )
 }
+

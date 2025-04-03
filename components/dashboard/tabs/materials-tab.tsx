@@ -1,14 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { Project } from "@/components/dashboard/projects-selector"
+import { useProject } from "@/contexts/project-context"
 
 interface MaterialsTabProps {
   dict: any
-  selectedProject: Project
 }
 
-export function MaterialsTab({ dict, selectedProject }: MaterialsTabProps) {
+export function MaterialsTab({ dict }: MaterialsTabProps) {
+  const { selectedProject } = useProject()
+
   // Get material status color
   const getMaterialStatusColor = (status: string) => {
     switch (status) {
@@ -68,4 +69,3 @@ export function MaterialsTab({ dict, selectedProject }: MaterialsTabProps) {
     </Card>
   )
 }
-

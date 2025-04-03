@@ -22,9 +22,10 @@ interface TaskCardProps {
     onStatusChange: (taskId: string, newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") => void
     onEditTask: (taskId: string, updatedTask: Partial<TaskCardProps["task"]>) => void
     onDeleteTask: (taskId: string) => void
+    team: any
 }
 
-export function TaskCard({ task, dict, lang, onStatusChange, onEditTask, onDeleteTask }: TaskCardProps) {
+export function TaskCard({ task, dict, lang, onStatusChange, onEditTask, onDeleteTask, team }: TaskCardProps) {
     // Obtener las iniciales del asignado
     const getInitials = (name: string) => {
         return name
@@ -122,7 +123,14 @@ export function TaskCard({ task, dict, lang, onStatusChange, onEditTask, onDelet
                       </SelectContent>
                   </Select>
               </div>
-              <EditTaskDialog task={task} dict={dict} lang={lang} onEditTask={onEditTask} onDeleteTask={onDeleteTask} />
+              <EditTaskDialog
+                task={task}
+                dict={dict}
+                lang={lang}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}
+                team={team}
+              />
           </CardHeader>
           <CardContent className="px-4">
               <div className="">

@@ -28,11 +28,11 @@ import {Badge} from "@/components/ui/badge"
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
 import {Input} from "@/components/ui/input"
 import {ScrollArea} from "@/components/ui/scroll-area"
-import {useUser} from "@/app/context/UserProvider";
+import {useUser} from "@/contexts/UserProvider";
 import {EditProfileDialog} from "./edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
 import {getRole, getToken} from "@/app/services/auth-service";
-import {User as User_Type} from "@/app/context/user.types";
+import {User as User_Type} from "@/contexts/user.types";
 import {updateUserInformation} from "@/app/actions/auth";
 
 // Mock data for user profile

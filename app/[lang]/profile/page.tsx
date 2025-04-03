@@ -6,7 +6,7 @@ import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
 import useAuthMiddleware from "@/lib/token-verification";
 import {TopBarWrapper} from "@/components/top-bar-wrapper";
-import {useUser} from "@/app/context/UserProvider";
+import {useUser} from "@/contexts/UserProvider";
 
 export default function  Profile() {
 

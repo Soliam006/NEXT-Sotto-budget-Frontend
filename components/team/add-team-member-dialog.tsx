@@ -17,14 +17,15 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useProject } from "@/contexts/project-context"
 
 interface Worker {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  skills: string[];
-  availability: string;
+  id: string
+  name: string
+  role: string
+  avatar: string
+  skills: string[]
+  availability: string
 }
 
 const AVAILABLE_WORKERS: Worker[] = [
@@ -88,17 +89,12 @@ const AVAILABLE_WORKERS: Worker[] = [
 
 interface AddTeamMemberDialogProps {
   dict: any
-  onAddTeamMember: (member: any) => void
   existingTeamIds: string[]
   buttonVariant?: "ghost" | "outline" | "default"
 }
 
-export function AddTeamMemberDialog({
-                                      dict,
-                                      onAddTeamMember,
-                                      existingTeamIds,
-                                      buttonVariant = "ghost",
-                                    }: AddTeamMemberDialogProps) {
+export function AddTeamMemberDialog({ dict, existingTeamIds, buttonVariant = "ghost" }: AddTeamMemberDialogProps) {
+  const { addTeamMember } = useProject()
   const [open, setOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedWorker, setSelectedWorker] = useState<any | null>(null)
@@ -119,7 +115,7 @@ export function AddTeamMemberDialog({
 
     try {
       // In a real app, this would be an API call
-      onAddTeamMember(selectedWorker)
+      addTeamMember(selectedWorker)
       setOpen(false)
       setSelectedWorker(null)
       setSearchTerm("")

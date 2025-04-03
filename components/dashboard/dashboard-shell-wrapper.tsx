@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { useUser } from "@/app/context/UserProvider";
+import { useUser } from "@/contexts/UserProvider";
 import LoadingView from "@/components/loading-view";
 
 export function DashboardShellWrapper({

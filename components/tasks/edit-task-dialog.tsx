@@ -44,17 +44,6 @@ const taskFormSchema = z.object({
 
 type TaskFormValues = z.infer<typeof taskFormSchema>
 
-// Datos de ejemplo para los miembros del equipo
-const teamMembers = [
-  { id: "1", name: "John Doe", role: "Project Manager", avatar: "/placeholder.svg?height=40&width=40&text=JD" },
-  { id: "2", name: "Jane Smith", role: "Engineer", avatar: "/placeholder.svg?height=40&width=40&text=JS" },
-  { id: "3", name: "Mike Johnson", role: "Lead Carpenter", avatar: "/placeholder.svg?height=40&width=40&text=MJ" },
-  { id: "4", name: "Sarah Williams", role: "Electrician", avatar: "/placeholder.svg?height=40&width=40&text=SW" },
-  { id: "5", name: "David Smith", role: "Plumber", avatar: "/placeholder.svg?height=40&width=40&text=DS" },
-  { id: "6", name: "Lisa Brown", role: "Interior Designer", avatar: "/placeholder.svg?height=40&width=40&text=LB" },
-  { id: "7", name: "Robert Davis", role: "General Contractor", avatar: "/placeholder.svg?height=40&width=40&text=RD" },
-]
-
 interface Task {
   id: string
   title: string
@@ -75,16 +64,17 @@ interface EditTaskDialogProps {
   lang: string
   onEditTask: (taskId: string, updatedTask: Partial<Task>) => void
   onDeleteTask: (taskId: string) => void
+  team: any
 }
 
-export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask }: EditTaskDialogProps) {
+export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, team }: EditTaskDialogProps) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   // Encontrar el ID del trabajador basado en el nombre del asignado
   const findWorkerId = (assigneeName: string) => {
-    const member = teamMembers.find((m) => m.name === assigneeName)
+    const member = team.find((m: any) => m.name === assigneeName)
     return member?.id || ""
   }
 
@@ -117,7 +107,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask }: E
       const updatedTask: Partial<Task> = {
         title: data.title,
         description: data.description,
-        assignee: teamMembers.find((member) => member.id === data.assignee)?.name || task.assignee,
+        assignee: team.find((member: any) => member.id === data.assignee)?.name || task.assignee,
         worker_id: data.assignee,
         status: data.status,
         dueDate: data.dueDate,
@@ -218,7 +208,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask }: E
                             )}
                           >
                             {field.value
-                              ? teamMembers.find((member) => member.id === field.value)?.name
+                              ? team.find((member: any) => member.id === field.value)?.name
                               : dict.tasks?.selectAssignee || "Select assignee"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -233,7 +223,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask }: E
                           <CommandList>
                             <CommandEmpty>{dict.tasks?.noResults || "No results found."}</CommandEmpty>
                             <CommandGroup>
-                              {teamMembers.map((member) => (
+                              {team.map((member: any) => (
                                 <CommandItem
                                   value={member.name}
                                   key={member.id}

@@ -43,25 +43,14 @@ const taskFormSchema = z.object({
 
 type TaskFormValues = z.infer<typeof taskFormSchema>
 
-// Datos de ejemplo para los miembros del equipo
-const teamMembers = [
-    { id: "1", name: "John Doe", role: "Project Manager", avatar: "/placeholder.svg?height=40&width=40&text=JD" },
-    { id: "2", name: "Jane Smith", role: "Engineer", avatar: "/placeholder.svg?height=40&width=40&text=JS" },
-    { id: "3", name: "Mike Johnson", role: "Lead Carpenter", avatar: "/placeholder.svg?height=40&width=40&text=MJ" },
-    { id: "4", name: "Sarah Williams", role: "Electrician", avatar: "/placeholder.svg?height=40&width=40&text=SW" },
-    { id: "5", name: "David Smith", role: "Plumber", avatar: "/placeholder.svg?height=40&width=40&text=DS" },
-    { id: "6", name: "Lisa Brown", role: "Interior Designer", avatar: "/placeholder.svg?height=40&width=40&text=LB" },
-    { id: "7", name: "Robert Davis", role: "General Contractor", avatar: "/placeholder.svg?height=40&width=40&text=RD" },
-]
-
 interface AddTaskDialogProps {
     dict: any
     lang: string
     onAddTask?: (task: any) => void
-    projectId?: string | number
+    teamMembers: any[] // Add this prop to receive team members from the project
 }
 
-export function AddTaskDialog({ dict, lang, onAddTask, projectId }: AddTaskDialogProps) {
+export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDialogProps) {
     const [open, setOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -79,17 +68,19 @@ export function AddTaskDialog({ dict, lang, onAddTask, projectId }: AddTaskDialo
         setIsSubmitting(true)
 
         try {
+            const selectedMember = teamMembers.find((member) => member.id === data.assignee)
+
             const newTask = {
                 id: `task-${Date.now()}`,
                 title: data.title,
                 description: data.description || "",
-                assignee: teamMembers.find((member) => member.id === data.assignee)?.name || "",
+                assignee: selectedMember?.name || "",
+                assigneeAvatar: selectedMember?.avatar,
                 worker_id: data.assignee,
                 status: data.status,
                 dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                project_id: projectId,
             }
 
             if (onAddTask) {
@@ -263,7 +254,12 @@ export function AddTaskDialog({ dict, lang, onAddTask, projectId }: AddTaskDialo
                       </div>
 
                       <DialogFooter>
-                          <Button type="button" variant="outline" onClick={() => setOpen(false)} className="bg-muted/50 cursor-pointer">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setOpen(false)}
+                            className="bg-muted/50 cursor-pointer"
+                          >
                               {dict.common?.cancel || "Cancel"}
                           </Button>
                           <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90 cursor-pointer">

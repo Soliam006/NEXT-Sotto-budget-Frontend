@@ -74,8 +74,8 @@ const PROJECTS: Project[] = [
     team: [
       {
         id: "1",
-        name: "John Doe",
-        role: "Project Manager",
+        name: "Dany Sotto",
+        role: "Electricista",
         avatar: "https://randomuser.me/api/portraits/men/1.jpg",
       },
       {
@@ -86,8 +86,8 @@ const PROJECTS: Project[] = [
       },
       {
         id: "3",
-        name: "Peter Jones",
-        role: "Designer",
+        name: "Julio César",
+        role: "Electricista",
         avatar: "https://randomuser.me/api/portraits/men/3.jpg",
       },
     ],
@@ -265,11 +265,7 @@ export function DashboardOverview({ dict, lang }: DashboardOverviewProps) {
 
       {/* Project selector */}
       <ProjectsSelector
-        projects={filteredProjects}
-        selectedProject={selectedProject}
-        setSelectedProject={setSelectedProject}
         dict={dict}
-        hasChanges={hasChanges}
       />
 
       {/* Main content */}
@@ -311,22 +307,22 @@ export function DashboardOverview({ dict, lang }: DashboardOverviewProps) {
 
             {/* Overview Tab Content */}
             <TabsContent value="overview">
-              <OverviewTab dict={dict} selectedProject={selectedProject} />
+              <OverviewTab dict={dict}/>
             </TabsContent>
 
             {/* Tasks Tab Content */}
             <TabsContent value="tasks">
-              <TasksTab dict={dict} lang={lang} selectedProject={selectedProject} hasChanges={hasChanges} setHasChanges={setHasChanges} />
+              <TasksTab dict={dict} lang={lang} />
             </TabsContent>
 
             {/* Team Tab Content */}
             <TabsContent value="team">
-              <TeamTab dict={dict} selectedProject={selectedProject} />
+              <TeamTab dict={dict}/>
             </TabsContent>
 
             {/* Materials Tab Content */}
             <TabsContent value="materials">
-              <MaterialsTab dict={dict} selectedProject={selectedProject} />
+              <MaterialsTab dict={dict}/>
             </TabsContent>
           </Tabs>
         </div>

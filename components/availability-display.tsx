@@ -5,7 +5,7 @@ import { CalendarRange } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import {Availability} from "@/app/context/user.types";
+import {Availability} from "@/contexts/user.types";
 
 
 export function AvailabilityDisplay({

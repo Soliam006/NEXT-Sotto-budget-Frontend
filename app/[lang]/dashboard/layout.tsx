@@ -5,6 +5,7 @@ import { DashboardShellWrapper } from "@/components/dashboard/dashboard-shell-wr
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
+import {ProjectProvider} from "@/contexts/project-context";
 
 export default function DashboardLayout({
                                                   children,
@@ -31,8 +32,10 @@ export default function DashboardLayout({
     localStorage.setItem("dictionary", JSON.stringify(dictionary));
 
     return (
+      <ProjectProvider>
         <DashboardShellWrapper dictionary={dictionary} lang={paramers.lang as string}>
             {children}
         </DashboardShellWrapper>
+      </ProjectProvider>
     );
 }

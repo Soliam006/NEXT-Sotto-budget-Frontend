@@ -2,14 +2,15 @@ import { CheckCircle2, DollarSign, LineChart, BarChart3, Timer } from "lucide-re
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import CustomPieChart from "@/components/custom-pie-chart"
-import type { Project } from "@/components/dashboard/projects-selector"
+import { useProject } from "@/contexts/project-context"
 
 interface OverviewTabProps {
   dict: any
-  selectedProject: Project
 }
 
-export function OverviewTab({ dict, selectedProject }: OverviewTabProps) {
+export function OverviewTab({ dict }: OverviewTabProps) {
+  const { selectedProject } = useProject()
+
   return (
     <div className="space-y-6 mt-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -26,7 +27,7 @@ export function OverviewTab({ dict, selectedProject }: OverviewTabProps) {
           value={Math.round(
             (selectedProject.progress.done /
               (selectedProject.progress.done + selectedProject.progress.inProgress + selectedProject.progress.todo)) *
-              100,
+            100,
           )}
           icon={CheckCircle2}
           trend="stable"
@@ -198,11 +199,11 @@ export function OverviewTab({ dict, selectedProject }: OverviewTabProps) {
 
 // Activity item component
 function ActivityItem({
-  title,
-  time,
-  description,
-  type,
-}: {
+                        title,
+                        time,
+                        description,
+                        type,
+                      }: {
   title: string
   time: string
   description: string
@@ -245,13 +246,13 @@ function ActivityItem({
 
 // Component for metric cards
 function MetricCard({
-  title,
-  value,
-  icon: Icon,
-  trend,
-  color,
-  detail,
-}: {
+                      title,
+                      value,
+                      icon: Icon,
+                      trend,
+                      color,
+                      detail,
+                    }: {
   title: string
   value: number
   icon: any
@@ -300,4 +301,3 @@ function MetricCard({
     </div>
   )
 }
-
