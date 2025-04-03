@@ -5,6 +5,7 @@ import type { Project } from "@/components/dashboard/projects-selector"
 import { isEqual } from "lodash"
 
 // Datos de ejemplo para proyectos
+// Datos de ejemplo para proyectos
 const MOCK_PROJECTS = [
   {
     id: 1,
@@ -25,13 +26,13 @@ const MOCK_PROJECTS = [
     team: [
       {
         id: "1",
-        name: "Dany Sotto",
+        name: "John Smith",
         role: "Senior Architect",
         avatar: "https://randomuser.me/api/portraits/men/1.jpg",
       },
       {
         id: "2",
-        name: "Julio César",
+        name: "Sarah Johnson",
         role: "Project Manager",
         avatar: "https://randomuser.me/api/portraits/women/2.jpg",
       },
@@ -119,8 +120,8 @@ const MOCK_PROJECTS = [
         id: 1,
         date: "2023-02-15",
         category: "Materials",
-        description: "Initial concrete purchase",
-        amount: 50000,
+        description: "Concrete purchase",
+        amount: 750000,
         status: "Approved",
       },
       {
@@ -128,7 +129,7 @@ const MOCK_PROJECTS = [
         date: "2023-03-01",
         category: "Labor",
         description: "Foundation team - February",
-        amount: 85000,
+        amount: 650000,
         status: "Approved",
       },
       {
@@ -136,8 +137,24 @@ const MOCK_PROJECTS = [
         date: "2023-03-15",
         category: "Equipment",
         description: "Crane rental - 2 weeks",
-        amount: 12000,
-        status: "Pending",
+        amount: 200000,
+        status: "Approved",
+      },
+      {
+        id: 4,
+        date: "2023-04-01",
+        category: "Permits",
+        description: "Permits and approvals",
+        amount: 100000,
+        status: "Approved",
+      },
+      {
+        id: 5,
+        date: "2023-04-10",
+        category: "Other",
+        description: "Miscellaneous expenses",
+        amount: 50000,
+        status: "Approved",
       },
     ],
     expenseCategories: {
@@ -167,7 +184,7 @@ const MOCK_PROJECTS = [
     team: [
       {
         id: "4",
-        name: "Gabriel Marcelino Brown",
+        name: "Michael Brown",
         role: "Lead Engineer",
         avatar: "https://randomuser.me/api/portraits/men/4.jpg",
       },
@@ -230,7 +247,7 @@ const MOCK_PROJECTS = [
     ],
     expenses: [
       {
-        id: 4,
+        id: 6,
         date: "2023-03-20",
         category: "Permits",
         description: "Building permits and approvals",
@@ -238,11 +255,27 @@ const MOCK_PROJECTS = [
         status: "Approved",
       },
       {
-        id: 5,
+        id: 7,
         date: "2023-04-01",
         category: "Materials",
         description: "Initial steel delivery",
-        amount: 400000,
+        amount: 1200000,
+        status: "Approved",
+      },
+      {
+        id: 8,
+        date: "2023-04-10",
+        category: "Labor",
+        description: "Labor costs for setup",
+        amount: 500000,
+        status: "Approved",
+      },
+      {
+        id: 9,
+        date: "2023-04-15",
+        category: "Equipment",
+        description: "Equipment rental",
+        amount: 150000,
         status: "Approved",
       },
     ],

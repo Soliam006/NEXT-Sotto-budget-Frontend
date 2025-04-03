@@ -79,7 +79,7 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
   }
   // Right sidebar content
   const TimeView = () => (
-    <div className="space-y-6">
+    <div>
       {/* System time */}
       <Card className="bg-card/50 border border-border/50 backdrop-blur-sm overflow-hidden">
         <CardContent className="p-0">
@@ -97,9 +97,9 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
 
   return (
     <Card className="bg-card/50 border-border/50 backdrop-blur-sm h-full">
-      <div className="p-4">
+      <div className="px-4">
         {/* Top Time View - only visible on larger screens */}
-        <div className="hidden lg:block">
+        <div className="pb-2">
           <TimeView />
         </div>
         <nav className="space-y-2">

@@ -41,7 +41,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
 
     return (
       <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col md:flex-row justify-between gap-1 items-center">
               <h2 className="text-xl font-bold">{dict.tasks?.taskBoard || "Task Board"}</h2>
               <div className="flex gap-2">
                   <Button

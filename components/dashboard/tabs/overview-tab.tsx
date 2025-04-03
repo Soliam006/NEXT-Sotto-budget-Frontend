@@ -46,13 +46,13 @@ export function OverviewTab({ dict }: OverviewTabProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Progress Pie Chart */}
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle>{dict.dashboard?.progressOverview || "Progress Overview"}</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center">
+          <CardContent className="h-[400px] flex items-center justify-center">
             <CustomPieChart selectedProject={selectedProject} />
           </CardContent>
         </Card>

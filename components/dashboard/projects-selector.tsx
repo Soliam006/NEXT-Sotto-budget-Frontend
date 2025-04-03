@@ -90,7 +90,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
   }
 
   return (
-    <>
+    <div className="">
       <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -188,7 +188,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
         cancelText={dict.common?.cancel || "Cancel"}
         alternativeText={dict.common?.discardAndContinue || "Discard and Continue"}
       />
-    </>
+    </div>
   )
 }
 
