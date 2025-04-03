@@ -8,6 +8,14 @@ export interface Availability {
   to: string
 }
 
+export interface UserFollower {
+  id: string
+  name: string
+  username: string
+  role: string
+  avatar?: string
+}
+
 export interface User {
   id: number
   name?: string
@@ -20,4 +28,9 @@ export interface User {
   description?: string
   created_at?: string // ISO 8601 e.g. '2025-03-20T10:00:00Z'
   availabilities?: Availability[]
+  followers?: UserFollower[]
+  following?: UserFollower[]
+  requests?: UserFollower[]
 }
+
+

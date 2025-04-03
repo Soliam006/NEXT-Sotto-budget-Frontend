@@ -4,10 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Building } from "lucide-react"
+import { Building, Plus } from "lucide-react"
 import { useProject } from "@/contexts/project-context"
 import { useState } from "react"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
+import { Button } from "@/components/ui/button"
+import { AddProjectDialog } from "@/components/projects/add-project-dialog"
+import {useUser} from "@/contexts/UserProvider";
 
 export interface Project {
   id: number
@@ -25,6 +28,13 @@ export interface Project {
   startDate: string
   endDate: string
   status: string
+  clients?: {
+    id: string
+    name: string
+    username: string
+    role: string
+    avatar?: string
+  }[]
   tasks?: any
   team?: any
   materials?: any
@@ -48,9 +58,11 @@ interface ProjectsSelectorProps {
 
 export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
   const { projects, selectedProject, hasChanges, setSelectedProjectById, saveChanges, discardChanges } = useProject()
+  const { user } = useUser()
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingProjectId, setPendingProjectId] = useState<number | null>(null)
+  const [showAddProject, setShowAddProject] = useState(false)
 
   const handleProjectChange = (projectIdStr: string) => {
     const projectId = Number.parseInt(projectIdStr, 10)
@@ -95,9 +107,19 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle>{dict.dashboard?.selectProject || "Select Project"}</CardTitle>
-            <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
-              {projects.length} {dict.dashboard?.projects || "Projects"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
+                {projects.length} {dict.dashboard?.projects || "Projects"}
+              </Badge>
+              <Button
+                variant="outline"
+                className="h-8 px-2 bg-primary/10 text-primary hover:bg-primary/20 flex items-center gap-1"
+                onClick={() => setShowAddProject(true)}
+              >
+                <Plus className="h-4 w-4" />
+                <span className="text-xs">{dict.projects?.addProject || "Add Project"}</span>
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -109,7 +131,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
-                  {projects.map((project:Project) => (
+                  {projects.map((project: Project) => (
                     <SelectItem key={project.id} value={project.id.toString()}>
                       {project.title}
                     </SelectItem>
@@ -167,6 +189,20 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                     <span>{selectedProject.endDate}</span>
                   </div>
                 </div>
+
+                {/* Clients section */}
+                {selectedProject.clients && selectedProject.clients.length > 0 && (
+                  <div className="mt-2">
+                    <h4 className="text-sm font-medium mb-1">{dict.projects?.clients || "Clients"}:</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedProject.clients.map((client) => (
+                        <Badge key={client.id} variant="secondary" className="text-xs">
+                          {client.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -188,7 +224,8 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
         cancelText={dict.common?.cancel || "Cancel"}
         alternativeText={dict.common?.discardAndContinue || "Discard and Continue"}
       />
+
+      <AddProjectDialog open={showAddProject} onOpenChange={setShowAddProject} dict={dict} user={user} />
     </div>
   )
 }
-

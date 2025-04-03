@@ -5,7 +5,6 @@ import type { Project } from "@/components/dashboard/projects-selector"
 import { isEqual } from "lodash"
 
 // Datos de ejemplo para proyectos
-// Datos de ejemplo para proyectos
 const MOCK_PROJECTS = [
   {
     id: 1,
@@ -23,6 +22,22 @@ const MOCK_PROJECTS = [
     startDate: "2023-01-15",
     endDate: "2024-06-30",
     status: "In Progress",
+    clients: [
+      {
+        id: "client-1",
+        name: "Acme Corporation",
+        username: "acmecorp",
+        role: "Corporate Client",
+        avatar: "/favicon.ico",
+      },
+      {
+        id: "client-2",
+        name: "Globex Industries",
+        username: "globex",
+        role: "Corporate Client",
+        avatar: "/favicon.ico",
+      },
+    ],
     team: [
       {
         id: "1",
@@ -181,6 +196,15 @@ const MOCK_PROJECTS = [
     startDate: "2023-03-10",
     endDate: "2025-07-15",
     status: "In Progress",
+    clients: [
+      {
+        id: "client-3",
+        name: "Initech LLC",
+        username: "initech",
+        role: "Corporate Client",
+        avatar: "/favicon.ico",
+      },
+    ],
     team: [
       {
         id: "4",
@@ -298,6 +322,7 @@ interface ProjectContextType {
   setSelectedProjectById: (id: number) => void
 
   // Métodos para modificar el proyecto
+  addProject: (project: Omit<Project, "id">) => Promise<Project>
   addTeamMember: (member: any) => void
   addTask: (task: any) => void
   updateTask: (taskId: string, updatedTask: any) => void
@@ -361,6 +386,39 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setSelectedProjectId(id)
   }
 
+  // Función para añadir un nuevo proyecto
+  const addProject = async (project: Omit<Project, "id">) => {
+    setIsSaving(true)
+
+    try {
+      // Simular una llamada a la API
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
+      // Generar un nuevo ID (en una aplicación real, esto vendría del backend)
+      const newId = Math.max(...projects.map((p) => p.id)) + 1
+
+      // Crear el nuevo proyecto con ID
+      const newProject: Project = {
+        id: newId,
+        ...project,
+      }
+
+      // Añadir el proyecto a la lista
+      setProjects((prev) => [...prev, newProject])
+
+      // Seleccionar el nuevo proyecto
+      setSelectedProjectId(newId)
+
+      console.log("Proyecto añadido con éxito:", newProject)
+      return newProject
+    } catch (error) {
+      console.error("Error al añadir el proyecto:", error)
+      throw error
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   // Métodos para modificar el proyecto seleccionado
 
   // Añadir un miembro al equipo
@@ -383,7 +441,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const updateTask = (taskId: string, updatedTask: any) => {
     setSelectedProject((prev) => ({
       ...prev,
-      tasks: prev.tasks?.map((task:any) => (task.id === taskId ? { ...task, ...updatedTask } : task)),
+      tasks: prev.tasks?.map((task: any) => (task.id === taskId ? { ...task, ...updatedTask } : task)),
     }))
   }
 
@@ -391,7 +449,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const deleteTask = (taskId: string) => {
     setSelectedProject((prev) => ({
       ...prev,
-      tasks: prev.tasks?.filter((task:any) => task.id !== taskId),
+      tasks: prev.tasks?.filter((task: any) => task.id !== taskId),
     }))
   }
 
@@ -399,7 +457,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const updateTaskStatus = (taskId: string, newStatus: string) => {
     setSelectedProject((prev) => ({
       ...prev,
-      tasks: prev.tasks?.map((task:any) => (task.id === taskId ? { ...task, status: newStatus } : task)),
+      tasks: prev.tasks?.map((task: any) => (task.id === taskId ? { ...task, status: newStatus } : task)),
     }))
   }
 
@@ -442,6 +500,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     originalSelectedProject,
     hasChanges,
     setSelectedProjectById,
+    addProject,
     addTeamMember,
     addTask,
     updateTask,
@@ -454,4 +513,3 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
 }
-
