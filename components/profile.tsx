@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {
   Activity,
   AlertCircle,
@@ -9,7 +9,7 @@ import {
   Calendar,
   Check,
   Edit,
-  FileText,
+  FileText, Loader2,
   Mail,
   MapPin,
   MessageSquare,
@@ -160,11 +160,11 @@ const SEARCH_RESULTS = [
 export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
   const router = useRouter()
-  const {user, setUser,    updateUser,
-    saveProfile,
-    addFollower,
-    removeFollower,
-    updateAvailability,
+  const {user, setUser,
+    acceptFollower,
+    rejectFollower,
+    followUser,
+    unfollowUser,
     isSaving} = useUser();
 
   const [user_data, setUser_data] = useState<User_Type | null>(user);
@@ -174,44 +174,62 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   const [isFollowingDialogOpen, setIsFollowingDialogOpen] = useState(false)
   const [isRequestsDialogOpen, setIsRequestsDialogOpen] = useState(false)
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
-  const [followers, setFollowers] = useState(user?.followers)
-  const [following, setFollowing] = useState(user?.following)
-  const [requests, setRequests] = useState(user?.requests)
+  const [followers, setFollowers] = useState(user?.followers || [])
+  const [following, setFollowing] = useState(user?.following || [])
+  const [requests, setRequests] = useState(user?.requests || [])
 
-  // Handle follow/unfollow
-  const handleFollowToggle = (userId: string) => {
+  useEffect(() => {
+    console.log("User data updated:", user)
+    setFollowers(user?.followers || [])
+    setFollowing(user?.following || [])
+    setRequests(user?.requests || [])
+  }, [user])
 
-    // Also update in following list if user_data is there
-    setFollowing((prev) => {
-      if(!prev) return []
-      const userInFollowing = prev.find((user) => user.id === userId)
-      if (userInFollowing) {
-        return prev.filter((user) => user.id !== userId)
+  /**
+   * Handle follow/unfollow toggle
+   * @param userId User ID to follow/unfollow
+   * @param follow Boolean indicating whether to follow or unfollow
+   */
+  const handleFollowToggle = (userId: string, follow: boolean) => {
+    try {
+      if (follow) {
+        const follower = followUser(userId);
+        if (!follower) {
+          throw new Error("Error following user");
+        }
       } else {
-        const userToAdd = SEARCH_RESULTS.find((user) => user.id === userId)
-        if (userToAdd) {
-          return [...prev, {...userToAdd, isFollowing: true}]
+        const unfollower = unfollowUser(userId);
+        if (!unfollower) {
+          throw new Error("Error unfollowing user");
         }
       }
-      return prev
-    })
-  }
-  // Handle accept request
-  const handleAcceptRequest = (userId: string) => {
-    // Remove from requests
-    setRequests((prev) => prev ? prev.filter((user) => user.id !== userId) : [])
-
-    // Add to followers
-    const userToAdd = REQUESTS.find((user) => user.id === userId)
-    if (userToAdd) {
-      setFollowers((prev) => prev ? [...prev, userToAdd] : [userToAdd])
+    } catch (error) {
+      alert(`Error: ${error}`);
     }
   }
+  // Handle accept request
+const handleAcceptRequest = async (userId: string) => {
+  try {
+    const follower = await acceptFollower(userId);
+    if (!follower) {
+      throw new Error("Error accepting follower request");
+    }
+    console.log("User After Accept:", user);
+  } catch (error) {
+    alert(`Error: ${error}`);
+  }
+}
 
   // Handle reject request
-  const handleRejectRequest = (userId: string) => {
-    // Remove from requests
-    setRequests((prev) => prev ? prev.filter((user) => user.id !== userId) : [])
+  const handleRejectRequest = async (userId: string) => {
+    try {
+      const responseFollower = await rejectFollower(userId);
+      if (! responseFollower) {
+        throw new Error("Error rejecting follower request");
+      }
+    } catch (error) {
+      alert(`Error: ${error}`);
+    }
   }
   /**
    * Handle save profile
@@ -362,20 +380,22 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                     <span className="text-xl font-bold text-cyan-400">{PROJECTS.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.projects}</span>
                   </Button>
-                  <Button
+                  {user?.followers && user.followers.length>0 &&
+                      <Button
                     variant="ghost"
                     className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsFollowersDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{followers?.length}</span>
+                    <span className="text-xl font-bold text-cyan-400">{user.followers.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.followers}</span>
                   </Button>
+                  }
                   <Button
                     variant="ghost"
                     className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsFollowingDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{following?.length}</span>
+                    <span className="text-xl font-bold text-cyan-400">{user?.following?.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.following}</span>
                   </Button>
                 </div>
@@ -386,7 +406,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
             <AvailabilityDisplay availabilities={user?.availabilities || []} lang={lang} dictionary={dict}/>
 
             {/* Follow Requests */}
-            {requests &&( requests.length > 0 ) && (
+            {user?.requests &&( user.requests.length > 0 ) && (
               <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center">
@@ -396,7 +416,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {requests.slice(0, 3).map((request) => (
+                    {user.requests.slice(0, 3).map((request) => (
                       <div key={request.id} className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Avatar className="h-10 w-10 mr-3">
@@ -411,35 +431,39 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                           </div>
                         </div>
                         <div className="flex space-x-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-green-500 hover:text-green-400 hover:bg-green-500/10"
-                            onClick={() => handleAcceptRequest(request.id)}
-                          >
-                            <Check className="h-4 w-4"/>
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                            onClick={() => handleRejectRequest(request.id)}
-                          >
-                            <X className="h-4 w-4"/>
-                          </Button>
+                          {isSaving? <Loader2 className="animate-spin h-4 w-4 text-cyan-500"/> :
+                            <div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-green-500 hover:text-green-400 hover:bg-green-500/10"
+                              onClick={() => handleAcceptRequest(request.id)}
+                            >
+                              <Check className="h-4 w-4"/>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                              onClick={() => handleRejectRequest(request.id)}
+                            >
+                              <X className="h-4 w-4"/>
+                            </Button>
+                          </div>
+                          }
                         </div>
                       </div>
                     ))}
                   </div>
                 </CardContent>
-                {requests.length > 3 && (
+                {user.requests.length > 3 && (
                   <CardFooter>
                     <Button
                       variant="ghost"
                       className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
                       onClick={() => setIsRequestsDialogOpen(true)}
                     >
-                      {dict.profile.viewAllRequests.replace("{count}", requests.length.toString())}
+                      {dict.profile.viewAllRequests.replace("{count}", user.requests.length.toString())}
                     </Button>
                   </CardFooter>
                 )}
@@ -661,15 +685,15 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
               onChange={(e) => {
                 const query = e.target.value
                 if (query.trim() === "") {
-                  setFollowers(FOLLOWERS)
+                  setFollowers(followers)
                 } else {
                   setFollowers(
-                    FOLLOWERS.filter(
+                    followers.filter(
                       (user) =>
                         user.name.toLowerCase().includes(query.toLowerCase()) ||
                         user.username.toLowerCase().includes(query.toLowerCase()) ||
                         user.role.toLowerCase().includes(query.toLowerCase()),
-                    ),
+                    ) || []
                   )
                 }
               }}
@@ -677,7 +701,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {followers&&followers.length > 0 ? (
+                {user?.followers&& user.followers.length > 0 ? (
                   followers.map((follower) => (
                     <div
                       key={follower.id}
@@ -699,7 +723,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                         variant="outline"
                         size="sm"
                         className="bg-secondary/70 border-border hover:bg-secondary"
-                        onClick={() => handleFollowToggle(follower.id)}
+                        onClick={() => handleFollowToggle(follower.id, true)}
                       >
                         {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
                       </Button>
@@ -736,10 +760,10 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
               onChange={(e) => {
                 const query = e.target.value
                 if (query.trim() === "") {
-                  setFollowing(FOLLOWING)
+                  setFollowing(following)
                 } else {
                   setFollowing(
-                    FOLLOWING.filter(
+                    following.filter(
                       (user) =>
                         user.name.toLowerCase().includes(query.toLowerCase()) ||
                         user.username.toLowerCase().includes(query.toLowerCase()) ||
@@ -752,7 +776,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {following&&following.length > 0 ? (
+                {user?.following && user.following.length > 0 ? (
                   following.map((follow) => (
                     <div
                       key={follow.id}
@@ -774,7 +798,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                         variant="outline"
                         size="sm"
                         className="bg-secondary/70 border-border hover:bg-secondary"
-                        onClick={() => handleFollowToggle(follow.id)}
+                        onClick={() => handleFollowToggle(follow.id, false)}
                       >
                         {dict.following.unfollow}
                       </Button>
@@ -807,7 +831,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
           <div className="mt-4">
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {requests&&requests.length > 0 ? (
+                {user?.requests && user.requests.length > 0 ? (
                   requests.map((request) => (
                     <div
                       key={request.id}

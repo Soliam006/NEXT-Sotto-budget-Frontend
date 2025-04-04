@@ -4,13 +4,24 @@
 import React, { createContext, useContext, useState } from 'react';
 import { User, UserFollower } from './user.types';
 
+interface FollowResponse {
+  follower_id: number;
+  following_id: number;
+  created_at: string;
+  status: 'ACCEPTED' | 'REJECTED' | 'PENDING';
+  updated_at: string;
+}
+
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   updateUser: (updatedFields: Partial<User>) => void;
   saveProfile: (updatedFields: Partial<User>) => Promise<void>;
-  addFollower: (follower: UserFollower) => void;
+  acceptFollower: (followerId: string) => any;
   removeFollower: (followerId: string) => void;
+  rejectFollower: (followerId: string) => any;
+  followUser: (followerId: string) => any;
+  unfollowUser: (followerId: string) => any;
   updateAvailability: (availabilities: User['availabilities']) => void;
   isSaving: boolean;
 }
@@ -50,12 +61,37 @@ export const UserProvider = ({ children }: Props) => {
   };
 
   // Agrega un seguidor al usuario
-  const addFollower = (follower: UserFollower) => {
+  const acceptFollower = async (followerID: string) => {
     if (!user) return;
-    setUser({
-      ...user,
-      followers: [...(user.followers || []), follower],
-    });
+
+    // Simular una llamada a la API
+    setIsSaving(true);
+    try {
+      // Aquí podrías hacer una llamada a la API para aceptar el seguidor
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const follower: UserFollower = {
+        id: followerID,
+        name: 'Nombre Prova',
+        username: 'Username',
+        role: 'client',
+        isFollowing: true,
+      };
+      console.log("Seguidor aceptado:", followerID);
+      // Actualiza el usuario con el nuevo seguidor y elimina el seguidor de las solicitudes
+      updateUser({
+        followers: [...(user.followers || []), follower],
+        requests: (user.requests || []).filter(request => request.id !== followerID),
+      })
+      console.log("User ACCEPTED:", user);
+
+      return follower;
+
+    } catch (error) {
+      console.error("Error al aceptar el seguidor:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Elimina un seguidor del usuario
@@ -66,6 +102,98 @@ export const UserProvider = ({ children }: Props) => {
       followers: (user.followers || []).filter(follower => follower.id !== followerId),
     });
   };
+
+  const rejectFollower = async (followerId: string) => {
+    if (!user) return;
+
+    // Simular una llamada a la API
+    setIsSaving(true);
+    try {
+      // Aquí podrías hacer una llamada a la API para rechazar el seguidor
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Respuesta simulada
+      const follower = {
+        "follower_id": followerId,
+        "status": "REJECTED",
+      }
+      console.log("Seguidor rechazado:", followerId);
+      setUser({
+        ...user,
+        requests: (user.requests || []).filter(request => request.id !== followerId),
+      });
+      return follower;
+
+    } catch (error) {
+      console.error("Error al rechazar el seguidor:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }
+  const followUser = async (followId: string) => {
+    if (!user) return;
+
+    // Simular una llamada a la API
+    setIsSaving(true);
+    try {
+      // Aquí podrías hacer una llamada a la API para seguir al usuario
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const followUserResponse: FollowResponse = {
+        follower_id: user.id,
+        following_id: Number(followId),
+        created_at: new Date().toISOString(),
+        status: 'PENDING',
+        updated_at: new Date().toISOString(),
+      }
+      console.log("Usuario seguido:", followId);
+      setUser({
+        ...user,
+        following: [...(user.following || []), { id: followId, name: '', username: '', role: '', isFollowing: true }],
+      });
+      return followUserResponse;
+
+    } catch (error) {
+      console.error("Error al seguir al usuario:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  const unfollowUser = async (followId: string) => {
+    if (!user) return;
+
+    // Simular una llamada a la API
+    setIsSaving(true);
+    try {
+      // Aquí podrías hacer una llamada a la API para dejar de seguir al usuario
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Usuario dejado de seguir:", followId);
+      setUser({
+        ...user,
+        following: (user.following || []).filter(following => following.id !== followId),
+      });
+      const followUserResponse: FollowResponse = {
+        follower_id: user.id,
+        following_id: Number(followId),
+        created_at: new Date().toISOString(),
+        status: 'ACCEPTED',
+        updated_at: new Date().toISOString(),
+      }
+      console.log("Usuario seguido:", followId);
+      setUser({
+        ...user,
+        following: [...(user.following || []), { id: followId, name: '', username: '', role: '', isFollowing: true }],
+      });
+      return followUserResponse;
+
+    } catch (error) {
+      console.error("Error al dejar de seguir al usuario:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   // Actualiza el array de disponibilidades
   const updateAvailability = (availabilities: User['availabilities']) => {
@@ -81,8 +209,11 @@ export const UserProvider = ({ children }: Props) => {
     setUser,
     updateUser,
     saveProfile,
-    addFollower,
+    acceptFollower,
     removeFollower,
+    rejectFollower,
+    followUser,
+    unfollowUser,
     updateAvailability,
     isSaving,
   };

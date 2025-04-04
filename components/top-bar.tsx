@@ -22,6 +22,7 @@ import {Input} from "@/components/ui/input";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useState} from "react";
 import Image from "next/image";
+import {clearToken} from "@/app/services/auth-service";
 
 interface TopBarProps {
   user: UserType | null
@@ -164,6 +165,11 @@ export function TopBar({
     }
   }
 
+  function logout() {
+    clearToken()
+    router.push(`/${lang}/login`)
+  }
+
   return (
     <header className="flex items-center justify-between border-b border-border mb-6 px-2 md:px-6 py-2 md:py-4 fixed top-0 left-0 right-0 z-50 bg-background">
       <div className="flex items-center space-x-2">
@@ -269,7 +275,7 @@ export function TopBar({
                 <span>{dictionary.nav?.dashboard || "Dashboard"}</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleNavigate("/logout")}>
+              <DropdownMenuItem onClick= {()=>logout()}>
                 <LogOutIcon className="mr-2 h-4 w-4" />
                 <span>{dictionary.nav?.logout || "Log out"}</span>
               </DropdownMenuItem>

@@ -451,7 +451,7 @@
   "followers": {
     "title": "Seguidores",
     "description": "Personas que siguen a {name}",
-    "followBack": "Seguir",
+    "followBack": "Seguir también",
     "following": "Siguiendo",
     "noFollowers": "Aún no hay seguidores"
   },
