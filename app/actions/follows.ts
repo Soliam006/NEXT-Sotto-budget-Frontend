@@ -1,5 +1,4 @@
-import {UserFollower} from "@/contexts/user.types";
-
+"use server"
 const api_URL = process.env.BASE_URL_BACK + "follows/"
 
 
@@ -32,8 +31,10 @@ export async function fetchFollowers(token: string, translates: any): Promise<an
 }
 
 
-export async function followUser(token: string, userId: string, translates: any): Promise<any | null> {
+export async function followUserBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+    if (!token) return null;
     try {
+        console.log("URL Using in FOLLOW _________________________", `${api_URL}${userId}`);
         return await fetch(`${api_URL}${userId}`, {
             method: "POST",
             headers: {
@@ -59,7 +60,8 @@ export async function followUser(token: string, userId: string, translates: any)
     return null
 }
 
-export async function unfollowUser(token: string, userId: string, translates: any): Promise<any | null> {
+export async function unfollowUserBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+    if (!token) return null;
     try {
         return await fetch(`${api_URL}unfollow/${userId}`, {
             method: "DELETE",
@@ -86,7 +88,8 @@ export async function unfollowUser(token: string, userId: string, translates: an
     return null
 }
 
-export async function acceptFollower(token: string, userId: string, translates: any): Promise<any | null> {
+export async function acceptFollowerBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+    if (!token) return null;
     try {
         return await fetch(`${api_URL}accept_follow/${userId}`, {
             method: "POST",
@@ -114,7 +117,8 @@ export async function acceptFollower(token: string, userId: string, translates: 
 }
 
 
-export async function rejectFollower(token: string, userId: string, translates: any): Promise<any | null> {
+export async function rejectFollowerBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+    if (!token) return null;
     try {
         return await fetch(`${api_URL}reject_follow/${userId}`, {
             method: "POST",

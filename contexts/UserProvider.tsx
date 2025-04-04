@@ -3,6 +3,8 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { User, UserFollower } from './user.types';
+import {followUserBD} from "@/app/actions/follows";
+import {getToken} from "@/app/services/auth-service";
 
 interface FollowResponse {
   follower_id: number;
@@ -68,15 +70,10 @@ export const UserProvider = ({ children }: Props) => {
     setIsSaving(true);
     try {
       // Aquí podrías hacer una llamada a la API para aceptar el seguidor
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const follower: UserFollower = {
-        id: followerID,
-        name: 'Nombre Prova',
-        username: 'Username',
-        role: 'client',
-        isFollowing: true,
-      };
-      console.log("Seguidor aceptado:", followerID);
+      const followerResponse = await followUserBD(getToken(), followerID, user.language_preference);
+
+      console.log("Seguidor aceptado:", followerResponse);
+      /*
       // Actualiza el usuario con el nuevo seguidor y elimina el seguidor de las solicitudes
       updateUser({
         followers: [...(user.followers || []), follower],
@@ -84,7 +81,8 @@ export const UserProvider = ({ children }: Props) => {
       })
       console.log("User ACCEPTED:", user);
 
-      return follower;
+      return follower;*/
+      return null;
 
     } catch (error) {
       console.error("Error al aceptar el seguidor:", error);
@@ -180,11 +178,7 @@ export const UserProvider = ({ children }: Props) => {
         status: 'ACCEPTED',
         updated_at: new Date().toISOString(),
       }
-      console.log("Usuario seguido:", followId);
-      setUser({
-        ...user,
-        following: [...(user.following || []), { id: followId, name: '', username: '', role: '', isFollowing: true }],
-      });
+      console.log("Usuario dejado de seguir:", followId);
       return followUserResponse;
 
     } catch (error) {

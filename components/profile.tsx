@@ -198,6 +198,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
           throw new Error("Error following user");
         }
       } else {
+        console.log("Unfollow User", userId);
         const unfollower = unfollowUser(userId);
         if (!unfollower) {
           throw new Error("Error unfollowing user");
@@ -431,26 +432,24 @@ const handleAcceptRequest = async (userId: string) => {
                           </div>
                         </div>
                         <div className="flex space-x-1">
-                          {isSaving? <Loader2 className="animate-spin h-4 w-4 text-cyan-500"/> :
-                            <div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-green-500 hover:text-green-400 hover:bg-green-500/10"
-                              onClick={() => handleAcceptRequest(request.id)}
-                            >
-                              <Check className="h-4 w-4"/>
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                              onClick={() => handleRejectRequest(request.id)}
-                            >
-                              <X className="h-4 w-4"/>
-                            </Button>
-                          </div>
-                          }
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-green-500 hover:text-green-400 hover:bg-green-500/10"
+                            onClick={() => handleAcceptRequest(request.id)}
+                            disabled={isSaving}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                            onClick={() => handleRejectRequest(request.id)}
+                            disabled={isSaving}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -723,7 +722,7 @@ const handleAcceptRequest = async (userId: string) => {
                         variant="outline"
                         size="sm"
                         className="bg-secondary/70 border-border hover:bg-secondary"
-                        onClick={() => handleFollowToggle(follower.id, true)}
+                        onClick={() => handleFollowToggle(follower.id, ! follower.isFollowing)}
                       >
                         {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
                       </Button>
