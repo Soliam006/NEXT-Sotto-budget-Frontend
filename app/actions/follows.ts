@@ -88,7 +88,7 @@ export async function unfollowUserBD(token: string|null, userId: string, transla
     return null
 }
 
-export async function acceptFollowerBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+export async function acceptRequestBD(token: string|null, userId: string, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
         return await fetch(`${api_URL}accept_follow/${userId}`, {

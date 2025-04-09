@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { User, UserFollower } from './user.types';
-import {followUserBD} from "@/app/actions/follows";
+import {acceptRequestBD, followUserBD, unfollowUserBD} from "@/app/actions/follows";
 import {getToken} from "@/app/services/auth-service";
 
 interface FollowResponse {
@@ -70,9 +70,9 @@ export const UserProvider = ({ children }: Props) => {
     setIsSaving(true);
     try {
       // Aquí podrías hacer una llamada a la API para aceptar el seguidor
-      const followerResponse = await followUserBD(getToken(), followerID, user.language_preference);
+      const followersResponse = await acceptRequestBD(getToken(), followerID, user.language_preference);
 
-      console.log("Seguidor aceptado:", followerResponse);
+      console.log("Seguidores Actualizados con el nuevo Follow:", followersResponse);
       /*
       // Actualiza el usuario con el nuevo seguidor y elimina el seguidor de las solicitudes
       updateUser({
