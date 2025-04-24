@@ -69,11 +69,11 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
 
 
   return (
-    <div className="min-h-screen min-w-screen bg-background text-foreground">
+    <div className="min-h-screen w-screen bg-background text-foreground">
         <TopBarWrapper user={user} dictionary={dictionary} lang={lang}
-                       onNavigate={handleNavigate} />
-      <div className="container px-2 py-6 pt-20">
-        <div className="flex flex-col md:flex-row gap-6 mt-6">
+                       onNavigate={handleNavigate} /><div className="w-full px-2 py-6 pt-20">
+
+    <div className="flex flex-col md:flex-row gap-6 mt-6">
           {/* Sidebar - visible en pantallas md y mayores */}
           <div className="hidden md:block w-64">
             <DashboardSidebar
@@ -84,7 +84,7 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
           </div>
 
           {/* Contenido principal */}
-          <div className="flex-1 pb-20 p-4 md:p-0 md:pb-0">
+          <div className="flex-1 pb-20 px-3 lg:px-8 min-h-full">
             {children}
           </div>
         </div>
