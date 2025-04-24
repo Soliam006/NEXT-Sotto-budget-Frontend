@@ -49,80 +49,77 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
   }
 
   return (
-    <div className="">
-      <div className="pb-2">
-        <h1 className="text-2xl font-bold">{dict.dashboard?.overview || "Dashboard Overview"}</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {dict.dashboard?.description || "Manage your projects and activities"}
-        </p>
-      </div>
+      <div className="space-y-6">
+        <div className="pb-2">
+          <h1 className="text-2xl font-bold">{dict.dashboard?.overview || "Dashboard Overview"}</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {dict.dashboard?.description || "Manage your projects and activities"}
+          </p>
+        </div>
 
-      {/* Project selector */}
-      <ProjectsSelector
-        dict={dict}
-      />
-      {/* Save changes bar - only visible when there are changes */}
-      {<SaveChangesBar dict={dict}/>}
+        {/* Project selector */}
+        <ProjectsSelector
+          dict={dict}
+        />
+        {/* Save changes bar - only visible when there are changes */}
+        {<SaveChangesBar dict={dict}/>}
 
-      {/* Main content */}
-      <div className="flex flex-col lg:flex-row gap-6 pt-6">
-        {/* Main content area */}
-        <div className="flex-1">
-          {/* Tabs for different views */}
-          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="w-full border-b rounded-none p-0 h-auto flex space-x-2">
-              <TabsTrigger
-                value="overview"
-                className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
-              >
-                <Activity className="h-4 w-4 mr-2"/>
-                {activeTab === "overview" && <>{dict.dashboard?.overview || "Overview"}</>}
-              </TabsTrigger>
-              <TabsTrigger
-                value="tasks"
-                className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
-              >
-                <ClipboardList className="h-4 w-4 mr-2"/>
-                {activeTab === "tasks" && <>{dict.dashboard?.tasks || "Tasks"}</>}
-              </TabsTrigger>
-              <TabsTrigger
-                value="team"
-                className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
-              >
-                <Users className="h-4 w-4 mr-2"/>
-                {activeTab === "team" && <>{dict.dashboard?.team || "Team"}</>}
-              </TabsTrigger>
-              <TabsTrigger
-                value="materials"
-                className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
-              >
-                <Package className="h-4 w-4 mr-2"/>
-                {activeTab === "materials" && <>{dict.dashboard?.materials || "Materials"}</>}
-              </TabsTrigger>
-            </TabsList>
+        {/* Main content */}
+        <div className="pt-6">
+            {/* Tabs for different views */}
+            <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="w-full border-b rounded-none p-0 h-auto flex space-x-2">
+                <TabsTrigger
+                  value="overview"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                >
+                  <Activity className="h-4 w-4 mr-2"/>
+                  {activeTab === "overview" && <>{dict.dashboard?.overview || "Overview"}</>}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="tasks"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                >
+                  <ClipboardList className="h-4 w-4 mr-2"/>
+                  {activeTab === "tasks" && <>{dict.dashboard?.tasks || "Tasks"}</>}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="team"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                >
+                  <Users className="h-4 w-4 mr-2"/>
+                  {activeTab === "team" && <>{dict.dashboard?.team || "Team"}</>}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="materials"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                >
+                  <Package className="h-4 w-4 mr-2"/>
+                  {activeTab === "materials" && <>{dict.dashboard?.materials || "Materials"}</>}
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Overview Tab Content */}
-            <TabsContent value="overview">
-              <OverviewTab dict={dict}/>
-            </TabsContent>
+              {/* Overview Tab Content */}
+              <TabsContent value="overview">
+                <OverviewTab dict={dict}/>
+              </TabsContent>
 
-            {/* Tasks Tab Content */}
-            <TabsContent value="tasks">
-              <TasksTab dict={dict} lang={lang}/>
-            </TabsContent>
+              {/* Tasks Tab Content */}
+              <TabsContent value="tasks">
+                <TasksTab dict={dict} lang={lang}/>
+              </TabsContent>
 
-            {/* Team Tab Content */}
-            <TabsContent value="team">
-              <TeamTab dict={dict}/>
-            </TabsContent>
+              {/* Team Tab Content */}
+              <TabsContent value="team">
+                <TeamTab dict={dict}/>
+              </TabsContent>
 
-            {/* Materials Tab Content */}
-            <TabsContent value="materials">
-              <MaterialsTab dict={dict}/>
-            </TabsContent>
-          </Tabs>
+              {/* Materials Tab Content */}
+              <TabsContent value="materials">
+                <MaterialsTab dict={dict}/>
+              </TabsContent>
+            </Tabs>
         </div>
       </div>
-    </div>
   )
 }

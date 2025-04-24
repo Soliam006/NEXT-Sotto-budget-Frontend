@@ -20,15 +20,10 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ children, user, dictionary, lang }: DashboardShellProps) {
-  const { theme, setTheme } = useTheme()
+
   const [isMobile, setIsMobile] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
 
   // Check if mobile on mount and window resize
   useEffect(() => {
@@ -70,12 +65,14 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
 
   return (
     <div className="min-h-screen w-screen bg-background text-foreground">
-        <TopBarWrapper user={user} dictionary={dictionary} lang={lang}
-                       onNavigate={handleNavigate} /><div className="w-full px-2 py-6 pt-20">
+      {/* Top bar */}
+      <TopBarWrapper user={user} dictionary={dictionary} lang={lang} onNavigate={handleNavigate} />
 
-    <div className="flex flex-col md:flex-row gap-6 mt-6">
+      <div className="w-full px-2 py-6 pt-20">
+
+        <div className="flex flex-col md:flex-row mt-6">
           {/* Sidebar - visible en pantallas md y mayores */}
-          <div className="hidden md:block w-64">
+          <div className="hidden md:block w-54">
             <DashboardSidebar
               dictionary={dictionary}
               currentSection={getCurrentSection()}
@@ -84,20 +81,20 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
           </div>
 
           {/* Contenido principal */}
-          <div className="flex-1 pb-20 px-3 lg:px-8 min-h-full">
+          <div className="flex-1 pb-20 p-3 lg:p-8 min-h-full">
             {children}
           </div>
         </div>
 
-        {/* Bottom bar - visible only on mobile */}
-        {isMobile && (
-          <DashboardBottomBar
-            dictionary={dictionary}
-            currentSection={getCurrentSection()}
-            onNavigate={handleNavigate}
-          />
-        )}
-      </div>
+          {/* Bottom bar - visible only on mobile */}
+          {isMobile && (
+            <DashboardBottomBar
+              dictionary={dictionary}
+              currentSection={getCurrentSection()}
+              onNavigate={handleNavigate}
+            />
+          )}
+        </div>
     </div>
   )
 }
