@@ -20,7 +20,6 @@ interface DashboardOverviewProps {
 export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
-  const {hasChanges, saveChanges, discardChanges, isSaving} = useProject()
 
   // Simulate data loading
   useEffect(() => {
