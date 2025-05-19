@@ -496,6 +496,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   // Valor del contexto
   const value = {
     projects,
+    setProjects,
     selectedProject,
     originalSelectedProject,
     hasChanges,

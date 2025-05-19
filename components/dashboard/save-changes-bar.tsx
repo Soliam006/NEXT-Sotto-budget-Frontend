@@ -14,7 +14,7 @@ export function SaveChangesBar({ dict }: SaveChangesBarProps) {
   if (!hasChanges) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-9990 py-4 px-4 flex items-center justify-between">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40 py-4 px-4 flex items-center justify-between">
       <div className="text-sm">
         <span className="font-medium text-primary">{dict.common?.unsavedChanges || "You have unsaved changes"}</span>
         <span className="text-muted-foreground ml-2">
