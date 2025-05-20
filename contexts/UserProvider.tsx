@@ -1,10 +1,23 @@
-// app/context/UserProvider.tsx
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
-import { User, UserFollower } from './user.types';
-import {acceptRequestBD, followUserBD, unfollowUserBD} from "@/app/actions/follows";
-import {getToken} from "@/app/services/auth-service";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User } from './user.types';
+import { acceptRequestBD } from "@/app/actions/follows";
+import { setCookie, deleteCookie } from 'cookies-next';
+import {fetchUserMe} from "@/app/actions/auth";
+import {redirect} from "next/navigation";
+
+// NUEVO: Función para obtener el token desde localStorage
+const getTokenFromStorage = () => {
+  if (typeof window !== 'undefined') {
+    const token = sessionStorage.getItem('access_token');
+    if (token) {
+      return token;
+    }
+    return localStorage.getItem('access_token');
+  }
+  return null;
+};
 
 interface FollowResponse {
   follower_id: number;
@@ -17,6 +30,8 @@ interface FollowResponse {
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
+  token: string | null;
+  setToken: (token: string | null, rememberMe: boolean, lang:string) => void;
   updateUser: (updatedFields: Partial<User>) => void;
   saveProfile: (updatedFields: Partial<User>) => Promise<void>;
   acceptFollower: (followerId: string) => any;
@@ -36,22 +51,60 @@ interface Props {
 
 export const UserProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null);
+  const [tokenState, setTokenState] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  // Actualiza el usuario en memoria combinando los campos actuales con los nuevos.
+  // NUEVO: Inicializa el token desde localStorage al montar
+  useEffect(() => {
+    const storedToken = getTokenFromStorage();
+    if (storedToken) {
+      setTokenState(storedToken);
+      // Cargar usuario desde backend
+      fetchUserMe(storedToken, { serverError: "Something went Wrong" }).then(res => {
+        if (res.statusCode === 200) {
+          console.log("User datafetch ME:", res.data);
+          setUser(res.data);
+        } else {
+          // Si error o token inválido, limpiar token y usuario
+          setTokenState(null);
+          setUser(null);
+          deleteCookie('access_token', { path: '/' });
+          deleteCookie('lang', { path: '/' });
+          redirect(`/es/login`);
+        }
+      });
+    }
+  }, []);
+
+  // NUEVO: Método para actualizar token en memoria + almacenamiento local
+  const setToken = (newToken: string | null, rememberMe: boolean, lang: string) => {
+    if (!newToken) {
+      // Eliminar cookies
+      deleteCookie('access_token', { path: '/' });
+      deleteCookie('lang', { path: '/' });
+      return;
+    }
+
+    // Establecer cookies
+    const cookieOptions = {
+      path: '/',
+      maxAge: rememberMe ? 60 * 60 * 24 * 30 : undefined, // 30 días
+    };
+
+    setCookie('access_token', newToken, cookieOptions);
+    setCookie('lang', lang, cookieOptions);
+  };
+
   const updateUser = (updatedFields: Partial<User>) => {
     if (!user) return;
     setUser({ ...user, ...updatedFields });
   };
 
-  // Simula el envío al backend y, si tiene éxito, actualiza el perfil.
   const saveProfile = async (updatedFields: Partial<User>): Promise<void> => {
     if (!user) return;
     setIsSaving(true);
     try {
-      // Simulación de llamada a la API (por ejemplo, 1.5 segundos de delay)
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Actualiza el usuario con los campos nuevos
       updateUser(updatedFields);
       console.log("Perfil actualizado con éxito");
     } catch (error) {
@@ -62,28 +115,14 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
-  // Agrega un seguidor al usuario
   const acceptFollower = async (followerID: string) => {
-    if (!user) return;
+    if (!user || !tokenState) return;
 
-    // Simular una llamada a la API
     setIsSaving(true);
     try {
-      // Aquí podrías hacer una llamada a la API para aceptar el seguidor
-      const followersResponse = await acceptRequestBD(getToken(), followerID, user.language_preference);
-
+      const followersResponse = await acceptRequestBD(tokenState, followerID, user.language_preference);
       console.log("Seguidores Actualizados con el nuevo Follow:", followersResponse);
-      /*
-      // Actualiza el usuario con el nuevo seguidor y elimina el seguidor de las solicitudes
-      updateUser({
-        followers: [...(user.followers || []), follower],
-        requests: (user.requests || []).filter(request => request.id !== followerID),
-      })
-      console.log("User ACCEPTED:", user);
-
-      return follower;*/
       return null;
-
     } catch (error) {
       console.error("Error al aceptar el seguidor:", error);
       throw error;
@@ -92,104 +131,86 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
-  // Elimina un seguidor del usuario
   const removeFollower = (followerId: string) => {
     if (!user) return;
     setUser({
       ...user,
-      followers: (user.followers || []).filter(follower => follower.id !== followerId),
+      followers: (user.followers || []).filter(f => f.id !== followerId),
     });
   };
 
   const rejectFollower = async (followerId: string) => {
     if (!user) return;
 
-    // Simular una llamada a la API
     setIsSaving(true);
     try {
-      // Aquí podrías hacer una llamada a la API para rechazar el seguidor
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Respuesta simulada
-      const follower = {
-        "follower_id": followerId,
-        "status": "REJECTED",
-      }
-      console.log("Seguidor rechazado:", followerId);
       setUser({
         ...user,
-        requests: (user.requests || []).filter(request => request.id !== followerId),
+        requests: (user.requests || []).filter(r => r.id !== followerId),
       });
-      return follower;
-
+      return {
+        follower_id: followerId,
+        status: "REJECTED",
+      };
     } catch (error) {
       console.error("Error al rechazar el seguidor:", error);
       throw error;
     } finally {
       setIsSaving(false);
     }
-  }
+  };
+
   const followUser = async (followId: string) => {
     if (!user) return;
 
-    // Simular una llamada a la API
     setIsSaving(true);
     try {
-      // Aquí podrías hacer una llamada a la API para seguir al usuario
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const followUserResponse: FollowResponse = {
+      setUser({
+        ...user,
+        following: [...(user.following || []), { id: followId, name: '', username: '', role: '', isFollowing: true }],
+      });
+      return {
         follower_id: user.id,
         following_id: Number(followId),
         created_at: new Date().toISOString(),
         status: 'PENDING',
         updated_at: new Date().toISOString(),
-      }
-      console.log("Usuario seguido:", followId);
-      setUser({
-        ...user,
-        following: [...(user.following || []), { id: followId, name: '', username: '', role: '', isFollowing: true }],
-      });
-      return followUserResponse;
-
+      };
     } catch (error) {
       console.error("Error al seguir al usuario:", error);
       throw error;
     } finally {
       setIsSaving(false);
     }
-  }
+  };
 
   const unfollowUser = async (followId: string) => {
     if (!user) return;
 
-    // Simular una llamada a la API
     setIsSaving(true);
     try {
-      // Aquí podrías hacer una llamada a la API para dejar de seguir al usuario
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Usuario dejado de seguir:", followId);
       setUser({
         ...user,
-        following: (user.following || []).filter(following => following.id !== followId),
+        following: (user.following || []).filter(f => f.id !== followId),
       });
-      const followUserResponse: FollowResponse = {
+      return {
         follower_id: user.id,
         following_id: Number(followId),
         created_at: new Date().toISOString(),
         status: 'ACCEPTED',
         updated_at: new Date().toISOString(),
-      }
-      console.log("Usuario dejado de seguir:", followId);
-      return followUserResponse;
-
+      };
     } catch (error) {
       console.error("Error al dejar de seguir al usuario:", error);
       throw error;
     } finally {
       setIsSaving(false);
     }
-  }
+  };
 
-  // Actualiza el array de disponibilidades
   const updateAvailability = (availabilities: User['availabilities']) => {
     if (!user) return;
     setUser({
@@ -201,6 +222,8 @@ export const UserProvider = ({ children }: Props) => {
   const value: UserContextType = {
     user,
     setUser,
+    token: tokenState,
+    setToken,
     updateUser,
     saveProfile,
     acceptFollower,
@@ -219,7 +242,6 @@ export const UserProvider = ({ children }: Props) => {
   );
 };
 
-// Custom hook para usar el contexto de usuario
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) throw new Error('useUser must be used within a UserProvider');

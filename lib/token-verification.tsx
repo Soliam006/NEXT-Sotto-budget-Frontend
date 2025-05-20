@@ -10,12 +10,12 @@ const useAuthMiddleware = (isAuthPath:boolean,
 
   console.log("useAuthMiddleware LANG_ROUTE", lang_route);
   const router = useRouter();
-  const {user, setUser} = useUser();
+  const {user, setUser, token, setToken} = useUser();
+  const tokenStorage = getToken(); // Obtiene el token del almacenamiento local o de sesión
 
   useEffect(() => {
     const checkToken = async () => {
       console.log('Checking token');
-      const token = getToken();
       const lang = getLang() || 'es';
       console.log('Token:', token, "Lang:", lang);
       if (!token) {
@@ -31,11 +31,13 @@ const useAuthMiddleware = (isAuthPath:boolean,
               console.log("User datafetch ME:", res.data);
               setUser(res.data); // Guarda el usuario en el contexto
             } else {
+              setToken(null, false, "es"); // Limpia el token si no fue posible cargar el usuario
               clearToken(); // Limpia el token si no fue posible cargar el usuario
               router.push(`/${lang_route? lang_route : lang}/login`); // Redirige al login si no fue posible cargar el usuario
             }
           } catch (err) {
             console.error(err); // Muestra un error en la consola
+            setToken(null, false, "es"); // Limpia el token si no fue posible cargar el usuario
             clearToken(); // Limpia el token si no fue posible cargar el usuario
             router.push(`/${lang_route? lang_route : lang}/login`);
           }

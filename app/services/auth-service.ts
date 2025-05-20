@@ -16,11 +16,10 @@ export function setToken(token: string, rememberMe: boolean, lang:string): void 
 }
 
 export function getToken(): string | null {
-    if (typeof window !== 'undefined') {
-        return window.sessionStorage.getItem('access_token') || window.localStorage.getItem('access_token');
-    }
-    return null;
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem("access_token") || localStorage.getItem("access_token");
 }
+
 
 export function getLang(): string | null {
     if (typeof window !== 'undefined') {

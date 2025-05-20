@@ -8,7 +8,6 @@ import LoadingView from "@/components/loading-view";
 import useAuthMiddleware from "@/lib/token-verification";
 
 export default function LoginPage() {
-    const [isLoadding, setIsLoadding] = useState(true);
 
     const params = useParams(); // Obtiene dinámicamente los parámetros de la URL
     const [dictionary, setDictionary] = useState<any>(null);
@@ -22,8 +21,6 @@ export default function LoginPage() {
         }
         fetchDictionary();
     }, [params?.lang]);
-
-    useAuthMiddleware(true, setIsLoadding, params?.lang as string); // Redirige al login si no hay token
 
     if (!dictionary) return <LoadingView/>// Muestra un estado de carga mientras se obtiene el diccionario
 

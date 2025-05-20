@@ -316,6 +316,7 @@ const MOCK_PROJECTS = [
 // Tipos para el contexto
 interface ProjectContextType {
   projects: Project[]
+  setAllProjects: (projects: Project[]) => void
   selectedProject: Project
   originalSelectedProject: Project
   hasChanges: boolean
@@ -418,6 +419,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       setIsSaving(false)
     }
   }
+  const setAllProjects = (projects: Project[]) => {
+    setProjects(projects)
+    setSelectedProjectId(projects[0].id)
+  }
 
   // Métodos para modificar el proyecto seleccionado
 
@@ -496,7 +501,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   // Valor del contexto
   const value = {
     projects,
-    setProjects,
+    setAllProjects,
     selectedProject,
     originalSelectedProject,
     hasChanges,

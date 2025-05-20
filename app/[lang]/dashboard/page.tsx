@@ -4,6 +4,7 @@ import { DashboardOverview } from "@/components/dashboard/dashboard-overview"
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
+import useAuthMiddleware from "@/lib/token-verification";
 
 export default function DashboardPage() {
   const params = useParams();
@@ -16,10 +17,12 @@ export default function DashboardPage() {
         setDictionary(dict);
       }
     }
+
     fetchDictionary();
   }, [params?.lang]);
 
     if (!dictionary) return <LoadingView/>;
 
   return <DashboardOverview dict={dictionary} lang={params.lang as string} />
+
 }

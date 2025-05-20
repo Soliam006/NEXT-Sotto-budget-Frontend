@@ -11,6 +11,8 @@ import {TeamTab} from "@/components/dashboard/tabs/team-tab"
 import {MaterialsTab} from "@/components/dashboard/tabs/materials-tab"
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
 import {useProject} from "@/contexts/project-context";
+import {fetchProjects} from "@/app/actions/project";
+import {useUser} from "@/contexts/UserProvider";
 
 interface DashboardOverviewProps {
   dict: any // Replace 'any' with the actual type of your dictionary
@@ -21,14 +23,24 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
 
-  // Simulate data loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+  const { setAllProjects, projects } = useProject(); // Obtiene la función para establecer proyectos
+  const {token} = useUser()
 
-    return () => clearTimeout(timer)
-  }, [])
+  useEffect(() => {
+    async function fetchProjectsData() {
+      console.log("Fetching projects data...", projects)
+      if(projects[0].title === "Modern Residential Complex") { // Si no hay proyectos
+        console.log("Fetching projects from API...")
+        // Simula una llamada a la API para obtener proyectos
+        const response = await fetchProjects(token)
+        if (response != null) {
+          setAllProjects(response); // Establece los proyectos en el context
+        }
+      }
+      setIsLoading(false) // Cambia el estado de carga a falso
+    }
+    fetchProjectsData();
+  }, []);
 
   if (isLoading) {
     return (

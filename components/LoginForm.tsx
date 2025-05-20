@@ -15,7 +15,7 @@ import {fetchUserMe, logIn} from "@/app/actions/auth"
 import type { ExpectedType } from "@/lib/validations/auth"
 import {redirect} from "next/navigation";
 import {useUser} from "@/contexts/UserProvider";
-import {getToken, setToken} from "@/app/services/auth-service";
+//import {getToken, setToken} from "@/app/services/auth-service";
 
 export default function LoginForm({ dictionary, lang, }: {
     dictionary: any
@@ -41,7 +41,7 @@ export default function LoginForm({ dictionary, lang, }: {
         setPasswordVisible(!passwordVisible)
     }
 
-    const { setUser, user } = useUser()
+    const { setUser, user , setToken} = useUser()
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()

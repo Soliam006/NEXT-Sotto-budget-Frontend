@@ -56,11 +56,8 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
     if (pathname?.includes("/dashboard/expenses")) return "expenses"
     return "dashboard"
   }
-  const [isLoadding, setIsLoadding]= useState(true);
-  // Redirige al login si no hay token
-  useAuthMiddleware(false, setIsLoadding);
 
-  if (!dictionary || isLoadding) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
+  if (!dictionary ) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
 
   return (

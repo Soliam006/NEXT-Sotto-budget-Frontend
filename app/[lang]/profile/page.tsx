@@ -12,7 +12,6 @@ export default function  Profile() {
 
   const params = useParams(); // Obtiene dinámicamente los parámetros de la URL
   const [dictionary, setDictionary] = useState<any>(null);
-  const [isLoadding, setIsLoadding]= useState(true);
 
   useEffect(() => {
     async function fetchDictionary() {
@@ -24,12 +23,9 @@ export default function  Profile() {
     fetchDictionary();
   }, [params?.lang]);
 
-  // Redirige al login si no hay token
-  useAuthMiddleware(false, setIsLoadding);
-
   const {user} = useUser();
 
-  if (!dictionary || isLoadding) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
+  if (!dictionary) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
   return (
       <div className="min-h-screen bg-background">
