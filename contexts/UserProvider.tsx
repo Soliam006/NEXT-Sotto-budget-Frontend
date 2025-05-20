@@ -3,21 +3,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from './user.types';
 import { acceptRequestBD } from "@/app/actions/follows";
-import { setCookie, deleteCookie } from 'cookies-next';
+import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import {fetchUserMe} from "@/app/actions/auth";
 import {redirect} from "next/navigation";
 
-// NUEVO: Función para obtener el token desde localStorage
 const getTokenFromStorage = () => {
-  if (typeof window !== 'undefined') {
-    const token = sessionStorage.getItem('access_token');
-    if (token) {
-      return token;
-    }
-    return localStorage.getItem('access_token');
-  }
-  return null;
+  const token = getCookie('access_token');
+  return token ? String(token) : null;
 };
+
 
 interface FollowResponse {
   follower_id: number;
