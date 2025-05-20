@@ -121,7 +121,7 @@ interface DashboardMaterialsProps {
   lang: string
 }
 
-export function DashboardMaterials({ dict, lang }: DashboardMaterialsProps) {
+export function DashboardInventory({ dict, lang }: DashboardMaterialsProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
   // Filter materials based on search term

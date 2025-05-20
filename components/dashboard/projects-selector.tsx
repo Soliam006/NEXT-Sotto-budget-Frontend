@@ -11,6 +11,7 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import { Button } from "@/components/ui/button"
 import { AddProjectDialog } from "@/components/projects/add-project-dialog"
 import {useUser} from "@/contexts/UserProvider";
+import {InventoryItem} from "@/lib/types/inventory-item";
 
 export interface Project {
   id: number
@@ -50,6 +51,7 @@ export interface Project {
   expenseCategories?: {
     [key: string]: number
   }
+  inventory?: InventoryItem[] // Añadir esta propiedad para el inventario
 }
 
 interface ProjectsSelectorProps {

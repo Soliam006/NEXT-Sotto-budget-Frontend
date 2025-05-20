@@ -1,6 +1,6 @@
 "use client";
 import { getDictionary } from "@/lib/dictionary"
-import { DashboardMaterials } from "@/components/dashboard/dashboard-materials"
+import { DashboardInventory } from "@/components/dashboard/dashboard-inventory"
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
@@ -20,6 +20,6 @@ export default function MaterialsPage() {
   }, [params?.lang]);
   if (!dictionary) return <LoadingView/>;
 
-  return <DashboardMaterials dict={dictionary} lang={params.lang as string} />
+  return <DashboardInventory dict={dictionary} lang={params.lang as string} />
 }
 

@@ -39,7 +39,11 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
       }
       setIsLoading(false) // Cambia el estado de carga a falso
     }
-    fetchProjectsData();
+    //fetchProjectsData();
+    //TIMER DE 1 segundo
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   }, []);
 
   if (isLoading) {

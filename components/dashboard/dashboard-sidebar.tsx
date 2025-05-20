@@ -1,9 +1,12 @@
 "use client"
 
-import { CalendarIcon, Command, DollarSign, Package, Settings, Users, Building } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Card, CardContent} from "@/components/ui/card"
 import {useEffect, useState} from "react";
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {LayoutDashboard, Calendar, Users, Package, DollarSign, Settings,} from "lucide-react"
+
 
 interface DashboardSidebarProps {
   dictionary: any
@@ -25,38 +28,44 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
     {
       id: "dashboard",
       label: dictionary.nav?.dashboard || "Dashboard",
-      icon: Command,
+      icon: LayoutDashboard,
       path: "/dashboard",
+      active: currentSection === "dashboard",
     },
     {
       id: "calendar",
       label: dictionary.nav?.calendar || "Calendar",
-      icon: CalendarIcon,
+      icon: Calendar,
       path: "/dashboard/calendar",
+      active: currentSection === "calendar",
     },
     {
       id: "workers",
       label: dictionary.nav?.workers || "Workers",
       icon: Users,
       path: "/dashboard/workers",
+      active: currentSection === "workers",
     },
     {
       id: "materials",
       label: dictionary.nav?.materials || "Materials",
       icon: Package,
       path: "/dashboard/materials",
+      active: currentSection === "materials",
     },
     {
       id: "expenses",
       label: dictionary.nav?.expenses || "Expenses",
       icon: DollarSign,
       path: "/dashboard/expenses",
+      active: currentSection === "expenses",
     },
     {
       id: "settings",
       label: dictionary.nav?.settings || "Settings",
       icon: Settings,
       path: "/dashboard/settings",
+      active: currentSection === "settings",
     },
   ]
   // Format time
@@ -102,21 +111,24 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
         <div className="pb-2">
           <TimeView />
         </div>
-        <nav className="space-y-2">
+        <div className="flex flex-col space-y-2">
           {navItems.map((item) => (
-            <Button
-              key={item.id}
-              variant="ghost"
-              className={`w-full justify-start ${
-                currentSection === item.id ? "bg-muted text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => onNavigate(item.path)}
-            >
-              <item.icon className="mr-2 h-4 w-4" />
-              {item.label}
-            </Button>
+              <Button
+                  key={item.path}
+                  variant={item.active ? "default" : "ghost"}
+                  className={cn(
+                      "justify-start",
+                      item.active
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
+                          : "text-muted-foreground hover:text-foreground",
+                  )}
+                  onClick={() => onNavigate(item.path)}
+              >
+                {<item.icon className="w-5 h-5" />}
+                <span className="ml-2">{item.label}</span>
+              </Button>
           ))}
-        </nav>
+        </div>
       </div>
     </Card>
   )

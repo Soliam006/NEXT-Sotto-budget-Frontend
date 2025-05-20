@@ -1,0 +1,15 @@
+
+// Añadir la interfaz InventoryItem
+export interface InventoryItem {
+    id: number | string
+    name: string
+    category: "Servicios" | "Materiales" | "Productos" | "Mano de Obra"
+    total: number
+    used: number
+    remaining: number
+    unit: string
+    unitCost: number
+    supplier: string
+    status: "Installed" | "Pending" | "in_budget"
+    project: string
+}

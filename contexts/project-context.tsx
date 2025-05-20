@@ -5,7 +5,7 @@ import type { Project } from "@/components/dashboard/projects-selector"
 import { isEqual } from "lodash"
 
 // Datos de ejemplo para proyectos
-const MOCK_PROJECTS = [
+const MOCK_PROJECTS: Project[] = [
   {
     id: 1,
     title: "Modern Residential Complex",
@@ -179,6 +179,7 @@ const MOCK_PROJECTS = [
       Permits: 100000,
       Other: 50000,
     },
+    inventory: [],
   },
   {
     id: 2,
@@ -310,6 +311,60 @@ const MOCK_PROJECTS = [
       Permits: 150000,
       Other: 0,
     },
+    inventory: [
+      {
+        id: 1,
+        name: "Azulejos de baño",
+        category: "Materiales",
+        total: 200,
+        used: 150,
+        remaining: 50,
+        unit: "m²",
+        unitCost: 35,
+        supplier: "Azulejos Premium",
+        status: "Installed",
+        project: "Reforma Casa Moderna",
+      },
+      {
+        id: 2,
+        name: "Instalación eléctrica",
+        category: "Servicios",
+        total: 1,
+        used: 0.7,
+        remaining: 0.3,
+        unit: "servicio",
+        unitCost: 5000,
+        supplier: "Electricidad Total",
+        status: "Pending",
+        project: "Reforma Casa Moderna",
+      },
+      {
+        id: 3,
+        name: "Grifería de cocina",
+        category: "Productos",
+        total: 3,
+        used: 0,
+        remaining: 3,
+        unit: "unidades",
+        unitCost: 120,
+        supplier: "Sanitarios Express",
+        status: "in_budget",
+        project: "Reforma Casa Moderna",
+      },
+      {
+        id: 4,
+        name: "Carpintero",
+        category: "Mano de Obra",
+        total: 80,
+        used: 40,
+        remaining: 40,
+        unit: "horas",
+        unitCost: 25,
+        supplier: "Autónomo",
+        status: "Pending",
+        project: "Reforma Casa Moderna",
+      },
+    ],
   },
 ]
 
