@@ -8,7 +8,7 @@ import {ProjectsSelector} from "@/components/dashboard/projects-selector"
 import {OverviewTab} from "@/components/dashboard/tabs/overview-tab"
 import {TasksTab} from "@/components/dashboard/tabs/tasks-tab"
 import {TeamTab} from "@/components/dashboard/tabs/team-tab"
-import {MaterialsTab} from "@/components/dashboard/tabs/materials-tab"
+import {InventoryTab} from "@/components/dashboard/tabs/inventory-tab"
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
 import {useProject} from "@/contexts/project-context";
 import {fetchProjects} from "@/app/actions/project";
@@ -131,7 +131,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
 
               {/* Materials Tab Content */}
               <TabsContent value="materials">
-                <MaterialsTab dict={dict}/>
+                <InventoryTab dict={dict}/>
               </TabsContent>
             </Tabs>
         </div>

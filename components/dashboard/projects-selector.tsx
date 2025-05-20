@@ -51,7 +51,7 @@ export interface Project {
   expenseCategories?: {
     [key: string]: number
   }
-  inventory?: InventoryItem[] // Añadir esta propiedad para el inventario
+  inventory: InventoryItem[] // Añadir esta propiedad para el inventario
 }
 
 interface ProjectsSelectorProps {

@@ -51,7 +51,7 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
   const getCurrentSection = () => {
     if (pathname?.includes("/dashboard/calendar")) return "calendar"
     if (pathname?.includes("/dashboard/workers")) return "workers"
-    if (pathname?.includes("/dashboard/materials")) return "materials"
+    if (pathname?.includes("/dashboard/inventory")) return "inventory"
     if (pathname?.includes("/dashboard/projects")) return "projects"
     if (pathname?.includes("/dashboard/expenses")) return "expenses"
     return "dashboard"

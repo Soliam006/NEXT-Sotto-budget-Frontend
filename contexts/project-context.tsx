@@ -5,7 +5,7 @@ import type { Project } from "@/components/dashboard/projects-selector"
 import { isEqual } from "lodash"
 
 // Datos de ejemplo para proyectos
-const MOCK_PROJECTS: Project[] = [
+const MOCK_PROJECTS:Project[] = [
   {
     id: 1,
     title: "Modern Residential Complex",
@@ -30,13 +30,6 @@ const MOCK_PROJECTS: Project[] = [
         role: "Corporate Client",
         avatar: "/favicon.ico",
       },
-      {
-        id: "client-2",
-        name: "Globex Industries",
-        username: "globex",
-        role: "Corporate Client",
-        avatar: "/favicon.ico",
-      },
     ],
     team: [
       {
@@ -44,18 +37,6 @@ const MOCK_PROJECTS: Project[] = [
         name: "John Smith",
         role: "Senior Architect",
         avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      {
-        id: "2",
-        name: "Sarah Johnson",
-        role: "Project Manager",
-        avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-      },
-      {
-        id: "3",
-        name: "David Lee",
-        role: "Civil Engineer",
-        avatar: "https://randomuser.me/api/portraits/men/3.jpg",
       },
     ],
     tasks: [
@@ -71,30 +52,6 @@ const MOCK_PROJECTS: Project[] = [
         created_at: "2023-02-01T10:00:00Z",
         updated_at: "2023-03-10T15:30:00Z",
       },
-      {
-        id: "task-2",
-        title: "Electrical wiring for floor 1",
-        description: "Complete electrical wiring for all units on floor 1",
-        assignee: "Sarah Johnson",
-        assigneeAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
-        worker_id: "2",
-        status: "IN_PROGRESS",
-        dueDate: "2023-04-20",
-        created_at: "2023-03-01T09:00:00Z",
-        updated_at: "2023-03-15T11:45:00Z",
-      },
-      {
-        id: "task-3",
-        title: "Design review for common areas",
-        description: "Review and finalize designs for lobby and recreational areas",
-        assignee: "John Smith",
-        assigneeAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
-        worker_id: "1",
-        status: "PENDING",
-        dueDate: "2023-04-30",
-        created_at: "2023-03-10T14:00:00Z",
-        updated_at: "2023-03-10T14:00:00Z",
-      },
     ],
     materials: [
       {
@@ -104,30 +61,6 @@ const MOCK_PROJECTS: Project[] = [
         unit: "tons",
         cost: 75000,
         status: "Delivered",
-      },
-      {
-        id: 2,
-        name: "Steel Reinforcement",
-        quantity: 300,
-        unit: "tons",
-        cost: 120000,
-        status: "Partially Delivered",
-      },
-      {
-        id: 3,
-        name: "Glass Panels",
-        quantity: 200,
-        unit: "panels",
-        cost: 80000,
-        status: "Ordered",
-      },
-      {
-        id: 4,
-        name: "Electrical Wiring",
-        quantity: 10000,
-        unit: "meters",
-        cost: 35000,
-        status: "Pending",
       },
     ],
     expenses: [
@@ -139,39 +72,8 @@ const MOCK_PROJECTS: Project[] = [
         amount: 750000,
         status: "Approved",
       },
-      {
-        id: 2,
-        date: "2023-03-01",
-        category: "Labor",
-        description: "Foundation team - February",
-        amount: 650000,
-        status: "Approved",
-      },
-      {
-        id: 3,
-        date: "2023-03-15",
-        category: "Equipment",
-        description: "Crane rental - 2 weeks",
-        amount: 200000,
-        status: "Approved",
-      },
-      {
-        id: 4,
-        date: "2023-04-01",
-        category: "Permits",
-        description: "Permits and approvals",
-        amount: 100000,
-        status: "Approved",
-      },
-      {
-        id: 5,
-        date: "2023-04-10",
-        category: "Other",
-        description: "Miscellaneous expenses",
-        amount: 50000,
-        status: "Approved",
-      },
     ],
+    inventory: [],
     expenseCategories: {
       Materials: 750000,
       Labor: 650000,
@@ -179,7 +81,6 @@ const MOCK_PROJECTS: Project[] = [
       Permits: 100000,
       Other: 50000,
     },
-    inventory: [],
   },
   {
     id: 2,
@@ -213,18 +114,6 @@ const MOCK_PROJECTS: Project[] = [
         role: "Lead Engineer",
         avatar: "https://randomuser.me/api/portraits/men/4.jpg",
       },
-      {
-        id: "5",
-        name: "Emily Davis",
-        role: "Interior Designer",
-        avatar: "https://randomuser.me/api/portraits/women/5.jpg",
-      },
-      {
-        id: "6",
-        name: "Robert Wilson",
-        role: "Safety Manager",
-        avatar: "https://randomuser.me/api/portraits/men/6.jpg",
-      },
     ],
     tasks: [
       {
@@ -239,18 +128,6 @@ const MOCK_PROJECTS: Project[] = [
         created_at: "2023-04-01T10:00:00Z",
         updated_at: "2023-04-10T15:30:00Z",
       },
-      {
-        id: "task-5",
-        title: "Lobby design finalization",
-        description: "Finalize materials and layout for main lobby",
-        assignee: "Emily Davis",
-        assigneeAvatar: "https://randomuser.me/api/portraits/women/5.jpg",
-        worker_id: "5",
-        status: "PENDING",
-        dueDate: "2023-05-30",
-        created_at: "2023-04-05T09:00:00Z",
-        updated_at: "2023-04-05T09:00:00Z",
-      },
     ],
     materials: [
       {
@@ -261,14 +138,6 @@ const MOCK_PROJECTS: Project[] = [
         cost: 600000,
         status: "Partially Delivered",
       },
-      {
-        id: 6,
-        name: "Glass Curtain Wall",
-        quantity: 15000,
-        unit: "sq meters",
-        cost: 900000,
-        status: "Ordered",
-      },
     ],
     expenses: [
       {
@@ -276,30 +145,6 @@ const MOCK_PROJECTS: Project[] = [
         date: "2023-03-20",
         category: "Permits",
         description: "Building permits and approvals",
-        amount: 150000,
-        status: "Approved",
-      },
-      {
-        id: 7,
-        date: "2023-04-01",
-        category: "Materials",
-        description: "Initial steel delivery",
-        amount: 1200000,
-        status: "Approved",
-      },
-      {
-        id: 8,
-        date: "2023-04-10",
-        category: "Labor",
-        description: "Labor costs for setup",
-        amount: 500000,
-        status: "Approved",
-      },
-      {
-        id: 9,
-        date: "2023-04-15",
-        category: "Equipment",
-        description: "Equipment rental",
         amount: 150000,
         status: "Approved",
       },
@@ -338,32 +183,6 @@ const MOCK_PROJECTS: Project[] = [
         status: "Pending",
         project: "Reforma Casa Moderna",
       },
-      {
-        id: 3,
-        name: "Grifería de cocina",
-        category: "Productos",
-        total: 3,
-        used: 0,
-        remaining: 3,
-        unit: "unidades",
-        unitCost: 120,
-        supplier: "Sanitarios Express",
-        status: "in_budget",
-        project: "Reforma Casa Moderna",
-      },
-      {
-        id: 4,
-        name: "Carpintero",
-        category: "Mano de Obra",
-        total: 80,
-        used: 40,
-        remaining: 40,
-        unit: "horas",
-        unitCost: 25,
-        supplier: "Autónomo",
-        status: "Pending",
-        project: "Reforma Casa Moderna",
-      },
     ],
   },
 ]
@@ -384,6 +203,12 @@ interface ProjectContextType {
   updateTask: (taskId: string, updatedTask: any) => void
   deleteTask: (taskId: string) => void
   updateTaskStatus: (taskId: string, newStatus: string) => void
+
+  // Métodos para el inventario
+  addInventoryItem: (item: any) => void
+  updateInventoryItem: (itemId: number, updatedItem: any) => void
+  deleteInventoryItem: (itemId: number) => void
+  updateInventoryItemStatus: (itemId: number, newStatus: "Installed" | "Pending" | "in_budget") => void
 
   // Métodos para guardar/descartar cambios
   saveChanges: () => Promise<void>
@@ -521,6 +346,48 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  // Métodos para gestionar el inventario
+
+  // Añadir un item al inventario
+  const addInventoryItem = (item: any) => {
+    setSelectedProject((prev) => ({
+      ...prev,
+      inventory: [...(prev.inventory || []), {
+        ...item,
+        id: Math.max(0, ...(prev.inventory?.map(i => i.id) || [])) + 1
+      }],
+    }))
+  }
+
+  // Actualizar un item del inventario
+  const updateInventoryItem = (itemId: number, updatedItem: any) => {
+    setSelectedProject((prev) => ({
+      ...prev,
+      inventory: prev.inventory?.map((item) =>
+          item.id === itemId ? { ...item, ...updatedItem } : item
+      ),
+    }))
+  }
+
+  // Eliminar un item del inventario
+  const deleteInventoryItem = (itemId: number) => {
+    setSelectedProject((prev) => ({
+      ...prev,
+      inventory: prev.inventory?.filter((item) => item.id !== itemId),
+    }))
+  }
+
+  // Actualizar el estado de un item del inventario
+  const updateInventoryItemStatus =
+      (itemId: number, newStatus: "Installed" | "Pending" | "in_budget") => {
+    setSelectedProject((prev) => ({
+      ...prev,
+      inventory: prev.inventory?.map((item) =>
+          item.id === itemId ? { ...item, status: newStatus } : item
+      ),
+    }))
+  }
+
   // Guardar cambios
   const saveChanges = async () => {
     if (!hasChanges) return
@@ -563,10 +430,17 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setSelectedProjectById,
     addProject,
     addTeamMember,
+    // Métodos para las tareas
     addTask,
     updateTask,
     deleteTask,
     updateTaskStatus,
+    // Métodos para el inventario
+    addInventoryItem,
+    updateInventoryItem,
+    deleteInventoryItem,
+    updateInventoryItemStatus,
+    // Métodos para guardar/descartar cambios
     saveChanges,
     discardChanges,
     isSaving,

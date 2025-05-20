@@ -1,288 +1,411 @@
 "use client"
 
-import { Package, Search } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Package, Search, Plus, FileDown, Edit, Trash2, CheckCircle, Clock, FileText } from "lucide-react"
+import { useProject } from "@/contexts/project-context"
+//import { AddInventoryItemDialog } from "@/components/inventory/add-inventory-item-dialog"
+//import { EditInventoryItemDialog } from "@/components/inventory/edit-inventory-item-dialog"
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
+import {InventoryItem} from "@/lib/types/inventory-item";
 
-// Mock data for materials
-const MATERIALS = [
-  {
-    id: 1,
-    name: "Kitchen Cabinets",
-    category: "Cabinetry",
-    total: 3500,
-    used: 3500,
-    remaining: 0,
-    unit: "set",
-    unitCost: 3500,
-    supplier: "Cabinet Pros",
-    status: "Installed",
-    project: "Kitchen Renovation",
-  },
-  {
-    id: 2,
-    name: "Granite Countertops",
-    category: "Countertops",
-    total: 2200,
-    used: 0,
-    remaining: 2200,
-    unit: "sq ft",
-    unitCost: 75,
-    supplier: "Stone Masters",
-    status: "Pending",
-    project: "Kitchen Renovation",
-  },
-  {
-    id: 3,
-    name: "Sink and Fixtures",
-    category: "Plumbing",
-    total: 850,
-    used: 850,
-    remaining: 0,
-    unit: "set",
-    unitCost: 850,
-    supplier: "Plumbing Supply Co",
-    status: "Installed",
-    project: "Kitchen Renovation",
-  },
-  {
-    id: 4,
-    name: "Stainless Steel Appliances",
-    category: "Appliances",
-    total: 4200,
-    used: 0,
-    remaining: 4200,
-    unit: "set",
-    unitCost: 4200,
-    supplier: "Appliance Warehouse",
-    status: "Ordered",
-    project: "Kitchen Renovation",
-  },
-  {
-    id: 5,
-    name: "Hardwood Flooring",
-    category: "Flooring",
-    total: 1800,
-    used: 1200,
-    remaining: 600,
-    unit: "sq ft",
-    unitCost: 12,
-    supplier: "Flooring Depot",
-    status: "In Progress",
-    project: "Kitchen Renovation",
-  },
-  {
-    id: 6,
-    name: "Bathroom Tiles",
-    category: "Tiling",
-    total: 950,
-    used: 500,
-    remaining: 450,
-    unit: "sq ft",
-    unitCost: 8,
-    supplier: "Tile World",
-    status: "In Progress",
-    project: "Bathroom Remodel",
-  },
-  {
-    id: 7,
-    name: "Shower Enclosure",
-    category: "Bathroom",
-    total: 1200,
-    used: 0,
-    remaining: 1200,
-    unit: "unit",
-    unitCost: 1200,
-    supplier: "Bath Fixtures Inc",
-    status: "Pending",
-    project: "Bathroom Remodel",
-  },
-  {
-    id: 8,
-    name: "Drywall",
-    category: "Building Materials",
-    total: 750,
-    used: 750,
-    remaining: 0,
-    unit: "sheets",
-    unitCost: 15,
-    supplier: "Building Supply Co",
-    status: "Installed",
-    project: "Basement Finishing",
-  },
-]
-
-interface DashboardMaterialsProps {
+interface DashboardInventoryProps {
   dict: any
-  lang: string
 }
 
-export function DashboardInventory({ dict, lang }: DashboardMaterialsProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+export function DashboardInventory({ dict }: DashboardInventoryProps) {
+  const { selectedProject, updateInventoryItemStatus, deleteInventoryItem } = useProject()
 
-  // Filter materials based on search term
-  const filteredMaterials = MATERIALS.filter(
-    (material) =>
-      material.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      material.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      material.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      material.project.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const [searchQuery, setSearchQuery] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [currentItem, setCurrentItem] = useState<InventoryItem | null>(null)
+  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">{dict.materials?.title || "Materials Inventory"}</h1>
+  // Inicializar el inventario si no existe
+  const inventory = selectedProject.inventory || []
 
-      <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-foreground flex items-center text-base">
-              <Package className="mr-2 h-5 w-5 text-cyan-500" />
-              {dict.materials?.inventory || "Inventory"}
-            </CardTitle>
-            <Badge variant="outline" className="bg-card text-cyan-400 border-cyan-500/50">
-              {MATERIALS.length} {dict.materials?.items || "Items"}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 relative">
-            <Input
-              className="bg-card border-border pl-10"
-              placeholder={dict.materials?.searchMaterials || "Search materials..."}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          </div>
+  // Filtrar elementos según los criterios de búsqueda y filtros
+  useEffect(() => {
+    let filtered = [...inventory]
 
-          <div className="space-y-4">
-            {filteredMaterials.map((material) => (
-              <MaterialCard key={material.id} material={material} dict={dict} />
-            ))}
+    // Filtrar por búsqueda
+    if (searchQuery) {
+      filtered = filtered.filter(
+          (item) =>
+              item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              item.supplier.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    }
 
-            {filteredMaterials.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                {dict.materials?.noResults || "No materials found matching your search."}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+    // Filtrar por categoría
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter((item) => item.category === categoryFilter)
+    }
 
-function MaterialCard({ material, dict }: { material: any; dict: any }) {
-  const getStatusBadge = () => {
-    switch (material.status) {
-      case "Installed":
-        return (
-          <Badge className="bg-green-500/20 text-green-400 border-green-500/50">
-            {dict.materials?.installed || "Installed"}
-          </Badge>
-        )
-      case "In Progress":
-        return (
-          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50">
-            {dict.materials?.inProgress || "In Progress"}
-          </Badge>
-        )
-      case "Pending":
-        return (
-          <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/50">
-            {dict.materials?.pending || "Pending"}
-          </Badge>
-        )
-      case "Ordered":
-        return (
-          <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
-            {dict.materials?.ordered || "Ordered"}
-          </Badge>
-        )
-      default:
-        return <Badge className="bg-slate-500/20 text-slate-400 border-slate-500/50">{material.status}</Badge>
+    // Filtrar por estado
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((item) => item.status === statusFilter)
+    }
+
+    setFilteredItems(filtered)
+  }, [inventory, searchQuery, categoryFilter, statusFilter])
+
+  // Calcular totales por estado
+  const inBudgetItems = inventory.filter((item) => item.status === "in_budget")
+  const pendingItems = inventory.filter((item) => item.status === "Pending")
+  const installedItems = inventory.filter((item) => item.status === "Installed")
+
+  // Calcular costos totales
+  const calculateTotalCost = (items: InventoryItem[]) => {
+    return items.reduce((total, item) => total + item.total * item.unitCost, 0)
+  }
+
+  const inBudgetCost = calculateTotalCost(inBudgetItems)
+  const pendingCost = calculateTotalCost(pendingItems)
+  const installedCost = calculateTotalCost(installedItems)
+  const totalCost = calculateTotalCost(inventory)
+
+  // Manejar cambio de estado
+  const handleStatusChange = (item: InventoryItem, newStatus: InventoryItem["status"]) => {
+    updateInventoryItemStatus(item.id, newStatus)
+    /*toast({
+      title: dict.inventory?.statusUpdated || "Status Updated",
+      description: `${item.name} ${dict.inventory?.movedTo || "moved to"} ${newStatus}`,
+    })*/
+  }
+
+  // Manejar eliminación
+  const handleDelete = () => {
+    if (currentItem) {
+      deleteInventoryItem(currentItem.id)
+      setShowDeleteDialog(false)
+      setCurrentItem(null)
+      /*toast({
+        title: dict.inventory?.itemDeleted || "Item Deleted",
+        description: `${currentItem.name} ${dict.inventory?.hasBeenDeleted || "has been deleted"}`,
+      })*/
     }
   }
 
-  const percentage = material.total > 0 ? Math.round((material.used / material.total) * 100) : 0
+  // Manejar exportación a PDF
+  const handleExportPDF = () => {
+    /*toast({
+      title: dict.inventory?.exportStarted || "Export Started",
+      description: dict.inventory?.exportDescription || "Your inventory report is being generated",
+    })*/
+    // Aquí iría la lógica real de exportación a PDF
+  }
 
   return (
-    <div className="bg-card rounded-lg border border-border/50 p-4">
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
-        <div className="flex-grow">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-            <div>
-              <h3 className="text-lg font-medium text-foreground">{material.name}</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className="bg-card border-border/80 text-foreground/80">
-                  {material.category}
-                </Badge>
-                <span className="text-xs text-muted-foreground">{material.project}</span>
+      <div className="space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Tarjeta de resumen */}
+          <Card className="flex-1">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Package className="h-5 w-5 text-primary" />
+                {dict.inventory?.title || "Inventory"}
+              </CardTitle>
+              <CardDescription>{dict.inventory?.summary || "Summary of all inventory items"}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-muted/30 p-3 rounded-lg border">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-medium text-sm">{dict.inventory?.inBudget || "In Budget"}</h3>
+                    <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
+                      {inBudgetItems.length}
+                    </Badge>
+                  </div>
+                  <div className="text-2xl font-bold">${inBudgetCost.toLocaleString()}</div>
+                  <Progress value={(inBudgetCost / totalCost) * 100} className="h-2 mt-2" />
+                </div>
+
+                <div className="bg-muted/30 p-3 rounded-lg border">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-medium text-sm">{dict.inventory?.pending || "Pending"}</h3>
+                    <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/30">
+                      {pendingItems.length}
+                    </Badge>
+                  </div>
+                  <div className="text-2xl font-bold">${pendingCost.toLocaleString()}</div>
+                  <Progress value={(pendingCost / totalCost) * 100} className="h-2 mt-2" />
+                </div>
+
+                <div className="bg-muted/30 p-3 rounded-lg border">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-medium text-sm">{dict.inventory?.installed || "Installed"}</h3>
+                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+                      {installedItems.length}
+                    </Badge>
+                  </div>
+                  <div className="text-2xl font-bold">${installedCost.toLocaleString()}</div>
+                  <Progress value={(installedCost / totalCost) * 100} className="h-2 mt-2" />
+                </div>
               </div>
-            </div>
-            {getStatusBadge()}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Barra de acciones */}
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+                type="search"
+                placeholder={dict.inventory?.searchItems || "Search items..."}
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dict.materials?.supplier || "Supplier"}:</span>
-                <span className="text-foreground/80">{material.supplier}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dict.materials?.unitCost || "Unit Cost"}:</span>
-                <span className="text-foreground/80">
-                  ${material.unitCost}/{material.unit}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dict.materials?.totalCost || "Total Cost"}:</span>
-                <span className="text-foreground/80">${material.total}</span>
-              </div>
-            </div>
+          <div className="flex gap-2 w-full md:w-auto">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={dict.inventory?.category || "Category"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{dict.inventory?.allCategories || "All Categories"}</SelectItem>
+                <SelectItem value="Servicios">{dict.inventory?.services || "Services"}</SelectItem>
+                <SelectItem value="Materiales">{dict.inventory?.materials || "Materials"}</SelectItem>
+                <SelectItem value="Productos">{dict.inventory?.products || "Products"}</SelectItem>
+                <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dict.materials?.used || "Used"}:</span>
-                <span className="text-foreground/80">${material.used}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dict.materials?.remaining || "Remaining"}:</span>
-                <span className="text-foreground/80">${material.remaining}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{dict.materials?.usage || "Usage"}:</span>
-                <span className="text-foreground/80">{percentage}%</span>
-              </div>
-            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={dict.inventory?.status || "Status"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{dict.inventory?.allStatuses || "All Statuses"}</SelectItem>
+                <SelectItem value="in_budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
+                <SelectItem value="Pending">{dict.inventory?.pending || "Pending"}</SelectItem>
+                <SelectItem value="Installed">{dict.inventory?.installed || "Installed"}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="mt-3">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-muted-foreground">{dict.materials?.progress || "Progress"}:</span>
-              <span className="text-muted-foreground">{percentage}%</span>
-            </div>
-            <Progress value={percentage} className="h-1.5">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
-                style={{ width: `${percentage}%` }}
-              />
-            </Progress>
-          </div>
+          <div className="flex gap-2 w-full md:w-auto">
+            <Button variant="outline" className="gap-1" onClick={handleExportPDF}>
+              <FileDown className="h-4 w-4" />
+              <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
+            </Button>
 
-          <div className="mt-3 flex justify-end">
-            <Button variant="outline" size="sm" className="border-border bg-card hover:bg-muted text-xs">
-              {dict.materials?.viewDetails || "View Details"}
+            <Button
+                className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                onClick={() => setShowAddDialog(true)}
+            >
+              <Plus className="h-4 w-4" />
+              <span>{dict.inventory?.addItem || "Add Item"}</span>
             </Button>
           </div>
         </div>
+
+        {/* Lista de elementos de inventario */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>{dict.inventory?.items || "Inventory Items"}</CardTitle>
+            <CardDescription>
+              {filteredItems.length} {dict.inventory?.itemsFound || "items found"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-4">
+                {filteredItems.length > 0 ? (
+                    filteredItems.map((item) => (
+                        <div key={item.id} className="p-4 border rounded-lg bg-card">
+                          <div className="flex flex-col md:flex-row justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-medium text-lg">{item.name}</h3>
+                                <div className="flex items-center gap-2">
+                                  <Badge
+                                      variant="outline"
+                                      className={
+                                        item.category === "Servicios"
+                                            ? "bg-purple-500/10 text-purple-500 border-purple-500/30"
+                                            : item.category === "Materiales"
+                                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
+                                                : item.category === "Productos"
+                                                    ? "bg-blue-500/10 text-blue-500 border-blue-500/30"
+                                                    : "bg-orange-500/10 text-orange-500 border-orange-500/30"
+                                      }
+                                  >
+                                    {item.category}
+                                  </Badge>
+                                  <Badge
+                                      variant="outline"
+                                      className={
+                                        item.status === "in_budget"
+                                            ? "bg-blue-500/10 text-blue-500 border-blue-500/30"
+                                            : item.status === "Pending"
+                                                ? "bg-amber-500/10 text-amber-500 border-amber-500/30"
+                                                : "bg-green-500/10 text-green-500 border-green-500/30"
+                                      }
+                                  >
+                                    {item.status}
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                  <p className="text-sm text-muted-foreground">{dict.inventory?.quantity || "Quantity"}</p>
+                                  <p className="font-medium">
+                                    {item.total} {item.unit} ({item.used} {dict.inventory?.used || "used"})
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">{dict.inventory?.unitCost || "Unit Cost"}</p>
+                                  <p className="font-medium">${item.unitCost.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-muted-foreground">{dict.inventory?.totalCost || "Total Cost"}</p>
+                                  <p className="font-medium">${(item.total * item.unitCost).toLocaleString()}</p>
+                                </div>
+                              </div>
+
+                              <div className="mt-2">
+                                <p className="text-sm text-muted-foreground">{dict.inventory?.supplier || "Supplier"}</p>
+                                <p className="font-medium">{item.supplier}</p>
+                              </div>
+
+                              <div className="mt-2">
+                                <p className="text-sm text-muted-foreground mb-1">{dict.inventory?.progress || "Progress"}</p>
+                                <div className="flex items-center gap-2">
+                                  <Progress value={(item.used / item.total) * 100} className="h-2 flex-1" />
+                                  <span className="text-sm font-medium">{Math.round((item.used / item.total) * 100)}%</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-row md:flex-col justify-end gap-2">
+                              <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="gap-1"
+                                  onClick={() => {
+                                    setCurrentItem(item)
+                                    setShowEditDialog(true)
+                                  }}
+                              >
+                                <Edit className="h-4 w-4" />
+                                <span>{dict.common?.edit || "Edit"}</span>
+                              </Button>
+
+                              <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
+                                  onClick={() => {
+                                    setCurrentItem(item)
+                                    setShowDeleteDialog(true)
+                                  }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span>{dict.common?.delete || "Delete"}</span>
+                              </Button>
+
+                              {item.status !== "in_budget" && (
+                                  <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="gap-1 text-blue-500 border-blue-500/30 hover:bg-blue-500/10"
+                                      onClick={() => handleStatusChange(item, "in_budget")}
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                    <span>{dict.inventory?.moveToInBudget || "Move to Budget"}</span>
+                                  </Button>
+                              )}
+
+                              {item.status !== "Pending" && (
+                                  <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="gap-1 text-amber-500 border-amber-500/30 hover:bg-amber-500/10"
+                                      onClick={() => handleStatusChange(item, "Pending")}
+                                  >
+                                    <Clock className="h-4 w-4" />
+                                    <span>{dict.inventory?.moveToPending || "Move to Pending"}</span>
+                                  </Button>
+                              )}
+
+                              {item.status !== "Installed" && (
+                                  <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="gap-1 text-green-500 border-green-500/30 hover:bg-green-500/10"
+                                      onClick={() => handleStatusChange(item, "Installed")}
+                                  >
+                                    <CheckCircle className="h-4 w-4" />
+                                    <span>{dict.inventory?.moveToInstalled || "Move to Installed"}</span>
+                                  </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <Package className="h-10 w-10 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-medium mb-1">
+                        {dict.inventory?.noItemsFound || "No inventory items found"}
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        {dict.inventory?.tryAdjustingFilters || "Try adjusting your filters or add a new item"}
+                      </p>
+                      <Button
+                          onClick={() => setShowAddDialog(true)}
+                          className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>{dict.inventory?.addFirstItem || "Add your first item"}</span>
+                      </Button>
+                    </div>
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Diálogos
+        <AddInventoryItemDialog open={showAddDialog} onOpenChange={setShowAddDialog} dict={dict} />
+
+        {currentItem && (
+            <EditInventoryItemDialog
+                open={showEditDialog}
+                onOpenChange={setShowEditDialog}
+                item={currentItem}
+                dict={dict}
+            />
+        )} */}
+
+        <ConfirmationDialog
+            open={showDeleteDialog}
+            onOpenChange={setShowDeleteDialog}
+            onCancel={() => setShowDeleteDialog(false)}
+            title={dict.inventory?.deleteItem || "Delete Item"}
+            description={
+                dict.inventory?.deleteItemConfirmation ||
+                "Are you sure you want to delete this item? This action cannot be undone."
+            }
+            onConfirm={handleDelete}
+            confirmText={dict.common?.delete || "Delete"}
+            cancelText={dict.common?.cancel || "Cancel"}
+        />
       </div>
-    </div>
   )
 }
-

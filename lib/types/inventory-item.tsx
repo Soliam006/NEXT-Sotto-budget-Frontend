@@ -1,7 +1,7 @@
 
 // Añadir la interfaz InventoryItem
 export interface InventoryItem {
-    id: number | string
+    id: number
     name: string
     category: "Servicios" | "Materiales" | "Productos" | "Mano de Obra"
     total: number

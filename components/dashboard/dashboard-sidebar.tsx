@@ -48,10 +48,10 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
     },
     {
       id: "materials",
-      label: dictionary.nav?.materials || "Materials",
+      label: dictionary.nav?.materials || "Inventory",
       icon: Package,
-      path: "/dashboard/materials",
-      active: currentSection === "materials",
+      path: "/dashboard/inventory",
+      active: currentSection === "inventory",
     },
     {
       id: "expenses",

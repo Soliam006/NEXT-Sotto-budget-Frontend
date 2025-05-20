@@ -7,7 +7,7 @@ interface MaterialsTabProps {
   dict: any
 }
 
-export function MaterialsTab({ dict }: MaterialsTabProps) {
+export function InventoryTab({ dict }: MaterialsTabProps) {
   const { selectedProject } = useProject()
 
   // Get material status color
