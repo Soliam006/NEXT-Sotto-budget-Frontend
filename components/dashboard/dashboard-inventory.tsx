@@ -15,6 +15,9 @@ import { useProject } from "@/contexts/project-context"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import {InventoryItem} from "@/lib/types/inventory-item";
 import {ProjectsSelector} from "@/components/dashboard/projects-selector";
+import {AddInventoryItemDialog} from "@/components/dashboard/inventory/add-inventory-item-dialog";
+import {EditInventoryItemDialog} from "@/components/dashboard/inventory/edit-inventory-item-dialog";
+import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
 
 interface DashboardInventoryProps {
   dict: any
@@ -397,7 +400,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
           </CardContent>
         </Card>
 
-        {/* Diálogos
+        {/* Diálogos*/}
         <AddInventoryItemDialog open={showAddDialog} onOpenChange={setShowAddDialog} dict={dict} />
 
         {currentItem && (
@@ -407,7 +410,9 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                 item={currentItem}
                 dict={dict}
             />
-        )} */}
+        )}
+        {/* Save changes bar - only visible when there are changes */}
+        <SaveChangesBar dict={dict}/>
 
         <ConfirmationDialog
             open={showDeleteDialog}

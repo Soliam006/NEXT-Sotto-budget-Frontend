@@ -5,10 +5,10 @@ import {useEffect, useState} from "react"
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {ProjectsSelector} from "@/components/dashboard/projects-selector"
-import {OverviewTab} from "@/components/dashboard/tabs/overview-tab"
-import {TasksTab} from "@/components/dashboard/tabs/tasks-tab"
-import {TeamTab} from "@/components/dashboard/tabs/team-tab"
-import {InventoryTab} from "@/components/dashboard/tabs/inventory-tab"
+import {OverviewTab} from "@/components/dashboard/panel/tabs/overview-tab"
+import {TasksTab} from "@/components/dashboard/panel/tabs/tasks-tab"
+import {TeamTab} from "@/components/dashboard/panel/tabs/team-tab"
+import {InventoryTab} from "@/components/dashboard/panel/tabs/inventory-tab"
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
 import {useProject} from "@/contexts/project-context";
 import {fetchProjects} from "@/app/actions/project";
@@ -76,8 +76,6 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
         <ProjectsSelector
           dict={dict}
         />
-        {/* Save changes bar - only visible when there are changes */}
-        {<SaveChangesBar dict={dict}/>}
 
         {/* Main content */}
         <div className="pt-6">
@@ -135,6 +133,8 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
               </TabsContent>
             </Tabs>
         </div>
+        {/* Save changes bar - only visible when there are changes */}
+        {<SaveChangesBar dict={dict}/>}
       </div>
   )
 }

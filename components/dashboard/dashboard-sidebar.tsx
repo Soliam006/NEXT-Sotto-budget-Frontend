@@ -110,7 +110,7 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
                   key={item.path}
                   variant={item.active ? "default" : "ghost"}
                   className={cn(
-                      "justify-start",
+                      "justify-start cursor-pointer",
                       item.active
                           ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600"
                           : "text-muted-foreground hover:text-foreground",

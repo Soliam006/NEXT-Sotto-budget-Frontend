@@ -129,7 +129,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
             {/* Project selector - simplified */}
             <div className="w-full">
               <Select value={selectedProject.id.toString()} onValueChange={handleProjectChange}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full cursor-pointer">
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
