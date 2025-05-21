@@ -117,6 +117,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                             selectedProject.progress.todo)) *
                         100
                       }
+                      indicatorClassName="bg-green-500"
                       className="h-1.5 bg-muted"
                     >
                       <div className="h-full bg-success rounded-full" />
@@ -135,6 +136,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                             selectedProject.progress.todo)) *
                         100
                       }
+                      indicatorClassName="bg-blue-500"
                       className="h-1.5 bg-muted"
                     >
                       <div className="h-full bg-info rounded-full" />
@@ -153,6 +155,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                             selectedProject.progress.todo)) *
                         100
                       }
+                      indicatorClassName="bg-yellow-500"
                       className="h-1.5 bg-muted"
                     >
                       <div className="h-full bg-warning rounded-full" />

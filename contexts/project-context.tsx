@@ -14,9 +14,9 @@ const MOCK_PROJECTS:Project[] = [
     limitBudget: 2500000,
     currentSpent: 1750000,
     progress: {
-      done: 35,
-      inProgress: 15,
-      todo: 20,
+      done: 1,
+      inProgress: 0,
+      todo: 0,
     },
     location: "Downtown, New York",
     startDate: "2023-01-15",
@@ -314,12 +314,22 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }))
   }
 
-  // Añadir una tarea
+    // Añadir una tarea
   const addTask = (task: any) => {
-    setSelectedProject((prev) => ({
-      ...prev,
-      tasks: [...(prev.tasks || []), task],
-    }))
+    setSelectedProject((prev) => {
+      const newTasks = [...(prev.tasks || []), task]
+      const progress = {
+        ...prev.progress,
+        todo: newTasks.filter((t: any) => t.status === "PENDING").length || 0,
+        done: newTasks.filter((t: any) => t.status === "COMPLETED").length || 0,
+        inProgress: newTasks.filter((t: any) => t.status === "IN_PROGRESS").length || 0,
+      }
+      return {
+        ...prev,
+        tasks: newTasks,
+        progress,
+      }
+    })
   }
 
   // Actualizar una tarea
@@ -332,18 +342,44 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
   // Eliminar una tarea
   const deleteTask = (taskId: string) => {
-    setSelectedProject((prev) => ({
-      ...prev,
-      tasks: prev.tasks?.filter((task: any) => task.id !== taskId),
-    }))
+    setSelectedProject((prev) => {
+      const newTasks = prev.tasks?.filter((task: any) => task.id !== taskId) || [];
+      const progress = {
+        ...prev.progress,
+        todo: newTasks.filter((t: any) => t.status === "PENDING").length || 0,
+        done: newTasks.filter((t: any) => t.status === "COMPLETED").length || 0,
+        inProgress: newTasks.filter((t: any) => t.status === "IN_PROGRESS").length || 0,
+      };
+      return {
+        ...prev,
+        tasks: newTasks,
+        progress,
+      };
+    });
   }
 
   // Actualizar el estado de una tarea
   const updateTaskStatus = (taskId: string, newStatus: string) => {
-    setSelectedProject((prev) => ({
-      ...prev,
-      tasks: prev.tasks?.map((task: any) => (task.id === taskId ? { ...task, status: newStatus } : task)),
-    }))
+    setSelectedProject((prev) => {
+      // Actualizar el estado de la tarea
+      const updatedTasks = prev.tasks?.map((task: any) =>
+          task.id === taskId ? { ...task, status: newStatus } : task
+      ) || [];
+
+      // Recalcular el progreso
+      const progress = {
+        ...prev.progress,
+        todo: updatedTasks.filter((task: any) => task.status === "PENDING").length || 0,
+        done: updatedTasks.filter((task: any) => task.status === "COMPLETED").length || 0,
+        inProgress: updatedTasks.filter((task: any) => task.status === "IN_PROGRESS").length || 0,
+      };
+
+      return {
+        ...prev,
+        tasks: updatedTasks,
+        progress,
+      };
+    });
   }
 
   // Métodos para gestionar el inventario

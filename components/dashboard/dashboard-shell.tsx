@@ -78,7 +78,7 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
           </div>
 
           {/* Contenido principal */}
-          <div className="flex-1 pb-20 p-3 lg:p-8 min-h-full">
+          <div className="flex-1 pb-20 p-4 lg:p-8 min-h-full">
             {children}
           </div>
         </div>

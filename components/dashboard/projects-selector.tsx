@@ -169,6 +169,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                   </div>
                   <Progress
                     value={(selectedProject.currentSpent / selectedProject.limitBudget) * 100}
+                    indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500"
                     className="h-2"
                   />
                 </div>

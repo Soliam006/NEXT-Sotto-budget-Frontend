@@ -59,14 +59,7 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
       icon: DollarSign,
       path: "/dashboard/expenses",
       active: currentSection === "expenses",
-    },
-    {
-      id: "settings",
-      label: dictionary.nav?.settings || "Settings",
-      icon: Settings,
-      path: "/dashboard/settings",
-      active: currentSection === "settings",
-    },
+    }
   ]
   // Format time
   const formatTime = (date: Date) => {

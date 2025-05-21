@@ -14,6 +14,7 @@ import { useProject } from "@/contexts/project-context"
 //import { EditInventoryItemDialog } from "@/components/inventory/edit-inventory-item-dialog"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import {InventoryItem} from "@/lib/types/inventory-item";
+import {ProjectsSelector} from "@/components/dashboard/projects-selector";
 
 interface DashboardInventoryProps {
   dict: any
@@ -108,7 +109,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
 
   return (
       <div className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Tarjeta de resumen */}
           <Card className="flex-1">
             <CardHeader className="pb-2">
@@ -119,7 +120,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
               <CardDescription>{dict.inventory?.summary || "Summary of all inventory items"}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted/30 p-3 rounded-lg border">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-medium text-sm">{dict.inventory?.inBudget || "In Budget"}</h3>
@@ -128,7 +129,8 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                     </Badge>
                   </div>
                   <div className="text-2xl font-bold">${inBudgetCost.toLocaleString()}</div>
-                  <Progress value={(inBudgetCost / totalCost) * 100} className="h-2 mt-2" />
+                  <Progress value={(inBudgetCost / totalCost) * 100} className="h-2 mt-2"
+                            indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500"/>
                 </div>
 
                 <div className="bg-muted/30 p-3 rounded-lg border">
@@ -139,7 +141,8 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                     </Badge>
                   </div>
                   <div className="text-2xl font-bold">${pendingCost.toLocaleString()}</div>
-                  <Progress value={(pendingCost / totalCost) * 100} className="h-2 mt-2" />
+                  <Progress value={(pendingCost / totalCost) * 100} className="h-2 mt-2"
+                            indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500" />
                 </div>
 
                 <div className="bg-muted/30 p-3 rounded-lg border">
@@ -150,17 +153,24 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                     </Badge>
                   </div>
                   <div className="text-2xl font-bold">${installedCost.toLocaleString()}</div>
-                  <Progress value={(installedCost / totalCost) * 100} className="h-2 mt-2" />
+                  <Progress value={(installedCost / totalCost) * 100} className="h-2 mt-2"
+                            indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500" />
                 </div>
               </div>
             </CardContent>
           </Card>
+          <div className="flex-1">
+          {/* Project selector */}
+          <ProjectsSelector
+              dict={dict}
+          />
+          </div>
         </div>
 
         {/* Barra de acciones */}
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-col lg:flex-row gap-4 w-full items-center">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground " />
             <Input
                 type="search"
                 placeholder={dict.inventory?.searchItems || "Search items..."}
@@ -170,7 +180,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             />
           </div>
 
-          <div className="flex gap-2 w-full md:w-auto">
+          <div className="flex flex-row gap-2 w-full">
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={dict.inventory?.category || "Category"} />
@@ -183,7 +193,6 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                 <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
               </SelectContent>
             </Select>
-
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={dict.inventory?.status || "Status"} />
@@ -197,7 +206,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             </Select>
           </div>
 
-          <div className="flex gap-2 w-full md:w-auto">
+          <div className="flex gap-2 w-full md:flex-row flex-col">
             <Button variant="outline" className="gap-1" onClick={handleExportPDF}>
               <FileDown className="h-4 w-4" />
               <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
@@ -222,7 +231,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[400px] pr-4">
+            <ScrollArea className="h-[500px] pr-4">
               <div className="space-y-4">
                 {filteredItems.length > 0 ? (
                     filteredItems.map((item) => (
@@ -286,17 +295,19 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                               <div className="mt-2">
                                 <p className="text-sm text-muted-foreground mb-1">{dict.inventory?.progress || "Progress"}</p>
                                 <div className="flex items-center gap-2">
-                                  <Progress value={(item.used / item.total) * 100} className="h-2 flex-1" />
+                                  <Progress value={(item.used / item.total) * 100} className="h-2 flex-1"
+                                            indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500"/>
                                   <span className="text-sm font-medium">{Math.round((item.used / item.total) * 100)}%</span>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="flex flex-row md:flex-col justify-end gap-2">
+                            <div className="flex flex-col justify-end gap-2">
+                              <div className="flex flex-row md:flex-col gap-2">
                               <Button
                                   variant="outline"
                                   size="sm"
-                                  className="gap-1"
+                                  className="gap-4"
                                   onClick={() => {
                                     setCurrentItem(item)
                                     setShowEditDialog(true)
@@ -318,6 +329,10 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                                 <Trash2 className="h-4 w-4" />
                                 <span>{dict.common?.delete || "Delete"}</span>
                               </Button>
+
+                              </div>
+
+                              <div className="flex flex-col gap-2">
 
                               {item.status !== "in_budget" && (
                                   <Button
@@ -354,6 +369,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                                     <span>{dict.inventory?.moveToInstalled || "Move to Installed"}</span>
                                   </Button>
                               )}
+                              </div>
                             </div>
                           </div>
                         </div>
