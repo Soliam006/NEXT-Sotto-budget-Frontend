@@ -11,8 +11,6 @@ import {TeamTab} from "@/components/dashboard/panel/tabs/team-tab"
 import {InventoryTab} from "@/components/dashboard/panel/tabs/inventory-tab"
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
 import {useProject} from "@/contexts/project-context";
-import {fetchProjects} from "@/app/actions/project";
-import {useUser} from "@/contexts/UserProvider";
 
 interface DashboardOverviewProps {
   dict: any // Replace 'any' with the actual type of your dictionary
@@ -20,33 +18,16 @@ interface DashboardOverviewProps {
 }
 
 export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
-  const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
 
-  const { setAllProjects, projects } = useProject(); // Obtiene la función para establecer proyectos
-  const {token} = useUser()
-
+  const [isClient, setIsClient] = useState(false)
+  const { loadingState, selectedProject } = useProject(); // Obtiene la función para establecer proyectos
+  // Esto asegura que el código solo se ejecute en el cliente
   useEffect(() => {
-    async function fetchProjectsData() {
-      console.log("Fetching projects data...", projects)
-      if(projects[0].title === "Modern Residential Complex") { // Si no hay proyectos
-        console.log("Fetching projects from API...")
-        // Simula una llamada a la API para obtener proyectos
-        const response = await fetchProjects(token)
-        if (response != null) {
-          setAllProjects(response); // Establece los proyectos en el context
-        }
-      }
-      setIsLoading(false) // Cambia el estado de carga a falso
-    }
-    //fetchProjectsData();
-    //TIMER DE 1 segundo
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    setIsClient(true)
+  }, [])
 
-  if (isLoading) {
+  if (!isClient || loadingState || !selectedProject) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="flex flex-col items-center">
@@ -108,7 +89,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
                   className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
                 >
                   <Package className="h-4 w-4 mr-2"/>
-                  {activeTab === "materials" && <>{dict.dashboard?.materials || "Materials"}</>}
+                  {activeTab === "materials" && <>{dict.dashboard?.inventory || "Inventory"}</>}
                 </TabsTrigger>
               </TabsList>
 

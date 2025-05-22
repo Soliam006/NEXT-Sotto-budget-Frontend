@@ -16,25 +16,44 @@ export function OverviewTab({ dict }: OverviewTabProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <MetricCard
           title={dict.dashboard?.budget || "Budget"}
-          value={Math.round((selectedProject.currentSpent / selectedProject.limitBudget) * 100)}
+          value={selectedProject?.currentSpent !== undefined && selectedProject?.limitBudget
+              ? Math.round((selectedProject.currentSpent / selectedProject.limitBudget) * 100)
+              : 0}
           icon={DollarSign}
-          trend={selectedProject.currentSpent > selectedProject.limitBudget * 0.8 ? "up" : "stable"}
+          trend={
+            selectedProject?.currentSpent !== undefined &&
+            selectedProject?.limitBudget !== undefined &&
+            selectedProject.limitBudget > 0 &&
+            selectedProject.currentSpent > selectedProject.limitBudget * 0.8
+              ? "up"
+              : "stable"
+          }
           color="primary"
-          detail={`$${selectedProject.currentSpent.toLocaleString()} / $${selectedProject.limitBudget.toLocaleString()}`}
+          detail={`$${selectedProject?.currentSpent.toLocaleString()} / $${selectedProject?.limitBudget.toLocaleString()}`}
         />
         <MetricCard
           title={dict.dashboard?.tasks || "Tasks"}
-          value={Math.round(
-            (selectedProject.progress.done /
-              (selectedProject.progress.done + selectedProject.progress.inProgress + selectedProject.progress.todo)) *
-            100,
-          )}
+          value={selectedProject?.progress &&
+          (selectedProject.progress.done !== undefined
+              && selectedProject.progress.inProgress !== undefined && selectedProject.progress.todo !== undefined)
+            ? Math.round(
+                (selectedProject.progress.done /
+                  (selectedProject.progress.done + selectedProject.progress.inProgress + selectedProject.progress.todo || 1)) *
+                100,
+              )
+            : 0}
           icon={CheckCircle2}
           trend="stable"
           color="accent"
-          detail={`${selectedProject.progress.done} / ${
-            selectedProject.progress.done + selectedProject.progress.inProgress + selectedProject.progress.todo
-          } ${dict.dashboard?.complete || "Complete"}`}
+          detail={
+            selectedProject?.progress &&
+            (selectedProject.progress.done !== undefined
+                && selectedProject.progress.inProgress !== undefined && selectedProject.progress.todo !== undefined)
+              ? `${selectedProject.progress.done} / ${
+                  selectedProject.progress.done + selectedProject.progress.inProgress + selectedProject.progress.todo
+                } ${dict.dashboard?.complete || "Complete"}`
+              : `0 / 0 ${dict.dashboard?.complete || "Complete"}`
+          }
         />
         <MetricCard
           title={dict.dashboard?.timeline || "Timeline"}
@@ -42,13 +61,14 @@ export function OverviewTab({ dict }: OverviewTabProps) {
           icon={Timer}
           trend="stable"
           color="secondary"
-          detail={`${selectedProject.startDate} - ${selectedProject.endDate}`}
+          detail={`${selectedProject?.startDate} - ${selectedProject?.endDate}`}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Progress Pie Chart */}
-        <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+        {selectedProject &&
+        (<Card className="bg-card/50 border-border/50 backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle>{dict.dashboard?.progressOverview || "Progress Overview"}</CardTitle>
           </CardHeader>
@@ -56,9 +76,11 @@ export function OverviewTab({ dict }: OverviewTabProps) {
             <CustomPieChart selectedProject={selectedProject} />
           </CardContent>
         </Card>
+        )}
 
         {/* Project Details */}
-        <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+        {selectedProject &&
+            (<Card className="bg-card/50 border-border/50 backdrop-blur-sm">
           <CardHeader className="pb-2">
             <CardTitle>{dict.dashboard?.projectDetails || "Project Details"}</CardTitle>
           </CardHeader>
@@ -68,34 +90,34 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{dict.dashboard?.location || "Location"}:</span>
-                    <span>{selectedProject.location}</span>
+                    <span>{selectedProject?.location}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{dict.dashboard?.startDate || "Start Date"}:</span>
-                    <span>{selectedProject.startDate}</span>
+                    <span>{selectedProject?.startDate}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{dict.dashboard?.endDate || "End Date"}:</span>
-                    <span>{selectedProject.endDate}</span>
+                    <span>{selectedProject?.endDate}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{dict.dashboard?.manager || "Manager"}:</span>
-                    <span>{selectedProject.admin}</span>
+                    <span>{selectedProject?.admin}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       {dict.dashboard?.tasksCompleted || "Tasks Completed"}:
                     </span>
-                    <span className="text-success">{selectedProject.progress.done}</span>
+                    <span className="text-success">{selectedProject?.progress.done}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       {dict.dashboard?.tasksRemaining || "Tasks Remaining"}:
                     </span>
                     <span className="text-warning">
-                      {selectedProject.progress.inProgress + selectedProject.progress.todo}
+                      {selectedProject?.progress.inProgress + selectedProject?.progress.todo}
                     </span>
                   </div>
                 </div>
@@ -107,14 +129,14 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                   <div>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-success">{dict.dashboard?.done || "Done"}</span>
-                      <span className="text-muted-foreground">{selectedProject.progress.done} tasks</span>
+                      <span className="text-muted-foreground">{selectedProject?.progress.done} tasks</span>
                     </div>
                     <Progress
                       value={
-                        (selectedProject.progress.done /
-                          (selectedProject.progress.done +
-                            selectedProject.progress.inProgress +
-                            selectedProject.progress.todo)) *
+                        (selectedProject?.progress.done /
+                          (selectedProject?.progress.done +
+                            selectedProject?.progress.inProgress +
+                            selectedProject?.progress.todo)) *
                         100
                       }
                       indicatorClassName="bg-green-500"
@@ -126,14 +148,14 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                   <div>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-info">{dict.dashboard?.inProgress || "In Progress"}</span>
-                      <span className="text-muted-foreground">{selectedProject.progress.inProgress} tasks</span>
+                      <span className="text-muted-foreground">{selectedProject?.progress.inProgress} tasks</span>
                     </div>
                     <Progress
                       value={
-                        (selectedProject.progress.inProgress /
-                          (selectedProject.progress.done +
-                            selectedProject.progress.inProgress +
-                            selectedProject.progress.todo)) *
+                        (selectedProject?.progress.inProgress /
+                          (selectedProject?.progress.done +
+                            selectedProject?.progress.inProgress +
+                            selectedProject?.progress.todo)) *
                         100
                       }
                       indicatorClassName="bg-blue-500"
@@ -145,14 +167,14 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                   <div>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-warning">{dict.dashboard?.todo || "To Do"}</span>
-                      <span className="text-muted-foreground">{selectedProject.progress.todo} tasks</span>
+                      <span className="text-muted-foreground">{selectedProject?.progress.todo} tasks</span>
                     </div>
                     <Progress
                       value={
-                        (selectedProject.progress.todo /
-                          (selectedProject.progress.done +
-                            selectedProject.progress.inProgress +
-                            selectedProject.progress.todo)) *
+                        (selectedProject?.progress.todo /
+                          (selectedProject?.progress.done +
+                            selectedProject?.progress.inProgress +
+                            selectedProject?.progress.todo)) *
                         100
                       }
                       indicatorClassName="bg-yellow-500"
@@ -165,7 +187,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card>)}
 
         {/* Recent activity */}
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">

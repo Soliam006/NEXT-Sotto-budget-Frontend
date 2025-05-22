@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import {Task} from "@/lib/types/tasks";
 
 // Esquema de validación para el formulario
 const taskFormSchema = z.object({
@@ -36,34 +37,20 @@ const taskFormSchema = z.object({
   assignee: z.string({
     required_error: "Por favor selecciona un responsable",
   }),
-  status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED"], {
+  status: z.enum(["todo", "in_progress", "done"], {
     required_error: "Por favor selecciona un estado",
   }),
-  dueDate: z.any().optional(),
+  due_date: z.any().optional(),
 })
 
 type TaskFormValues = z.infer<typeof taskFormSchema>
-
-interface Task {
-  id: string
-  title: string
-  description?: string
-  assignee: string
-  assigneeAvatar?: string
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED"
-  dueDate?: string
-  created_at: string
-  updated_at: string
-  project_id?: string | number
-  worker_id?: string
-}
 
 interface EditTaskDialogProps {
   task: Task
   dict: any
   lang: string
-  onEditTask: (taskId: string, updatedTask: Partial<Task>) => void
-  onDeleteTask: (taskId: string) => void
+  onEditTask: (taskId: number, updatedTask: Partial<Task>) => void
+  onDeleteTask: (taskId: number) => void
   team: any
 }
 
@@ -85,7 +72,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
       description: task.description || "",
       assignee: task.worker_id || findWorkerId(task.assignee),
       status: task.status,
-      dueDate: task.dueDate,
+      due_date: task.due_date,
     },
   })
 
@@ -96,7 +83,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
       description: task.description || "",
       assignee: task.worker_id || findWorkerId(task.assignee),
       status: task.status,
-      dueDate: task.dueDate,
+      due_date: task.due_date,
     })
   }, [task, form])
 
@@ -108,9 +95,9 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
         title: data.title,
         description: data.description,
         assignee: team.find((member: any) => member.id === data.assignee)?.name || task.assignee,
-        worker_id: data.assignee,
+        worker_id: team.find ((member: any) => member.id === data.assignee)?.id || task.worker_id,
         status: data.status,
-        dueDate: data.dueDate,
+        due_date: data.due_date,
         updated_at: new Date().toISOString(),
       }
 
@@ -252,10 +239,10 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
 
               <FormField
                 control={form.control}
-                name="dueDate"
+                name="due_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{dict.tasks?.dueDate || "Due Date"}</FormLabel>
+                    <FormLabel>{dict.tasks?.due_date || "Due Date"}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -305,9 +292,9 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="PENDING">{dict.tasks?.statusPending || "Pending"}</SelectItem>
-                      <SelectItem value="IN_PROGRESS">{dict.tasks?.statusInProgress || "In Progress"}</SelectItem>
-                      <SelectItem value="COMPLETED">{dict.tasks?.statusCompleted || "Completed"}</SelectItem>
+                      <SelectItem value="todo">{dict.tasks?.statusPending || "Pending"}</SelectItem>
+                      <SelectItem value="in_progress">{dict.tasks?.statusInProgress || "In Progress"}</SelectItem>
+                      <SelectItem value="done">{dict.tasks?.statusCompleted || "Completed"}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

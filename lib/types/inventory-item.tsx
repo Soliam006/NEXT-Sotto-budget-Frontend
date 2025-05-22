@@ -10,6 +10,6 @@ export interface InventoryItem {
     unit: string
     unitCost: number
     supplier: string
-    status: "Installed" | "Pending" | "in_budget"
+    status: "Installed" | "Pending" | "In_Budget"
     project: string
 }

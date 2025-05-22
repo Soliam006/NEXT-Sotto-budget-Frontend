@@ -10,8 +10,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Package, Search, Plus, FileDown, Edit, Trash2, CheckCircle, Clock, FileText } from "lucide-react"
 import { useProject } from "@/contexts/project-context"
-//import { AddInventoryItemDialog } from "@/components/inventory/add-inventory-item-dialog"
-//import { EditInventoryItemDialog } from "@/components/inventory/edit-inventory-item-dialog"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import {InventoryItem} from "@/lib/types/inventory-item";
 import {ProjectsSelector} from "@/components/dashboard/projects-selector";
@@ -65,7 +63,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
   }, [inventory, searchQuery, categoryFilter, statusFilter])
 
   // Calcular totales por estado
-  const inBudgetItems = inventory.filter((item) => item.status === "in_budget")
+  const inBudgetItems = inventory.filter((item) => item.status === "In_Budget")
   const pendingItems = inventory.filter((item) => item.status === "Pending")
   const installedItems = inventory.filter((item) => item.status === "Installed")
 
@@ -108,6 +106,19 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
       description: dict.inventory?.exportDescription || "Your inventory report is being generated",
     })*/
     // Aquí iría la lógica real de exportación a PDF
+  }
+
+  function get_status_translate(status: string) {
+    switch (status) {
+      case "In_Budget":
+        return dict.inventory?.inBudget || "In Budget"
+      case "Pending":
+        return dict.inventory?.pending || "Pending"
+      case "Installed":
+        return dict.inventory?.installed || "Installed"
+      default:
+        return status
+    }
   }
 
   return (
@@ -169,59 +180,65 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
           />
           </div>
         </div>
-
-        {/* Barra de acciones */}
-        <div className="flex flex-col lg:flex-row gap-4 w-full items-center">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground " />
+        {/* Barra de acciones - Versión corregida */}
+        <div className="flex flex-col xl:flex-row gap-4 w-full items-stretch xl:items-center">
+          {/* Contenedor del buscador - Ocupa espacio disponible */}
+          <div className="relative w-full xl:flex-1 min-w-[200px]">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
                 type="search"
                 placeholder={dict.inventory?.searchItems || "Search items..."}
-                className="pl-8"
+                className="pl-8 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-row gap-2 w-full">
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={dict.inventory?.category || "Category"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{dict.inventory?.allCategories || "All Categories"}</SelectItem>
-                <SelectItem value="Servicios">{dict.inventory?.services || "Services"}</SelectItem>
-                <SelectItem value="Materiales">{dict.inventory?.materials || "Materials"}</SelectItem>
-                <SelectItem value="Productos">{dict.inventory?.products || "Products"}</SelectItem>
-                <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={dict.inventory?.status || "Status"} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{dict.inventory?.allStatuses || "All Statuses"}</SelectItem>
-                <SelectItem value="in_budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
-                <SelectItem value="Pending">{dict.inventory?.pending || "Pending"}</SelectItem>
-                <SelectItem value="Installed">{dict.inventory?.installed || "Installed"}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Contenedor principal de controles - Se reorganiza en responsive */}
+          <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto">
+            {/* Contenedor de selects - Se alinea correctamente */}
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder={dict.inventory?.category || "Category"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{dict.inventory?.allCategories || "All Categories"}</SelectItem>
+                  <SelectItem value="Servicios">{dict.inventory?.services || "Services"}</SelectItem>
+                  <SelectItem value="Materiales">{dict.inventory?.materials || "Materials"}</SelectItem>
+                  <SelectItem value="Productos">{dict.inventory?.products || "Products"}</SelectItem>
+                  <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
+                </SelectContent>
+              </Select>
 
-          <div className="flex gap-2 w-full md:flex-row flex-col">
-            <Button variant="outline" className="gap-1" onClick={handleExportPDF}>
-              <FileDown className="h-4 w-4" />
-              <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
-            </Button>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder={dict.inventory?.status || "Status"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{dict.inventory?.allStatuses || "All Statuses"}</SelectItem>
+                  <SelectItem value="in_budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
+                  <SelectItem value="Pending">{dict.inventory?.pending || "Pending"}</SelectItem>
+                  <SelectItem value="Installed">{dict.inventory?.installed || "Installed"}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Button
-                className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
-                onClick={() => setShowAddDialog(true)}
-            >
-              <Plus className="h-4 w-4" />
-              <span>{dict.inventory?.addItem || "Add Item"}</span>
-            </Button>
+            {/* Contenedor de botones - Se mantiene a la derecha */}
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <Button variant="outline" className="gap-1 w-full sm:w-auto" onClick={handleExportPDF}>
+                <FileDown className="h-4 w-4" />
+                <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
+              </Button>
+
+              <Button
+                  className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                  onClick={() => setShowAddDialog(true)}
+              >
+                <Plus className="h-4 w-4" />
+                <span>{dict.inventory?.addItem || "Add Item"}</span>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -234,11 +251,11 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[500px] pr-4">
-              <div className="space-y-4">
+            <ScrollArea className="h-[530px]">
+              <div className="space-y-4 p-0 md:p-2">
                 {filteredItems.length > 0 ? (
                     filteredItems.map((item) => (
-                        <div key={item.id} className="p-4 border rounded-lg bg-card">
+                        <div key={item.id} className="p-3 md:p-4 border rounded-lg bg-card md:shadow-md">
                           <div className="flex flex-col md:flex-row justify-between gap-4">
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
@@ -261,14 +278,14 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                                   <Badge
                                       variant="outline"
                                       className={
-                                        item.status === "in_budget"
+                                        item.status === "In_Budget"
                                             ? "bg-blue-500/10 text-blue-500 border-blue-500/30"
                                             : item.status === "Pending"
                                                 ? "bg-amber-500/10 text-amber-500 border-amber-500/30"
                                                 : "bg-green-500/10 text-green-500 border-green-500/30"
                                       }
                                   >
-                                    {item.status}
+                                    {get_status_translate(item.status)}
                                   </Badge>
                                 </div>
                               </div>
@@ -337,12 +354,12 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
 
                               <div className="flex flex-col gap-2">
 
-                              {item.status !== "in_budget" && (
+                              {item.status !== "In_Budget" && (
                                   <Button
                                       variant="outline"
                                       size="sm"
                                       className="gap-1 text-blue-500 border-blue-500/30 hover:bg-blue-500/10"
-                                      onClick={() => handleStatusChange(item, "in_budget")}
+                                      onClick={() => handleStatusChange(item, "In_Budget")}
                                   >
                                     <FileText className="h-4 w-4" />
                                     <span>{dict.inventory?.moveToInBudget || "Move to Budget"}</span>

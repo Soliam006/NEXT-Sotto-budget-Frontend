@@ -4,6 +4,8 @@ import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Save, Loader2 } from "lucide-react"
 import { useProject } from "@/contexts/project-context"
+import {useEffect} from "react";
+import { Task } from "@/lib/types/tasks"
 
 interface TaskBoardProps {
     dict: any
@@ -14,23 +16,26 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
     const { selectedProject, addTask, updateTask, deleteTask, updateTaskStatus, saveChanges, hasChanges, isSaving } =
       useProject()
 
+    useEffect(() => {
+        console.log("Selected Project IN TAAAAABS:", selectedProject)
+    }, []);
     // Filtrar tareas por estado
-    const pendingTasks = selectedProject.tasks?.filter((task:any) => task.status === "PENDING") || []
-    const inProgressTasks = selectedProject.tasks?.filter((task:any) => task.status === "IN_PROGRESS") || []
-    const completedTasks = selectedProject.tasks?.filter((task:any) => task.status === "COMPLETED") || []
+    const pendingTasks = selectedProject?.tasks?.filter((task:Task) => task.status === "todo") || []
+    const inProgressTasks = selectedProject?.tasks?.filter((task:Task) => task.status === "in_progress") || []
+    const completedTasks = selectedProject?.tasks?.filter((task:Task) => task.status === "done") || []
 
     // Función para manejar el cambio de estado de una tarea
-    const handleStatusChange = (taskId: string, newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") => {
+    const handleStatusChange = (taskId: number, newStatus: "todo" | "in_progress" | "done") => {
         updateTaskStatus(taskId, newStatus)
     }
 
     // Función para editar una tarea existente
-    const handleEditTask = (taskId: string, updatedTask: Partial<any>) => {
+    const handleEditTask = (taskId: number, updatedTask: Partial<any>) => {
         updateTask(taskId, updatedTask)
     }
 
     // Función para eliminar una tarea
-    const handleDeleteTask = (taskId: string) => {
+    const handleDeleteTask = (taskId: number) => {
         deleteTask(taskId)
     }
 
@@ -63,7 +68,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                         </>
                       )}
                   </Button>
-                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} teamMembers={selectedProject.team || []} />
+                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} teamMembers={selectedProject?.team || []} />
               </div>
           </div>
 
@@ -76,7 +81,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                   </div>
 
                   <div className="min-h-[200px] bg-muted/30 rounded-lg p-2 border border-border/30 space-y-3">
-                      {pendingTasks.map((task:any) => (
+                      {pendingTasks.map((task:Task) => (
                         <div key={`pending-${task.id}`}>
                             <TaskCard
                               task={task}
@@ -85,7 +90,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                               onStatusChange={handleStatusChange}
                               onEditTask={handleEditTask}
                               onDeleteTask={handleDeleteTask}
-                              team={selectedProject.team}
+                              team={selectedProject?.team}
                             />
                         </div>
                       ))}
@@ -102,7 +107,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                                       id: `task-${Date.now()}`,
                                       title: dict.tasks?.newTask || "New Task",
                                       assignee: "Unassigned",
-                                      status: "PENDING",
+                                      status: "todo",
                                       created_at: new Date().toISOString(),
                                       updated_at: new Date().toISOString(),
                                   }
@@ -134,7 +139,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                               onStatusChange={handleStatusChange}
                               onEditTask={handleEditTask}
                               onDeleteTask={handleDeleteTask}
-                              team={selectedProject.team}
+                              team={selectedProject?.team}
                             />
                         </div>
                       ))}
@@ -164,7 +169,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                               onStatusChange={handleStatusChange}
                               onEditTask={handleEditTask}
                               onDeleteTask={handleDeleteTask}
-                              team={selectedProject.team}
+                              team={selectedProject?.team}
                             />
                         </div>
                       ))}

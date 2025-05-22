@@ -35,27 +35,27 @@ interface AddProjectDialogProps {
   user: any
 }
 
-const projectSchema = z.object({
+const projectSchema = (dict: any) => z.object({
   title: z.string().min(3, {
-    message: "Title must be at least 3 characters.",
+    message: dict.projects?.titleMinLength || "Title must be at least 3 characters.",
   }),
   description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
+    message: dict.projects?.descriptionMinLength || "Description must be at least 10 characters.",
   }),
   location: z.string().min(3, {
-    message: "Location must be at least 3 characters.",
+    message: dict.projects?.locationMinLength || "Location must be at least 3 characters.",
   }),
   limitBudget: z.coerce.number().positive({
-    message: "Budget must be a positive number.",
+    message: dict.projects?.budgetPositive || "Budget must be a positive number.",
   }),
   startDate: z.date({
-    required_error: "Start date is required.",
+    required_error: dict.projects?.startDateRequired || "Start date is required.",
   }),
   endDate: z.date({
-    required_error: "End date is required.",
+    required_error: dict.projects?.endDateRequired || "End date is required.",
   }),
   clients: z.array(z.string()).min(1, {
-    message: "At least one client must be selected.",
+    message: dict.projects?.clientsMin || "At least one client must be selected.",
   }),
 })
 
@@ -64,8 +64,10 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedClients, setSelectedClients] = useState<UserFollower[]>([])
 
-  const form = useForm<z.infer<typeof projectSchema>>({
-    resolver: zodResolver(projectSchema),
+  const schema = projectSchema(dict)
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       title: "",
       description: "",
@@ -77,7 +79,7 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof projectSchema>) => {
+  const onSubmit = async (values: z.infer<typeof schema>) => {
     setIsSubmitting(true)
 
     try {
@@ -100,14 +102,10 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
         clients: selectedClients,
         tasks: [],
         team: [],
-        materials: [],
         expenses: [],
         expenseCategories: {},
+        inventory: [],
       }
-
-      // Simular una llamada a la API
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
       // Añadir el proyecto
       await addProject(newProject)
 

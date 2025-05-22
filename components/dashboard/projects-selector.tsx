@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { AddProjectDialog } from "@/components/projects/add-project-dialog"
 import {useUser} from "@/contexts/UserProvider";
 import {InventoryItem} from "@/lib/types/inventory-item";
+import {Task} from "@/lib/types/tasks";
 
 export interface Project {
   id: number
@@ -36,11 +37,10 @@ export interface Project {
     role: string
     avatar?: string
   }[]
-  tasks?: any
+  tasks?: Task []
   team?: any
-  materials?: any
   workers?: any
-  expenses?: {
+  expenses: {
     id: number
     date: string
     category: string
@@ -128,7 +128,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
           <div className="flex flex-col gap-4">
             {/* Project selector - simplified */}
             <div className="w-full">
-              <Select value={selectedProject.id.toString()} onValueChange={handleProjectChange}>
+              <Select value={selectedProject?.id.toString()} onValueChange={handleProjectChange}>
                 <SelectTrigger className="w-full cursor-pointer">
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
@@ -143,7 +143,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
             </div>
 
             {/* Project summary card - enhanced */}
-            <div className="w-full p-3 border rounded-md bg-muted/30 border-border">
+            {selectedProject ? ( <div className="w-full p-3 border rounded-md bg-muted/30 border-border">
               <div className="flex flex-col space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
@@ -208,6 +208,13 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                 )}
               </div>
             </div>
+            ):(
+                <div className="w-full p-6 text-center text-muted-foreground border rounded-md bg-muted/30 border-border">
+                  {projects.length === 0
+                      ? dict.dashboard?.noProjectsAvailable || "No projects available"
+                      : dict.dashboard?.selectProjectToView || "Select a project to view details"}
+                </div>
+            )}
           </div>
         </CardContent>
       </Card>

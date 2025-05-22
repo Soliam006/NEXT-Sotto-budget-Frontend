@@ -48,7 +48,7 @@ export const UserProvider = ({ children }: Props) => {
   const [tokenState, setTokenState] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  // NUEVO: Inicializa el token desde localStorage al montar
+  // NUEVO: Inicializa el token desde coockies al montar
   useEffect(() => {
     const storedToken = getTokenFromStorage();
     if (storedToken) {
