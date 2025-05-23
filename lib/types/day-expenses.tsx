@@ -17,5 +17,5 @@ export interface DailyExpense {
     spent: number;
     limit: number;
     tasks: Task[];
-    materials: Material[];
+    inventory: Material[];
 }

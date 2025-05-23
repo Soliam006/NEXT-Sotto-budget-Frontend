@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import {useState, useEffect, useMemo} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,35 +31,34 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [currentItem, setCurrentItem] = useState<InventoryItem | null>(null)
-  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
+  //const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
 
   // Inicializar el inventario si no existe
-  const inventory = selectedProject.inventory || []
+  const inventory = selectedProject?.inventory || []
 
   // Filtrar elementos según los criterios de búsqueda y filtros
-  useEffect(() => {
+// Reemplaza el useEffect con un useMemo para calcular filteredItems
+  const filteredItems = useMemo(() => {
     let filtered = [...inventory]
 
-    // Filtrar por búsqueda
     if (searchQuery) {
+      // Filtrar por nombre o proveedor
       filtered = filtered.filter(
           (item) =>
               item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              item.supplier.toLowerCase().includes(searchQuery.toLowerCase()),
+              item.supplier.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
-
     // Filtrar por categoría
     if (categoryFilter !== "all") {
       filtered = filtered.filter((item) => item.category === categoryFilter)
     }
-
     // Filtrar por estado
     if (statusFilter !== "all") {
       filtered = filtered.filter((item) => item.status === statusFilter)
     }
 
-    setFilteredItems(filtered)
+    return filtered
   }, [inventory, searchQuery, categoryFilter, statusFilter])
 
   // Calcular totales por estado
@@ -69,7 +68,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
 
   // Calcular costos totales
   const calculateTotalCost = (items: InventoryItem[]) => {
-    return items.reduce((total, item) => total + item.total * item.unitCost, 0)
+    return items.reduce((total, item) => total + item.total * item.unit_cost, 0)
   }
 
   const inBudgetCost = calculateTotalCost(inBudgetItems)
@@ -118,6 +117,21 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
         return dict.inventory?.installed || "Installed"
       default:
         return status
+    }
+  }
+
+  function getCategoryTraduction(category: string) {
+    switch (category) {
+      case "materials":
+        return dict.inventory?.categories.materials || "Materials"
+      case "labour":
+        return dict.inventory?.categories.labour || "Labour"
+      case "services":
+        return dict.inventory?.categories.products || "Services"
+      case "others":
+        return dict.inventory?.categories.others || "Others"
+      default:
+        return category
     }
   }
 
@@ -204,10 +218,10 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{dict.inventory?.allCategories || "All Categories"}</SelectItem>
-                  <SelectItem value="Servicios">{dict.inventory?.services || "Services"}</SelectItem>
-                  <SelectItem value="Materiales">{dict.inventory?.materials || "Materials"}</SelectItem>
-                  <SelectItem value="Productos">{dict.inventory?.products || "Products"}</SelectItem>
-                  <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
+                  <SelectItem value="Services">{dict.inventory?.services || "Services"}</SelectItem>
+                  <SelectItem value="Materials">{dict.inventory?.materials || "Materials"}</SelectItem>
+                  <SelectItem value="Products">{dict.inventory?.products || "Products"}</SelectItem>
+                  <SelectItem value="Labour">{dict.inventory?.labor || "Labor"}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -217,7 +231,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{dict.inventory?.allStatuses || "All Statuses"}</SelectItem>
-                  <SelectItem value="in_budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
+                  <SelectItem value="In_Budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
                   <SelectItem value="Pending">{dict.inventory?.pending || "Pending"}</SelectItem>
                   <SelectItem value="Installed">{dict.inventory?.installed || "Installed"}</SelectItem>
                 </SelectContent>
@@ -264,16 +278,16 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                                   <Badge
                                       variant="outline"
                                       className={
-                                        item.category === "Servicios"
+                                        item.category === "Services"
                                             ? "bg-purple-500/10 text-purple-500 border-purple-500/30"
-                                            : item.category === "Materiales"
+                                            : item.category === "Materials"
                                                 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/30"
-                                                : item.category === "Productos"
+                                                : item.category === "Products"
                                                     ? "bg-blue-500/10 text-blue-500 border-blue-500/30"
                                                     : "bg-orange-500/10 text-orange-500 border-orange-500/30"
                                       }
                                   >
-                                    {item.category}
+                                    {getCategoryTraduction(item.category)}
                                   </Badge>
                                   <Badge
                                       variant="outline"
@@ -298,12 +312,12 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                                   </p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-muted-foreground">{dict.inventory?.unitCost || "Unit Cost"}</p>
-                                  <p className="font-medium">${item.unitCost.toLocaleString()}</p>
+                                  <p className="text-sm text-muted-foreground">{dict.inventory?.unit_cost || "Unit Cost"}</p>
+                                  <p className="font-medium">${item.unit_cost.toLocaleString()}</p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-muted-foreground">{dict.inventory?.totalCost || "Total Cost"}</p>
-                                  <p className="font-medium">${(item.total * item.unitCost).toLocaleString()}</p>
+                                  <p className="font-medium">${(item.total * item.unit_cost).toLocaleString()}</p>
                                 </div>
                               </div>
 

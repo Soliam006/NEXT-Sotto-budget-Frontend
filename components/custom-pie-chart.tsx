@@ -73,7 +73,7 @@ const renderActiveShape = (props: any) => {
     </g>
   );
 };
-const COLORS = ['#FFBB28','#0088FE', '#00C49F'];
+const COLORS = ['#0088FE','#FFBB28', '#00C49F'];
 
 type Project = {
   id?: number;

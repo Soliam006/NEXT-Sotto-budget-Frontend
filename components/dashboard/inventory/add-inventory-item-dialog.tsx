@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useProject } from "@/contexts/project-context"
+import {InventoryCategory} from "@/lib/types/inventory-item";
 
 interface AddInventoryItemDialogProps {
     open: boolean
@@ -27,17 +28,17 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
     const { selectedProject, addInventoryItem } = useProject()
 
     const [name, setName] = useState("")
-    const [category, setCategory] = useState<"Servicios" | "Materiales" | "Productos" | "Mano de Obra">("Materiales")
+    const [category, setCategory] = useState<InventoryCategory>("Materials")
     const [total, setTotal] = useState<number>(0)
     const [used, setUsed] = useState<number>(0)
     const [unit, setUnit] = useState("")
-    const [unitCost, setUnitCost] = useState<number>(0)
+    const [unit_cost, setUnitCost] = useState<number>(0)
     const [supplier, setSupplier] = useState("")
     const [status, setStatus] = useState<"in_budget" | "Pending" | "Installed">("in_budget")
 
     const resetForm = () => {
         setName("")
-        setCategory("Materiales")
+        setCategory("Materials")
         setTotal(0)
         setUsed(0)
         setUnit("")
@@ -50,7 +51,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
         e.preventDefault()
 
         // Validación básica
-        if (!name || total <= 0 || !unit || unitCost <= 0 || !supplier) {
+        if (!name || total <= 0 || !unit || unit_cost <= 0 || !supplier) {
             /*toast({
                 title: dict.common?.validationError || "Validation Error",
                 description: dict.inventory?.fillAllFields || "Please fill all required fields",
@@ -77,10 +78,10 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
             used,
             remaining: total - used,
             unit,
-            unitCost,
+            unit_cost,
             supplier,
             status,
-            project: selectedProject.title,
+            project: selectedProject?.title,
         })
 
         // Mostrar notificación de éxito
@@ -120,15 +121,15 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="category">{dict.inventory?.category || "Category"} *</Label>
-                                <Select value={category} onValueChange={(value: any) => setCategory(value)}>
+                                <Select value={category} onValueChange={(value: InventoryCategory) => setCategory(value)}>
                                     <SelectTrigger id="category">
                                         <SelectValue placeholder={dict.inventory?.selectCategory || "Select category"} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Servicios">{dict.inventory?.services || "Services"}</SelectItem>
-                                        <SelectItem value="Materiales">{dict.inventory?.materials || "Materials"}</SelectItem>
-                                        <SelectItem value="Productos">{dict.inventory?.products || "Products"}</SelectItem>
-                                        <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
+                                        <SelectItem value="Services">{dict.inventory?.services || "Services"}</SelectItem>
+                                        <SelectItem value="Materials">{dict.inventory?.materials || "Materials"}</SelectItem>
+                                        <SelectItem value="Products">{dict.inventory?.products || "Products"}</SelectItem>
+                                        <SelectItem value="Labour">{dict.inventory?.labor || "Labor"}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -189,13 +190,13 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="unitCost">{dict.inventory?.unitCost || "Unit Cost"} *</Label>
+                                <Label htmlFor="unit_cost">{dict.inventory?.unit_cost || "Unit Cost"} *</Label>
                                 <Input
-                                    id="unitCost"
+                                    id="unit_cost"
                                     type="number"
                                     min="0"
                                     step="0.01"
-                                    value={unitCost}
+                                    value={unit_cost}
                                     onChange={(e) => setUnitCost(Number.parseFloat(e.target.value) || 0)}
                                     required
                                 />
@@ -216,7 +217,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
                         <div className="space-y-2">
                             <Label>{dict.inventory?.totalCost || "Total Cost"}</Label>
                             <div className="p-2 border rounded-md bg-muted/30">
-                                <span className="font-medium">${(total * unitCost).toLocaleString()}</span>
+                                <span className="font-medium">${(total * unit_cost).toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

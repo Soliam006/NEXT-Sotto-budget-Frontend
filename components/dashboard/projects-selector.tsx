@@ -13,6 +13,7 @@ import { AddProjectDialog } from "@/components/projects/add-project-dialog"
 import {useUser} from "@/contexts/UserProvider";
 import {InventoryItem} from "@/lib/types/inventory-item";
 import {Task} from "@/lib/types/tasks";
+import {Expenses} from "@/lib/types/expenses";
 
 export interface Project {
   id: number
@@ -40,14 +41,7 @@ export interface Project {
   tasks?: Task []
   team?: any
   workers?: any
-  expenses: {
-    id: number
-    date: string
-    category: string
-    description: string
-    amount: number
-    status: string
-  }[]
+  expenses: Expenses[]
   expenseCategories?: {
     [key: string]: number
   }

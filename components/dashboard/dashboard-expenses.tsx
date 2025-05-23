@@ -30,19 +30,18 @@ interface DashboardExpensesProps {
 }
 
 export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
-  const {selectedProject} = useProject()
+  const {selectedProject, hasChanges, discardChanges, saveChanges} = useProject()
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeTab, setActiveTab] = useState("overview")
-  const [hasChanges, setHasChanges] = useState(false)
 
   // Filter expenses based on search term and filters
-  const filteredExpenses = selectedProject.expenses?.filter((expense) => {
+  const filteredExpenses = selectedProject?.expenses?.filter((expense) => {
     const matchesSearch =
       expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      expense.date.includes(searchTerm)
+      expense.expense_date.includes(searchTerm)
 
     const matchesCategory = categoryFilter === "all" || expense.category === categoryFilter
     const matchesStatus = statusFilter === "all" || expense.status === statusFilter
@@ -67,25 +66,45 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
   // Get category color
   const getCategoryColor = (category: string) => {
     switch (category) {
+      //('OTHERS', 'MATERIALS', 'PRODUCTS', 'LABOUR', 'TRANSPORT')
       case "Materials":
         return "#3b82f6" // blue
-      case "Labor":
-        return "#10b981" // green
-      case "Equipment":
-        return "#f59e0b" // amber
-      case "Other":
+      case "Labour":
+        return "#f97316" // orange
+      case "Products":
+        return "#22c55e" // green
+      case "Transport":
+        return "#eab308" // purple
+      case "Others":
         return "#6b7280" // gray
       default:
         return "#6b7280" // gray
     }
   }
 
+  function getNameTraduction(category: string) {
+    switch (category) {
+      case "Materials":
+        return dict.expenses?.categories.materials || "Materials"
+      case "Labour":
+        return dict.expenses?.categories.labour || "Labour"
+      case "Products":
+        return dict.expenses?.categories.products || "Products"
+      case "Transport":
+        return dict.expenses?.categories.transport || "Transport"
+      case "Others":
+        return dict.expenses?.categories.others || "Others"
+      default:
+        return category
+    }
+  }
+
   // Calculate total expenses
-  const totalExpenses = selectedProject.expenses?.reduce((sum, expense) => sum + expense.amount, 0)
+  const totalExpenses = selectedProject?.currentSpent;
 
   // Prepare data for pie chart
-  const pieChartData = Object.entries(selectedProject.expenseCategories || {}).map(([category, amount]) => ({
-    name: category,
+  const pieChartData = Object.entries(selectedProject?.expenseCategories || {}).map(([category, amount]) => ({
+    name: getNameTraduction(category),
     value: amount,
     color: getCategoryColor(category),
   }))
@@ -95,9 +114,9 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
     const monthlyData: { [key: string]: number } = {}; // se declara el tipo
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-    selectedProject.expenses?.forEach((expense) => {
-      const date = new Date(expense.date)
-      const monthIndex = date.getMonth()
+    selectedProject?.expenses?.forEach((expense) => {
+      const expense_date = new Date(expense.expense_date)
+      const monthIndex = expense_date.getMonth()
       const monthName = months[monthIndex]
 
       if (!monthlyData[monthName]) {
@@ -168,13 +187,14 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="p-6 space-y-6">
+            {selectedProject && (
+                <TabsContent value="overview" className="p-6 space-y-6">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <Card className="bg-muted/30 border-border/50">
                   <CardContent className="p-6">
                     <div className="flex flex-col space-y-2">
                       <span className="text-muted-foreground text-sm">
-                        {dict.expenses?.totalBudget || "Total Budget"}
+                        {dict.dashboard?.totalBudget || "Total Budget"}
                       </span>
                       <span className="text-2xl font-bold">${selectedProject.limitBudget.toLocaleString()}</span>
                       <div className="flex items-center text-xs text-muted-foreground mt-1">
@@ -189,7 +209,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                     <CardContent className="p-6">
                       <div className="flex flex-col space-y-2">
                       <span className="text-muted-foreground text-sm">
-                        {dict.expenses?.totalSpent || "Total Spent"}
+                        {dict.expenses?.budgetUsed || "Total Spent"}
                       </span>
                         <span className="text-2xl font-bold">${totalExpenses?.toLocaleString()}</span>
                         <div className="flex items-center text-xs text-muted-foreground mt-1">
@@ -205,7 +225,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                   <Card className="bg-muted/30 border-border/50">
                     <CardContent className="p-6">
                       <div className="flex flex-col space-y-2">
-                        <span className="text-muted-foreground text-sm">{dict.expenses?.remaining || "Remaining"}</span>
+                        <span className="text-muted-foreground text-sm">{dict.expenses?.budgetRemaining || "Remaining"}</span>
                         <span className="text-2xl font-bold">
                         ${totalExpenses && ((selectedProject.limitBudget - totalExpenses).toLocaleString())}
                       </span>
@@ -277,7 +297,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                     <Table>
                       <TableHeader>
                         <TableRow className="border-border">
-                          <TableHead className="text-muted-foreground">{dict.expenses?.date || "Date"}</TableHead>
+                          <TableHead className="text-muted-foreground">{dict.expenses?.expense_date || "Date"}</TableHead>
                           <TableHead className="text-muted-foreground">
                             {dict.expenses?.category || "Category"}
                           </TableHead>
@@ -288,7 +308,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                       <TableBody>
                         {selectedProject.expenses?.slice(0, 5).map((expense) => (
                           <TableRow key={expense.id} className="border-border">
-                            <TableCell>{expense.date}</TableCell>
+                            <TableCell>{expense.expense_date}</TableCell>
                             <TableCell>{expense.category}</TableCell>
                             <TableCell>${expense.amount.toLocaleString()}</TableCell>
                             <TableCell>
@@ -302,6 +322,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                 </Card>
               </div>
             </TabsContent>
+            )}
 
             <TabsContent value="list" className="p-6">
               <div className="space-y-4">
@@ -325,10 +346,11 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">{dict.expenses?.allCategories || "All Categories"}</SelectItem>
-                        <SelectItem value="Materials">Materials</SelectItem>
-                        <SelectItem value="Labor">Labor</SelectItem>
-                        <SelectItem value="Equipment">Equipment</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
+                        <SelectItem value="Materials">{getNameTraduction("Materials")}</SelectItem>
+                        <SelectItem value="Labour"> {getNameTraduction("Labour")}</SelectItem>
+                        <SelectItem value="Products"> {getNameTraduction("Products")}</SelectItem>
+                        <SelectItem value="Transport"> {getNameTraduction("Transport")}</SelectItem>
+                        <SelectItem value="Others"> {getNameTraduction("Others")}</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -356,7 +378,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                   <Table>
                     <TableHeader>
                       <TableRow className="border-border">
-                        <TableHead className="text-muted-foreground">{dict.expenses?.date || "Date"}</TableHead>
+                        <TableHead className="text-muted-foreground">{dict.expenses?.expense_date || "Date"}</TableHead>
                         <TableHead className="text-muted-foreground">{dict.expenses?.category || "Category"}</TableHead>
                         <TableHead className="text-muted-foreground">
                           {dict.expenses?.description || "Description"}
@@ -368,7 +390,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                     <TableBody>
                       {filteredExpenses?.map((expense) => (
                         <TableRow key={expense.id} className="border-border">
-                          <TableCell>{expense.date}</TableCell>
+                          <TableCell>{expense.expense_date}</TableCell>
                           <TableCell>{expense.category}</TableCell>
                           <TableCell>{expense.description}</TableCell>
                           <TableCell>${expense.amount.toLocaleString()}</TableCell>

@@ -77,7 +77,7 @@ export function InventoryTab({ dict }: MaterialsTabProps) {
                       <TableHead className="w-[250px]">{dict.inventory?.itemName || "Item"}</TableHead>
                       <TableHead>{dict.inventory?.category || "Category"}</TableHead>
                       <TableHead>{dict.inventory?.quantity || "Quantity"}</TableHead>
-                      <TableHead>{dict.inventory?.unitCost || "Unit Cost"}</TableHead>
+                      <TableHead>{dict.inventory?.unit_cost || "Unit Cost"}</TableHead>
                       <TableHead>{dict.inventory?.totalCost || "Total Cost"}</TableHead>
                       <TableHead>{dict.inventory?.progress || "Progress"}</TableHead>
                       <TableHead>{dict.inventory?.status || "Status"}</TableHead>
@@ -98,8 +98,8 @@ export function InventoryTab({ dict }: MaterialsTabProps) {
                             <TableCell>
                               {item.total} {item.unit}
                             </TableCell>
-                            <TableCell>${item.unitCost}</TableCell>
-                            <TableCell>${item.total * item.unitCost}</TableCell>
+                            <TableCell>${item.unit_cost}</TableCell>
+                            <TableCell>${item.total * item.unit_cost}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Progress value={progressPercentage} className="h-2 w-24" />

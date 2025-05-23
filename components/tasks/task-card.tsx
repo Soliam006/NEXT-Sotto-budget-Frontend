@@ -105,10 +105,10 @@ export function TaskCard({ task, dict, lang, onStatusChange, onEditTask, onDelet
                                   <span>{getStatusText("in_progress")}</span>
                               </div>
                           </SelectItem>
-                          <SelectItem value="todo" className={getStatusColor("todo")}>
+                          <SelectItem value="done" className={getStatusColor("done")}>
                               <div className="flex items-center">
-                                  {getStatusIcon("todo")}
-                                  <span>{getStatusText("todo")}</span>
+                                  {getStatusIcon("done")}
+                                  <span>{getStatusText("done")}</span>
                               </div>
                           </SelectItem>
                       </SelectContent>

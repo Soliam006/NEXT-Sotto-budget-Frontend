@@ -11,6 +11,32 @@ interface OverviewTabProps {
 export function OverviewTab({ dict }: OverviewTabProps) {
   const { selectedProject } = useProject()
 
+    const getTimelineMetrics = (startDate?: string, endDate?: string) => {
+        if (!startDate || !endDate) {
+            return { value: 0, trend: "stable" as "up" | "down" | "stable" };
+        }
+        const start = new Date(startDate).getTime();
+        const end = new Date(endDate).getTime();
+        const now = Date.now();
+        const porcentaje = ((now - start) / (end - start)) * 100
+        let trend: "up" | "down" | "stable" = "stable"; // Los valores son estables por defecto
+        if (porcentaje > 0.8) trend = "up"; // Si el 80% del tiempo ha pasado, la tendencia es hacia arriba
+        else if (porcentaje < 0.3) trend = "down"; // Si el 30% del tiempo ha pasado, la tendencia es hacia abajo
+        return { value: Math.round(porcentaje), trend };
+    };
+
+    const timelineMetrics = getTimelineMetrics(selectedProject?.startDate, selectedProject?.endDate);
+
+    // Función para formatear fechas en formato legible
+    function formatDate(dateString?: string) {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+        });
+    }
   return (
     <div className="space-y-6 mt-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -20,14 +46,17 @@ export function OverviewTab({ dict }: OverviewTabProps) {
               ? Math.round((selectedProject.currentSpent / selectedProject.limitBudget) * 100)
               : 0}
           icon={DollarSign}
-          trend={
-            selectedProject?.currentSpent !== undefined &&
-            selectedProject?.limitBudget !== undefined &&
-            selectedProject.limitBudget > 0 &&
-            selectedProject.currentSpent > selectedProject.limitBudget * 0.8
-              ? "up"
-              : "stable"
-          }
+            trend={
+              selectedProject?.currentSpent !== undefined &&
+              selectedProject?.limitBudget !== undefined &&
+              selectedProject.limitBudget > 0
+                ? selectedProject.currentSpent > selectedProject.limitBudget * 0.8
+                  ? "up"
+                  : selectedProject.currentSpent < selectedProject.limitBudget * 0.3
+                    ? "down"
+                    : "stable"
+                : "stable"
+            }
           color="primary"
           detail={`$${selectedProject?.currentSpent.toLocaleString()} / $${selectedProject?.limitBudget.toLocaleString()}`}
         />
@@ -57,11 +86,11 @@ export function OverviewTab({ dict }: OverviewTabProps) {
         />
         <MetricCard
           title={dict.dashboard?.timeline || "Timeline"}
-          value={75}
+          value={timelineMetrics.value}
           icon={Timer}
-          trend="stable"
+          trend={timelineMetrics.trend}
           color="secondary"
-          detail={`${selectedProject?.startDate} - ${selectedProject?.endDate}`}
+          detail={`${formatDate(selectedProject?.startDate)} - ${formatDate(selectedProject?.endDate)}`}
         />
       </div>
 
@@ -86,42 +115,49 @@ export function OverviewTab({ dict }: OverviewTabProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{dict.dashboard?.location || "Location"}:</span>
-                    <span>{selectedProject?.location}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{dict.dashboard?.startDate || "Start Date"}:</span>
-                    <span>{selectedProject?.startDate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{dict.dashboard?.endDate || "End Date"}:</span>
-                    <span>{selectedProject?.endDate}</span>
-                  </div>
+                {/* Ubicación - ahora en una sola línea consistente */}
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground min-w-[120px]">
+                      {dict.dashboard?.location || "Location"}:
+                    </span>
+                        <span className="text-right">{selectedProject?.location}</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{dict.dashboard?.manager || "Manager"}:</span>
-                    <span>{selectedProject?.admin}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {dict.dashboard?.tasksCompleted || "Tasks Completed"}:
-                    </span>
-                    <span className="text-success">{selectedProject?.progress.done}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      {dict.dashboard?.tasksRemaining || "Tasks Remaining"}:
-                    </span>
-                    <span className="text-warning">
-                      {selectedProject?.progress.inProgress + selectedProject?.progress.todo}
-                    </span>
-                  </div>
+
+                {/* Fechas - mejor distribución en móvil y desktop */}
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                    <div className="flex justify-between sm:flex-col sm:gap-1">
+                      <span className="text-muted-foreground">
+                        {dict.projects?.startDate || "Start Date"}:
+                      </span>
+                      <span>{formatDate(selectedProject?.startDate)}</span>
+                    </div>
+                    <div className="flex justify-between sm:flex-col sm:gap-1">
+                      <span className="text-muted-foreground">
+                        {dict.projects?.endDate || "End Date"}:
+                      </span>
+                            <span>{formatDate(selectedProject?.endDate)}</span>
+                    </div>
                 </div>
-              </div>
+
+                {/* Información del proyecto - mejor estructura grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              {dict.dashboard?.tasksCompleted || "Tasks Completed"}:
+                            </span>
+                            <span className="text-success">{selectedProject?.progress.done}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              {dict.dashboard?.tasksRemaining || "Tasks Remaining"}:
+                            </span>
+                            <span className="text-warning">
+                            {selectedProject?.progress.inProgress + selectedProject?.progress.todo}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
               <div className="pt-4 border-t border-border/50">
                 <h4 className="text-sm font-medium mb-2">{dict.dashboard?.taskBreakdown || "Task Breakdown"}</h4>
@@ -312,7 +348,7 @@ function MetricCard({
   }
 
   return (
-    <div className={`bg-muted/50 rounded-lg border ${getColor()} p-4 relative overflow-hidden`}>
+    <div className={`bg-muted/50 rounded-lg border shadow-lg ${getColor()} p-4 relative overflow-hidden`}>
       <div className="flex items-center justify-between mb-2">
         <div className="text-sm text-muted-foreground">{title}</div>
         <Icon className={`h-5 w-5 text-${color}`} />

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useProject } from "@/contexts/project-context"
-import {InventoryItem} from "@/lib/types/inventory-item";
+import {InventoryCategory, InventoryItem} from "@/lib/types/inventory-item";
 
 interface EditInventoryItemDialogProps {
     open: boolean
@@ -30,35 +30,35 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
 
 
     const [name, setName] = useState(item.name)
-    const [category, setCategory] = useState<"Servicios" | "Materiales" | "Productos" | "Mano de Obra">(
-        item.category as "Servicios" | "Materiales" | "Productos" | "Mano de Obra",
+    const [category, setCategory] = useState<InventoryCategory>(
+        item.category as InventoryCategory,
     )
     const [total, setTotal] = useState<number>(item.total)
     const [used, setUsed] = useState<number>(item.used)
     const [unit, setUnit] = useState(item.unit)
-    const [unitCost, setUnitCost] = useState<number>(item.unitCost)
+    const [unit_cost, setUnitCost] = useState<number>(item.unit_cost)
     const [supplier, setSupplier] = useState(item.supplier)
-    const [status, setStatus] = useState<"in_budget" | "Pending" | "Installed">(
-        item.status as "in_budget" | "Pending" | "Installed",
+    const [status, setStatus] = useState<InventoryCategory>(
+        item.status as InventoryCategory,
     )
 
     // Actualizar los estados cuando cambia el item
     useEffect(() => {
         setName(item.name)
-        setCategory(item.category as "Servicios" | "Materiales" | "Productos" | "Mano de Obra")
+        setCategory(item.category as InventoryCategory)
         setTotal(item.total)
         setUsed(item.used)
         setUnit(item.unit)
-        setUnitCost(item.unitCost)
+        setUnitCost(item.unit_cost)
         setSupplier(item.supplier)
-        setStatus(item.status as "in_budget" | "Pending" | "Installed")
+        setStatus(item.status as InventoryCategory)
     }, [item])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
         // Validación básica
-        if (!name || total <= 0 || !unit || unitCost <= 0 || !supplier) {
+        if (!name || total <= 0 || !unit || unit_cost <= 0 || !supplier) {
             /*toast({
                 title: dict.common?.validationError || "Validation Error",
                 description: dict.inventory?.fillAllFields || "Please fill all required fields",
@@ -85,7 +85,7 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
             used,
             remaining: total - used,
             unit,
-            unitCost,
+            unit_cost,
             supplier,
             status,
         })
@@ -131,22 +131,22 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
                                         <SelectValue placeholder={dict.inventory?.selectCategory || "Select category"} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Servicios">{dict.inventory?.services || "Services"}</SelectItem>
-                                        <SelectItem value="Materiales">{dict.inventory?.materials || "Materials"}</SelectItem>
-                                        <SelectItem value="Productos">{dict.inventory?.products || "Products"}</SelectItem>
-                                        <SelectItem value="Mano de Obra">{dict.inventory?.labor || "Labor"}</SelectItem>
+                                        <SelectItem value="Services">{dict.inventory?.services || "Services"}</SelectItem>
+                                        <SelectItem value="Materials">{dict.inventory?.materials || "Materials"}</SelectItem>
+                                        <SelectItem value="Products">{dict.inventory?.products || "Products"}</SelectItem>
+                                        <SelectItem value="Labour">{dict.inventory?.labor || "Labor"}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="status">{dict.inventory?.status || "Status"} *</Label>
-                                <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                                <Select value={status} onValueChange={(value: InventoryCategory) => setStatus(value)}>
                                     <SelectTrigger id="status">
                                         <SelectValue placeholder={dict.inventory?.selectStatus || "Select status"} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="in_budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
+                                        <SelectItem value="In_Budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
                                         <SelectItem value="Pending">{dict.inventory?.pending || "Pending"}</SelectItem>
                                         <SelectItem value="Installed">{dict.inventory?.installed || "Installed"}</SelectItem>
                                     </SelectContent>
@@ -195,13 +195,13 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="unitCost">{dict.inventory?.unitCost || "Unit Cost"} *</Label>
+                                <Label htmlFor="unit_cost">{dict.inventory?.unit_cost || "Unit Cost"} *</Label>
                                 <Input
-                                    id="unitCost"
+                                    id="unit_cost"
                                     type="number"
                                     min="0"
                                     step="0.01"
-                                    value={unitCost}
+                                    value={unit_cost}
                                     onChange={(e) => setUnitCost(Number.parseFloat(e.target.value) || 0)}
                                     required
                                 />
@@ -222,7 +222,7 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
                         <div className="space-y-2">
                             <Label>{dict.inventory?.totalCost || "Total Cost"}</Label>
                             <div className="p-2 border rounded-md bg-muted/30">
-                                <span className="font-medium">${(total * unitCost).toLocaleString()}</span>
+                                <span className="font-medium">${(total * unit_cost).toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

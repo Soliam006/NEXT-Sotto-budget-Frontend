@@ -291,7 +291,7 @@
     "materials": "Materials",
     "material": "Material",
     "quantity": "Quantity",
-    "unitCost": "Unit Cost",
+    "unit_cost": "Unit Cost",
     "total": "Total"
   },
   "workers": {
@@ -326,7 +326,7 @@
     "addItem": "Add Item",
     "quantity": "Quantity",
     "used": "used",
-    "unitCost": "Unit Cost",
+    "unit_cost": "Unit Cost",
     "totalCost": "Total Cost",
     "supplier": "Supplier",
     "progress": "Progress",
@@ -436,7 +436,9 @@
     "monthlyExpenses": "Monthly Expenses",
     "totalExpenses": "Total Expenses",
     "budgetRemaining": "Budget Remaining",
-    "budgetUsed": "Budget Used",
+    "remaining": "Remaining",
+    "ofBudget": "of Budget",
+    "budgetUsed": "Total Spent",
     "overBudget": "Over Budget",
     "underBudget": "Under Budget",
     "filterBy": "Filter by",
@@ -449,14 +451,11 @@
     "reset": "Reset",
     "noExpenses": "No expenses found matching your search.",
     "categories": {
+      "labour": "Labour",
+      "products": "Products",
       "materials": "Materials",
-      "labor": "Labor",
-      "equipment": "Equipment",
-      "permits": "Permits",
-      "utilities": "Utilities",
-      "transportation": "Transportation",
-      "food": "Food",
-      "other": "Other"
+      "transport": "Transport",
+      "others": "Others"
     },
     "paymentMethods": {
       "cash": "Cash",

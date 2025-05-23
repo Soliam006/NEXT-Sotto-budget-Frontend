@@ -44,7 +44,7 @@ const generateDailyExpenses = () => {
           worker: "Worker " + ((day % 3) + 1),
         },
       ],
-      materials: [
+      inventory: [
         {
           id: day * 100 + 1,
           name: "Material A",
@@ -100,7 +100,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
   const calculateTotalSpent = (date: string) => {
     if (!dailyExpenses[date]) return 0
 
-    return dailyExpenses[date].materials.reduce((total: number, material: any) => {
+    return dailyExpenses[date].inventory.reduce((total: number, material: any) => {
       return total + material.cost * material.quantity
     }, 0)
   }
@@ -109,7 +109,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "COMPLETED":
-        return "bg-success/20 text-success border-success/50"
+        return "bg-green-100 text-green-800  text-success border-success/50"
       case "IN_PROGRESS":
         return "bg-info/20 text-info border-info/50"
       case "PENDING":
@@ -144,7 +144,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
       let bgColor = "bg-muted/50"
       if (dayData) {
         bgColor =
-          dayData.spent > dayData.limit ? "bg-destructive/30 hover:bg-destructive/50" : "bg-success/30 hover:bg-success/50"
+          dayData.spent > dayData.limit ? "bg-destructive/30 hover:bg-destructive/50" : "bg-green-100 text-green-800  hover:bg-green-100 text-green-800 "
       }
 
       days.push(
@@ -159,9 +159,16 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
       )
     }
 
+    function getDaysTraduction(){
+      if (lang === "es") {
+        return ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+      }
+      return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    }
+
     return (
       <div className="grid grid-cols-7 gap-1">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+        {getDaysTraduction().map((day) => (
           <div key={day} className="text-center text-xs text-muted-foreground py-1">
             {day}
           </div>
@@ -185,7 +192,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
             </CardTitle>
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-1">
-                <div className="h-3 w-3 rounded-full bg-success/70"></div>
+                <div className="h-3 w-3 rounded-full bg-green-100 text-green-800 "></div>
                 <span className="text-xs text-muted-foreground">{dict.calendar?.underBudget || "Under Budget"}</span>
               </div>
               <div className="flex items-center space-x-1">
@@ -228,7 +235,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
               {dict.calendar?.expensesFor || "Expenses for"} {selectedDate}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              {dict.calendar?.detailedBreakdown || "Detailed breakdown of tasks, materials, and expenses"}
+              {dict.calendar?.detailedBreakdown || "Detailed breakdown of tasks, inventory, and expenses"}
             </DialogDescription>
           </DialogHeader>
 
@@ -255,7 +262,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
                     className={
                       dailyExpenses[selectedDate].spent > dailyExpenses[selectedDate].limit
                         ? "bg-destructive/20 text-destructive border-destructive/50"
-                        : "bg-success/20 text-success border-success/50"
+                        : "bg-green-100 text-green-800  text-success border-success/50"
                     }
                   >
                     {dailyExpenses[selectedDate].spent > dailyExpenses[selectedDate].limit
@@ -290,7 +297,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
               </div>
 
               <div>
-                <h3 className="text-lg font-medium mb-2">{dict.calendar?.materials || "Materials"}</h3>
+                <h3 className="text-lg font-medium mb-2">{dict.calendar?.inventory || "Inventory"}</h3>
                 <Table>
                   <TableHeader>
                     <TableRow className="border-border">
@@ -301,7 +308,7 @@ export function DashboardCalendar({ dict, lang }: DashboardCalendarProps) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dailyExpenses[selectedDate].materials.map((material) => (
+                    {dailyExpenses[selectedDate].inventory.map((material) => (
                       <TableRow key={material.id} className="border-border">
                         <TableCell>{material.name}</TableCell>
                         <TableCell>{material.quantity}</TableCell>

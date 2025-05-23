@@ -149,8 +149,8 @@
     "projectInfo": "Información del Proyecto",
     "manager": "Gerente",
     "location": "Ubicación",
-    "startDate": "Fecha de Inicio",
-    "endDate": "Fecha de Finalización",
+    "startDate": "Inicio",
+    "endDate": "Finalización",
     "budget": "Presupuesto",
     "spent": "Gastado",
     "remaining": "Restante",
@@ -291,7 +291,7 @@
     "materials": "Materiales",
     "material": "Material",
     "quantity": "Cantidad",
-    "unitCost": "Costo Unitario",
+    "unit_cost": "Costo Unitario",
     "total": "Total"
   },
   "workers": {
@@ -326,7 +326,7 @@
     "addItem": "Añadir Artículo",
     "quantity": "Cantidad",
     "used": "usados",
-    "unitCost": "Costo Unitario",
+    "unit_cost": "Costo Unitario",
     "totalCost": "Costo Total",
     "supplier": "Proveedor",
     "progress": "Progreso",
@@ -436,7 +436,9 @@
     "monthlyExpenses": "Gastos Mensuales",
     "totalExpenses": "Gastos Totales",
     "budgetRemaining": "Presupuesto Restante",
-    "budgetUsed": "Presupuesto Utilizado",
+    "remaining": "Restante",
+    "ofBudget": "del Presupuesto",
+    "budgetUsed": "Total Gastado",
     "overBudget": "Sobre Presupuesto",
     "underBudget": "Bajo Presupuesto",
     "filterBy": "Filtrar por",
@@ -449,14 +451,11 @@
     "reset": "Restablecer",
     "noExpenses": "No se encontraron gastos que coincidan con tu búsqueda.",
     "categories": {
+      "labour": "Mano de obra",
+      "products": "Productos",
       "materials": "Materiales",
-      "labor": "Mano de Obra",
-      "equipment": "Equipamiento",
-      "permits": "Permisos",
-      "utilities": "Servicios",
-      "transportation": "Transporte",
-      "food": "Alimentación",
-      "other": "Otros"
+      "transport": "Transporte",
+      "others": "Otros"
     },
     "paymentMethods": {
       "cash": "Efectivo",
