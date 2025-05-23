@@ -2,22 +2,8 @@
 
 import {useEffect, useState} from "react"
 import {
-  Activity,
-  AlertCircle,
-  Bell,
-  Building,
-  Calendar,
-  Check,
-  Edit,
-  FileText, Loader2,
-  Mail,
-  MapPin,
-  MessageSquare,
-  Phone,
-  Share2,
-  UserPlus,
-  Users,
-  X,
+  Activity, AlertCircle, Bell, Building, Calendar, Check, Edit, FileText, Mail,
+  MapPin, MessageSquare, Phone, Share2, UserPlus, Users, X,
 } from "lucide-react"
 import {useRouter} from "next/navigation"
 
@@ -29,38 +15,12 @@ import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} fro
 import {Input} from "@/components/ui/input"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {useUser} from "@/contexts/UserProvider";
-import {EditProfileDialog} from "./edit-profile-dialog"
+import {EditProfileDialog} from "../edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
 import {getRole, getToken} from "@/app/services/auth-service";
 import {User as User_Type} from "@/contexts/user.types";
 import {updateUserInformation} from "@/app/actions/auth";
 
-// Mock data for user profile
-const USER_PROFILE: User_Type = {
-  id: 123,
-  name: "Alex Johnson",
-  username: "alexj_builder",
-  role: "ADMIN",
-  language_preference: "en",
-  email: "alex.johnson@example.com",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA",
-  description:
-    "Experienced construction project manager with over 10 years in residential and commercial projects. Specializing in sustainable building practices and efficient project delivery.",
-  created_at: "2020-01-15T00:00:00Z",
-  availabilities: [
-    {
-      id: "avail-1",
-      from: "2025-04-01T08:00:00Z",
-      to: "2025-04-15T17:00:00Z",
-    },
-    {
-      id: "avail-2",
-      from: "2025-05-10T08:00:00Z",
-      to: "2025-05-20T17:00:00Z",
-    },
-  ],
-}
 
 // Mock data for projects
 const PROJECTS = [
@@ -116,47 +76,7 @@ const PROJECTS = [
   },
 ]
 
-// Mock data for followers, following, and requests
-const generateUsers = (count: any) => {
-  const roles = [
-    "Project Manager",
-    "Architect",
-    "Civil Engineer",
-    "Contractor",
-    "Interior Designer",
-    "Electrician",
-    "Plumber",
-    "Carpenter",
-    "Construction Worker",
-    "Consultant",
-  ]
 
-  return Array.from({length: count}, (_, i) => ({
-    id: `user${i + 1}`,
-    name: `User ${i + 1}`,
-    username: `user${i + 1}`,
-    role: roles[Math.floor(Math.random() * roles.length)],
-    avatar: `/placeholder.svg?height=100&width=100&text=U${i + 1}`,
-    isFollowing: Math.random() > 0.5,
-  }))
-}
-
-const FOLLOWERS = generateUsers((USER_PROFILE.id % 100) + 56)
-const FOLLOWING = generateUsers((USER_PROFILE.id % 100) - 11)
-const REQUESTS = generateUsers((USER_PROFILE.id % 10) - 3)
-
-// Mock data for search results
-const SEARCH_RESULTS = [
-  ...generateUsers(10),
-  {
-    id: "user123",
-    name: "Alex Johnson",
-    username: "alexj_builder",
-    role: "Senior Project Manager",
-    avatar: "/placeholder.svg?height=100&width=100&text=AJ",
-    isFollowing: false,
-  },
-]
 export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
   const router = useRouter()

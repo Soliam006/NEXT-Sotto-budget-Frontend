@@ -23,6 +23,7 @@ import {ScrollArea} from "@/components/ui/scroll-area";
 import {useState} from "react";
 import Image from "next/image";
 import {clearToken} from "@/app/services/auth-service";
+import {NotificationButton} from "@/components/notifications/notification-button";
 
 interface TopBarProps {
   user: UserType | null
@@ -210,19 +211,9 @@ export function TopBar({
             </SelectContent>
           </Select>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-cyan-500 rounded-full animate-pulse"></span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{dictionary.nav?.notifications || "Notifications"}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+
+          {/* Replace Bell icon with NotificationButton component */}
+          <NotificationButton dictionary={dictionary} />
 
           <TooltipProvider>
             <Tooltip>

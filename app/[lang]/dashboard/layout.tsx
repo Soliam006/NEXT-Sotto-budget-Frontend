@@ -6,6 +6,7 @@ import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
 import {ProjectProvider} from "@/contexts/project-context";
+import {NotificationProvider} from "@/contexts/notification-context";
 
 export default function DashboardLayout({
                                                   children,
@@ -30,10 +31,12 @@ export default function DashboardLayout({
     if (!dictionary) return <LoadingView/>;
 
     return (
-        <ProjectProvider>
-            <DashboardShellWrapper dictionary={dictionary} lang={paramers.lang as string}>
-                {children}
-            </DashboardShellWrapper>
-        </ProjectProvider>
+        <NotificationProvider dictionary={dictionary}>
+            <ProjectProvider>
+                <DashboardShellWrapper dictionary={dictionary} lang={paramers.lang as string}>
+                    {children}
+                </DashboardShellWrapper>
+            </ProjectProvider>
+        </NotificationProvider>
     );
 }

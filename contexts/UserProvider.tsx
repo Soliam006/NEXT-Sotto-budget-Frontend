@@ -1,11 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
 import { User } from './user.types';
 import { acceptRequestBD } from "@/app/actions/follows";
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import {fetchUserMe} from "@/app/actions/auth";
 import {redirect} from "next/navigation";
+import {Activity, Notification} from "@/lib/types/notification";
+import {fetchNotifications} from "@/app/actions/notifications";
+import {convertToNotification} from "@/lib/helpers/notifications";
 
 const getTokenFromStorage = () => {
   const token = getCookie('access_token');
@@ -70,7 +73,6 @@ export const UserProvider = ({ children }: Props) => {
     }
   }, []);
 
-  // NUEVO: Método para actualizar token en memoria + almacenamiento local
   const setToken = (newToken: string | null, rememberMe: boolean, lang: string) => {
     if (!newToken) {
       // Eliminar cookies
@@ -226,7 +228,7 @@ export const UserProvider = ({ children }: Props) => {
     followUser,
     unfollowUser,
     updateAvailability,
-    isSaving,
+    isSaving
   };
 
   return (
