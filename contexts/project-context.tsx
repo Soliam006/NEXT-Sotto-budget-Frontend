@@ -1,10 +1,11 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import React, {createContext, useContext, useState, useEffect, type ReactNode, useCallback} from "react"
 import type { Project } from "@/components/dashboard/projects-selector"
 import { isEqual } from "lodash"
 import {addProjectToBackend, fetchProjects, updateProjectToBackend} from "@/app/actions/project";
 import {getCookie} from "cookies-next";
+import Swal from "sweetalert2";
 
 // Tipos para el contexto
 interface ProjectContextType {
@@ -56,9 +57,12 @@ const getToken = () => {
   return token ? String(token) : null;
 };
 
+interface ProjectProviderProps {
+  children: React.ReactNode
+  dictionary?: any
+}
 // Provider component
-export function ProjectProvider({ children }: { children: ReactNode }) {
-
+export function ProjectProvider({ children, dictionary }: ProjectProviderProps) {
   const [projects, setProjects] = useState<Project[]>([])
   // Estado para el proyecto seleccionado y su versión original
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
@@ -88,6 +92,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
           setError("Error al cargar los proyectos")
         }
       })
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred')
       console.error("Error fetching projects:", err)
@@ -335,6 +340,24 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
           };
         })
   }
+
+  // Función para mostrar errores
+  const showErrorAlert = useCallback((errorMessage: string) => {
+    Swal.fire({
+      title: dictionary?.common?.errorTitle || 'Error',
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonText: dictionary?.common.acept || 'Aceptar',
+      footer: dictionary?.notifications?.urgentHelp || 'Si es urgente, contacte a soporte inmediatamente'
+    });
+  }, [dictionary]);
+
+  // Efecto para mostrar errores cuando cambien
+  useEffect(() => {
+    if (error) {
+      showErrorAlert(error);
+    }
+  }, [error, showErrorAlert]);
 
 
   // Descartar cambios

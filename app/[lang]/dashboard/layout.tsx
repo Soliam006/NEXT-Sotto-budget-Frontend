@@ -32,7 +32,7 @@ export default function DashboardLayout({
 
     return (
         <NotificationProvider dictionary={dictionary}>
-            <ProjectProvider>
+            <ProjectProvider dictionary={dictionary}>
                 <DashboardShellWrapper dictionary={dictionary} lang={paramers.lang as string}>
                     {children}
                 </DashboardShellWrapper>

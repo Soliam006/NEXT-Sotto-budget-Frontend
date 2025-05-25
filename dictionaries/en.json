@@ -131,13 +131,15 @@
     }
   },
   "common": {
+    "acept": "Accept",
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
     "processing": "Processing...",
-    "serverError": "Server error, please try again later"
+    "serverError": "Server error, please try again later",
+    "errorTitle": "System Error"
   },
   "projects": {
     "title": "Project Management",
@@ -519,7 +521,10 @@
     "date": "Date",
     "task": "Task",
     "expense": "Expense",
-    "additionalInfo": "Additional Information"
+    "additionalInfo": "Additional Information",
+    "contactAdmin": "Contact Admin",
+    "urgentHelp": "If this is urgent, please contact support immediately",
+    "failedToLoad": "Failed to load notifications"
   },
   "followers": {
     "title": "Followers",

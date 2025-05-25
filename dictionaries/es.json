@@ -131,13 +131,15 @@
     }
   },
   "common": {
+    "acept": "Aceptar",
     "edit": "Editar",
     "delete": "Eliminar",
     "cancel": "Cancelar",
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
     "processing": "Procesando...",
-    "serverError": "Error del servidor, por favor intenta de nuevo más tarde"
+    "serverError": "Error del servidor, por favor intenta de nuevo más tarde",
+    "errorTitle": "Error del sistema"
   },
   "projects": {
     "title": "Gestión de Proyectos",
@@ -519,7 +521,10 @@
     "date": "Fecha",
     "task": "Tarea",
     "expense": "Gasto",
-    "additionalInfo": "Información Adicional"
+    "additionalInfo": "Información Adicional",
+    "contactAdmin": "Contactar al administrador",
+    "urgentHelp": "Si es urgente, contacte a soporte inmediatamente",
+    "failedToLoad": "No se pudieron cargar las notificaciones"
   },
   "followers": {
     "title": "Seguidores",

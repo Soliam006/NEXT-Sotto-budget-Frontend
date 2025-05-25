@@ -25,7 +25,6 @@ export function TopBarWrapper({ user, dictionary, lang, onNavigate, children }: 
         if (theme === "dark" || theme === "light") {
             setCurrentTheme(theme as "dark" | "light")
         }
-        console.log("CURRENT DICCIONARY", dictionary)
     }, [theme])
 
     // Toggle theme

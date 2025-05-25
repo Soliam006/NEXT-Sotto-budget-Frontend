@@ -3,10 +3,9 @@
 import type React from "react"
 import {createContext, useCallback, useContext, useEffect, useState} from "react"
 import {Activity, ActivityType, Notification, UINotificationType} from "@/lib/types/notification";
-import {MOCK_BACKEND_ACTIVITIES} from "@/lib/helpers/notifications";
 import {fetchNotificationsBD} from "@/app/actions/notifications";
 import {getTokenFromStorage} from "@/contexts/UserProvider";
-
+import Swal from 'sweetalert2';
 
 interface NotificationContextType {
     notifications: Notification[]
@@ -197,11 +196,11 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
         setLoading(true)
         try {
             const response = await fetchNotificationsBD(getTokenFromStorage())
+
             if (response.statusCode !== 200) {
                 throw new Error(response.message || "Failed to fetch notifications")
             }
-            const activities: Activity[] = response.data || []
-
+            const activities: Activity[] = response.data.activities || []
             // For now, use mock data
             //await new Promise((resolve) => setTimeout(resolve, 1000))
             const convertedNotifications = activities.map((activity) =>
@@ -210,7 +209,7 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
             setNotifications(convertedNotifications)
             setError(null)
         } catch (err) {
-            setError("Failed to load notifications")
+            setError(dictionary.notifications.failedToLoad || "Failed to load notifications")
             console.error("Error fetching notifications:", err)
         } finally {
             setLoading(false)
@@ -253,6 +252,24 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
             console.error("Error marking all notifications as read:", err)
         }
     }, [])
+
+    // Función para mostrar errores
+    const showErrorAlert = useCallback((errorMessage: string) => {
+        Swal.fire({
+            title: dictionary?.common?.errorTitle || 'Error',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonText: dictionary?.common.acept || 'Aceptar',
+            footer: dictionary?.notifications?.urgentHelp || 'Si es urgente, contacte a soporte inmediatamente'
+        });
+    }, [dictionary]);
+
+    // Efecto para mostrar errores cuando cambien
+    useEffect(() => {
+        if (error) {
+            showErrorAlert(error);
+        }
+    }, [error, showErrorAlert]);
 
     const value = {
         notifications,
