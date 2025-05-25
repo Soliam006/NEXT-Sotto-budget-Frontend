@@ -99,35 +99,40 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
-                {selectedNotification ? (
-                    // Detailed view of a single notification
-                    <div className="flex flex-col h-full">
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-border/50">
-                            <div className="flex items-center space-x-3">
-                                <div className={`p-2 rounded-full ${getNotificationTypeStyles(selectedNotification.type).bgColor}`}>
-                                    {getNotificationTypeIcon(selectedNotification.type)}
-                                </div>
-                                <div>
-                                    <DialogTitle className="text-lg font-semibold">
-                                        {dictionary.notifications?.detail || "Notification Detail"}
-                                    </DialogTitle>
-                                    <p className="text-sm text-muted-foreground">{formatRelativeTime(selectedNotification.time)}</p>
-                                </div>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setSelectedNotification(null)}
-                                className="h-8 w-8 hover:bg-secondary/80"
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
+          <DialogContent className={
+                `sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 
+            ${selectedNotification ? "w-full max-w-[95vw] h-[95vh]" : ""} 
+            max-h-[95vh] flex flex-col`
+            }>
+            { /* If a notification is selected, show its details */ }
+            {selectedNotification ? (
+                <div className="flex flex-col h-full">
+                    {/* Header */}
 
-                        {/* Content */}
-                        <div className="flex-1 overflow-auto p-6 space-y-6">
+                    {/* Content - Scrollable area */}
+                    <ScrollArea className="max-h-[75vh] flex-1">
+                    <div className="flex items-center justify-between p-4 md:p-6 border-b border-border/50">
+                        <div className="flex items-center space-x-3">
+                            <div className={`p-2 rounded-full ${getNotificationTypeStyles(selectedNotification.type).bgColor}`}>
+                                {getNotificationTypeIcon(selectedNotification.type)}
+                            </div>
+                            <div>
+                                <DialogTitle className="text-lg font-semibold">
+                                    {dictionary.notifications?.detail || "Notification Detail"}
+                                </DialogTitle>
+                                <p className="text-sm text-muted-foreground">{formatRelativeTime(selectedNotification.time)}</p>
+                            </div>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSelectedNotification(null)}
+                            className="h-8 w-8 hover:bg-secondary/80"
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                        <div className="p-4 md:p-6 space-y-6">
                             {/* Main notification card */}
                             <div className="bg-gradient-to-r from-secondary/30 to-secondary/10 rounded-lg p-4 border border-border/50">
                                 <h3 className="font-semibold text-base mb-2">{selectedNotification.title}</h3>
@@ -153,7 +158,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                             )}
 
                             {/* Metadata */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-card/50 rounded-lg p-3 border border-border/30">
                                     <p className="text-xs text-muted-foreground mb-1">
                                         {dictionary.notifications?.activityType || "Type"}
@@ -166,110 +171,111 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                 </div>
                             </div>
                         </div>
+                    </ScrollArea>
 
-                        {/* Footer */}
-                        {selectedNotification.link && (
-                            <div className="p-6 border-t border-border/50 bg-secondary/20">
+                    {/* Footer */}
+                    {selectedNotification.link && (
+                        <div className="p-4 md:p-6 border-t border-border/50 bg-secondary/20">
+                            <Button
+                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg"
+                                onClick={() => {
+                                    window.location.href = selectedNotification.link!
+                                    onOpenChange(false)
+                                }}
+                            >
+                                <Bell className="mr-2 h-4 w-4" />
+                                {dictionary.notifications?.viewRelated || "View Related Content"}
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            ) : (
+                // List of notifications
+                <>
+                    <DialogHeader>
+                        <div className="flex items-center justify-between">
+                            <DialogTitle className="text-xl flex items-center">
+                                <Bell className="mr-2 h-5 w-5 text-cyan-500" />
+                                {dictionary.notifications?.title || "Notifications"}
+                            </DialogTitle>
+                            {unreadCount > 0 && (
                                 <Button
-                                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg"
-                                    onClick={() => {
-                                        window.location.href = selectedNotification.link!
-                                        onOpenChange(false)
-                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={markAllAsRead}
+                                    className="text-xs text-cyan-400 hover:text-cyan-300"
                                 >
-                                    <Bell className="mr-2 h-4 w-4" />
-                                    {dictionary.notifications?.viewRelated || "View Related Content"}
+                                    {dictionary.notifications?.markAllRead || "Mark all as read"}
                                 </Button>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    // List of notifications
-                    <>
-                        <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle className="text-xl flex items-center">
-                                    <Bell className="mr-2 h-5 w-5 text-cyan-500" />
-                                    {dictionary.notifications?.title || "Notifications"}
-                                </DialogTitle>
-                                {unreadCount > 0 && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={markAllAsRead}
-                                        className="text-xs text-cyan-400 hover:text-cyan-300"
-                                    >
-                                        {dictionary.notifications?.markAllRead || "Mark all as read"}
-                                    </Button>
-                                )}
-                            </div>
-                        </DialogHeader>
+                            )}
+                        </div>
+                    </DialogHeader>
 
-                        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mt-2">
-                            <TabsList className="grid grid-cols-2 mb-4">
-                                <TabsTrigger value="all">
-                                    {dictionary.notifications?.all || "All"}
-                                    <span className="ml-1 text-xs">({allNotifications.length})</span>
-                                </TabsTrigger>
-                                <TabsTrigger value="unread">
-                                    {dictionary.notifications?.unread || "Unread"}
-                                    <span className="ml-1 text-xs">({unreadNotifications.length})</span>
-                                </TabsTrigger>
-                            </TabsList>
+                    <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mt-2">
+                        <TabsList className="grid grid-cols-2 mb-4">
+                            <TabsTrigger value="all">
+                                {dictionary.notifications?.all || "All"}
+                                <span className="ml-1 text-xs">({allNotifications.length})</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="unread">
+                                {dictionary.notifications?.unread || "Unread"}
+                                <span className="ml-1 text-xs">({unreadNotifications.length})</span>
+                            </TabsTrigger>
+                        </TabsList>
 
-                            <TabsContent value="all" className="mt-0">
-                                <ScrollArea className="h-[400px] pr-4">
-                                    <div className="space-y-1">
-                                        {allNotifications.length > 0 ? (
-                                            allNotifications.map((notification) => (
-                                                <ActivityItem
-                                                    key={notification.id}
-                                                    id={notification.id}
-                                                    title={notification.title}
-                                                    description={notification.description}
-                                                    time={formatRelativeTime(notification.time)}
-                                                    type={notification.type}
-                                                    read={notification.read}
-                                                    onClick={handleNotificationClick}
-                                                />
-                                            ))
-                                        ) : (
-                                            <div className="text-center py-8 text-muted-foreground">
-                                                <p>{dictionary.notifications?.noNotifications || "No notifications"}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </ScrollArea>
-                            </TabsContent>
+                        <TabsContent value="all" className="mt-0">
+                            <ScrollArea className="h-[400px] pr-4">
+                                <div className="space-y-1">
+                                    {allNotifications.length > 0 ? (
+                                        allNotifications.map((notification) => (
+                                            <ActivityItem
+                                                key={notification.id}
+                                                id={notification.id}
+                                                title={notification.title}
+                                                description={notification.description}
+                                                time={formatRelativeTime(notification.time)}
+                                                type={notification.type}
+                                                read={notification.read}
+                                                onClick={handleNotificationClick}
+                                            />
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-8 text-muted-foreground">
+                                            <p>{dictionary.notifications?.noNotifications || "No notifications"}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
 
-                            <TabsContent value="unread" className="mt-0">
-                                <ScrollArea className="h-[400px] pr-4">
-                                    <div className="space-y-1">
-                                        {unreadNotifications.length > 0 ? (
-                                            unreadNotifications.map((notification) => (
-                                                <ActivityItem
-                                                    key={notification.id}
-                                                    id={notification.id}
-                                                    title={notification.title}
-                                                    description={notification.description}
-                                                    time={formatRelativeTime(notification.time)}
-                                                    type={notification.type}
-                                                    read={notification.read}
-                                                    onClick={handleNotificationClick}
-                                                />
-                                            ))
-                                        ) : (
-                                            <div className="text-center py-8 text-muted-foreground">
-                                                <p>{dictionary.notifications?.noUnread || "No unread notifications"}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </ScrollArea>
-                            </TabsContent>
-                        </Tabs>
-                    </>
-                )}
-            </DialogContent>
-        </Dialog>
-    )
+                        <TabsContent value="unread" className="mt-0">
+                            <ScrollArea className="h-[400px] pr-4">
+                                <div className="space-y-1">
+                                    {unreadNotifications.length > 0 ? (
+                                        unreadNotifications.map((notification) => (
+                                            <ActivityItem
+                                                key={notification.id}
+                                                id={notification.id}
+                                                title={notification.title}
+                                                description={notification.description}
+                                                time={formatRelativeTime(notification.time)}
+                                                type={notification.type}
+                                                read={notification.read}
+                                                onClick={handleNotificationClick}
+                                            />
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-8 text-muted-foreground">
+                                            <p>{dictionary.notifications?.noUnread || "No unread notifications"}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    </Tabs>
+                </>
+            )}
+        </DialogContent>
+    </Dialog>
+  )
 }

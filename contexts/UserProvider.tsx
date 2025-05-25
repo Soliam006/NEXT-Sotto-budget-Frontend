@@ -6,11 +6,8 @@ import { acceptRequestBD } from "@/app/actions/follows";
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import {fetchUserMe} from "@/app/actions/auth";
 import {redirect} from "next/navigation";
-import {Activity, Notification} from "@/lib/types/notification";
-import {fetchNotifications} from "@/app/actions/notifications";
-import {convertToNotification} from "@/lib/helpers/notifications";
 
-const getTokenFromStorage = () => {
+export const getTokenFromStorage = () => {
   const token = getCookie('access_token');
   return token ? String(token) : null;
 };

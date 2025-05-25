@@ -4,6 +4,8 @@ import type React from "react"
 import {createContext, useCallback, useContext, useEffect, useState} from "react"
 import {Activity, ActivityType, Notification, UINotificationType} from "@/lib/types/notification";
 import {MOCK_BACKEND_ACTIVITIES} from "@/lib/helpers/notifications";
+import {fetchNotificationsBD} from "@/app/actions/notifications";
+import {getTokenFromStorage} from "@/contexts/UserProvider";
 
 
 interface NotificationContextType {
@@ -194,13 +196,15 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
     const fetchNotifications = useCallback(async () => {
         setLoading(true)
         try {
-            // TODO: Replace with actual API call
-            // const response = await fetch('/api/activities')
-            // const backendActivities: Activity[] = await response.json()
+            const response = await fetchNotificationsBD(getTokenFromStorage())
+            if (response.statusCode !== 200) {
+                throw new Error(response.message || "Failed to fetch notifications")
+            }
+            const activities: Activity[] = response.data || []
 
             // For now, use mock data
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            const convertedNotifications = MOCK_BACKEND_ACTIVITIES.map((activity) =>
+            //await new Promise((resolve) => setTimeout(resolve, 1000))
+            const convertedNotifications = activities.map((activity) =>
                 convertToNotification(activity, dictionary))
 
             setNotifications(convertedNotifications)
