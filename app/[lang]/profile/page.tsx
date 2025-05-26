@@ -29,7 +29,7 @@ export default function  Profile() {
   if (!dictionary) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
   return (
-      <NotificationProvider dictionary={dictionary}>
+      <NotificationProvider dictionary={dictionary} lang={typeof params.lang === 'string' ? params.lang : 'es'} >// Fallback a 'es'
           <div className="min-h-screen bg-background">
             <TopBarWrapper user={user} dictionary={dictionary} lang={params.lang as string} />
             <div className="container mx-auto px-4 py-6 md:pt-16">

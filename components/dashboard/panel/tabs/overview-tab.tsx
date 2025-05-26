@@ -21,8 +21,8 @@ export function OverviewTab({ dict }: OverviewTabProps) {
         const porcentaje = ((now - start) / (end - start)) * 100
         let trend: "up" | "down" | "stable" = "stable"; // Los valores son estables por defecto
         if (porcentaje > 0.8) trend = "up"; // Si el 80% del tiempo ha pasado, la tendencia es hacia arriba
-        else if (porcentaje < 0.3) trend = "down"; // Si el 30% del tiempo ha pasado, la tendencia es hacia abajo
-        return { value: Math.round(porcentaje), trend };
+            else if (porcentaje < 0.3) trend = "down"; // Si el 30% del tiempo ha pasado, la tendencia es hacia abajo
+        return { value: Math.max(0, Math.min(100, Math.round(porcentaje))), trend };
     };
 
     const timelineMetrics = getTimelineMetrics(selectedProject?.startDate, selectedProject?.endDate);

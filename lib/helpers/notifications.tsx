@@ -2,7 +2,7 @@
 // Map backend activity types to UI notification types
 import {Activity,ActivityType, Notification, UINotificationType} from "@/lib/types/notification";
 
-const mapActivityTypeToUIType = (activityType: ActivityType): UINotificationType => {
+export const mapActivityTypeToUIType = (activityType: ActivityType): UINotificationType => {
     switch (activityType) {
         case "task_completed":
         case "expense_approved":
@@ -25,7 +25,7 @@ const mapActivityTypeToUIType = (activityType: ActivityType): UINotificationType
 }
 
 // Generate title based on activity type
-const generateTitle = (activity: Activity, dictionary?: any): string => {
+export const generateTitle = (activity: Activity, dictionary?: any): string => {
     const dict = dictionary?.notifications || {}
 
     switch (activity.activity_type) {
@@ -57,7 +57,7 @@ const generateTitle = (activity: Activity, dictionary?: any): string => {
 }
 
 // Generate description based on activity type
-const generateDescription = (activity: Activity, dictionary?: any): string => {
+export const generateDescription = (activity: Activity, dictionary?: any): string => {
     const dict = dictionary?.notifications || {}
     const itemName = activity.task?.title || activity.expense?.title || activity.metadatas?.item_name || ""
     const projectName = activity.title_project
@@ -119,97 +119,3 @@ export const generateDetails = (activity: Activity, dictionary?: any): string =>
 
     return details
 }
-
-// Generate navigation link
-export const generateLink = (activity: Activity): string => {
-    switch (activity.activity_type) {
-        case "task_created":
-        case "task_completed":
-        case "task_updated":
-        case "task_deleted":
-            return "/dashboard/tasks"
-        case "expense_added":
-        case "expense_approved":
-        case "expense_updated":
-        case "expense_deleted":
-            return "/dashboard/expenses"
-        case "inventory_added":
-        case "inventory_updated":
-        case "inventory_deleted":
-            return "/dashboard/inventory"
-        default:
-            return "/dashboard"
-    }
-}
-
-// Convert backend activity to UI notification
-export const convertToNotification = (activity: Activity, dictionary?: any): Notification => {
-    return {
-        id: activity.id.toString(),
-        title: generateTitle(activity, dictionary),
-        description: generateDescription(activity, dictionary),
-        time: activity.created_at,
-        type: mapActivityTypeToUIType(activity.activity_type),
-        read: activity.is_read,
-        link: generateLink(activity),
-        details: generateDetails(activity, dictionary),
-        project: activity.project,
-        task: activity.task,
-        expense: activity.expense,
-        metadatas: activity.metadatas,
-        activity_type: activity.activity_type,
-    }
-}
-
-// Mock data for development (replace with actual API calls)
-export const MOCK_BACKEND_ACTIVITIES: Activity[] = [
-    {
-        id: 1,
-        activity_type: "task_created",
-        title_project: "Modern Residential Complex",
-        is_read: false,
-        created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-        project: { id: 1, title: "Modern Residential Complex" },
-        task: { id: 1, title: "Foundation excavation" },
-        metadatas: { assigned_to: "John Doe", priority: "high" },
-    },
-    {
-        id: 2,
-        activity_type: "expense_added",
-        title_project: "Commercial Office Renovation",
-        is_read: false,
-        created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-        project: { id: 2, title: "Commercial Office Renovation" },
-        expense: { id: 1, title: "Construction materials" },
-        metadatas: { amount: 15000, currency: "USD", category: "materials" },
-    },
-    {
-        id: 3,
-        activity_type: "task_completed",
-        title_project: "Eco-Friendly School Building",
-        is_read: true,
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        project: { id: 3, title: "Eco-Friendly School Building" },
-        task: { id: 2, title: "Foundation work" },
-        metadatas: { completed_by: "Maria Rodriguez", duration_hours: 48 },
-    },
-    {
-        id: 4,
-        activity_type: "inventory_updated",
-        title_project: "Hospital Wing Addition",
-        is_read: false,
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-        project: { id: 4, title: "Hospital Wing Addition" },
-        metadatas: { item_name: "Kitchen cabinets", status: "delayed", delay_days: 3 },
-    },
-    {
-        id: 5,
-        activity_type: "expense_approved",
-        title_project: "Modern Residential Complex",
-        is_read: true,
-        created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-        project: { id: 1, title: "Modern Residential Complex" },
-        expense: { id: 2, title: "Electrical equipment" },
-        metadatas: { approved_by: "Project Manager", amount: 8500, currency: "USD" },
-    },
-]
