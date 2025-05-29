@@ -9,14 +9,13 @@ import type { User as UserType } from "@/contexts/user.types"
 import LoadingView from "@/components/loading-view";
 
 interface TopBarWrapperProps {
-    user: UserType | null
     dictionary: any
     lang: string,
     onNavigate?: (path: string) => void
     children?: React.ReactNode
 }
 
-export function TopBarWrapper({ user, dictionary, lang, onNavigate, children }: TopBarWrapperProps) {
+export function TopBarWrapper({ dictionary, lang, onNavigate, children }: TopBarWrapperProps) {
     const { theme, setTheme } = useNextTheme()
     const [currentTheme, setCurrentTheme] = useState<"dark" | "light">("dark")
 
@@ -36,7 +35,7 @@ export function TopBarWrapper({ user, dictionary, lang, onNavigate, children }: 
 
     return (
         <>
-            <TopBar user={user} theme={currentTheme} toggleTheme={toggleTheme}
+            <TopBar theme={currentTheme} toggleTheme={toggleTheme}
                     dictionary={dictionary} lang={lang} onNavigate={onNavigate} />
             {children}
         </>

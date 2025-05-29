@@ -24,14 +24,12 @@ export default function  Profile() {
     fetchDictionary();
   }, [params?.lang]);
 
-  const {user} = useUser();
-
   if (!dictionary) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario
 
   return (
-      <NotificationProvider dictionary={dictionary} lang={typeof params.lang === 'string' ? params.lang : 'es'} >// Fallback a 'es'
+      <NotificationProvider dictionary={dictionary}>
           <div className="min-h-screen bg-background">
-            <TopBarWrapper user={user} dictionary={dictionary} lang={params.lang as string} />
+            <TopBarWrapper dictionary={dictionary} lang={params.lang as string} />
             <div className="container mx-auto px-4 py-6 md:pt-16">
               <ProfilePage dict={dictionary} lang={params.lang as string} />
             </div>

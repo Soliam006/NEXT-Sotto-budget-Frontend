@@ -1,10 +1,14 @@
 "use server"
+import {redirect} from "next/navigation";
+
 const api_URL = process.env.BASE_URL_BACK + "follows/"
 
 
-export async function fetchFollowers(token: string, translates: any): Promise<any | null> {
+export async function fetchFollowers(token: string | null, translates: any|null): Promise<any | null> {
+    if (!token) redirect("/es/login");
+
     try {
-        return await fetch(`${api_URL}follows_user`, {
+        return await fetch(`${api_URL}follows_status`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -13,8 +17,9 @@ export async function fetchFollowers(token: string, translates: any): Promise<an
         }).then(
             async (res) => {
                 const json = await res.json();
+                console .log("Followers Status", json);
                 if (json.statusCode === 200) {
-                    console.log("Followers", json);
+                    console.log("STATUS", json);
                     return json.data;
                 } else {
                     return null
@@ -25,13 +30,10 @@ export async function fetchFollowers(token: string, translates: any): Promise<an
         console.error("Error en la petición FOLLOWS_USER:", error);
         return null;
     }
-
-    return null
-
 }
 
 
-export async function followUserBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+export async function followUserBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
         console.log("URL Using in FOLLOW _________________________", `${api_URL}${userId}`);
@@ -43,13 +45,7 @@ export async function followUserBD(token: string|null, userId: string, translate
             }
         }).then(
             async (res) => {
-                const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Follow User", json);
-                    return json.data;
-                } else {
-                    return null
-                }
+                return await res.json()
             }
         )
     }catch ( error) {
@@ -60,7 +56,7 @@ export async function followUserBD(token: string|null, userId: string, translate
     return null
 }
 
-export async function unfollowUserBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+export async function unfollowUserBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
         return await fetch(`${api_URL}unfollow/${userId}`, {
@@ -88,7 +84,7 @@ export async function unfollowUserBD(token: string|null, userId: string, transla
     return null
 }
 
-export async function acceptRequestBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+export async function acceptRequestBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
         return await fetch(`${api_URL}accept_follow/${userId}`, {
@@ -117,7 +113,7 @@ export async function acceptRequestBD(token: string|null, userId: string, transl
 }
 
 
-export async function rejectFollowerBD(token: string|null, userId: string, translates: any): Promise<any | null> {
+export async function rejectFollowerBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
         return await fetch(`${api_URL}reject_follow/${userId}`, {

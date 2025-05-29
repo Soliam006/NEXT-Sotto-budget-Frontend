@@ -131,6 +131,7 @@
     }
   },
   "common": {
+    "loading": "Cargando...",
     "acept": "Aceptar",
     "edit": "Editar",
     "delete": "Eliminar",
@@ -552,7 +553,9 @@
     "placeholder": "Buscar por nombre, usuario o rol...",
     "noResults": "No se encontraron usuarios",
     "follow": "Seguir",
-    "following": "Siguiendo"
+    "following": "Siguiendo",
+    "pending": "Pendiente",
+    "unfollow": "Dejar de seguir"
   },
   "nav": {
     "profile": "Perfil",

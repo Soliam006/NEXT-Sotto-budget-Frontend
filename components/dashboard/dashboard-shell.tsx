@@ -14,12 +14,11 @@ import LoadingView from "@/components/loading-view";
 
 interface DashboardShellProps {
   children: React.ReactNode
-  user: UserType | null
   dictionary: any
   lang: string
 }
 
-export function DashboardShell({ children, user, dictionary, lang }: DashboardShellProps) {
+export function DashboardShell({ children, dictionary, lang }: DashboardShellProps) {
 
   const [isMobile, setIsMobile] = useState(false)
   const pathname = usePathname()
@@ -63,7 +62,7 @@ export function DashboardShell({ children, user, dictionary, lang }: DashboardSh
   return (
     <div className="min-h-screen w-screen bg-background text-foreground">
       {/* Top bar */}
-      <TopBarWrapper user={user} dictionary={dictionary} lang={lang} onNavigate={handleNavigate} />
+      <TopBarWrapper dictionary={dictionary} lang={lang} onNavigate={handleNavigate} />
 
       <div className="w-full px-2 py-6 pt-20">
 

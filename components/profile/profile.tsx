@@ -110,7 +110,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
    * @param userId User ID to follow/unfollow
    * @param follow Boolean indicating whether to follow or unfollow
    */
-  const handleFollowToggle = (userId: string, follow: boolean) => {
+  const handleFollowToggle = (userId: number, follow: boolean) => {
     try {
       if (follow) {
         const follower = followUser(userId);
@@ -129,7 +129,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
     }
   }
   // Handle accept request
-const handleAcceptRequest = async (userId: string) => {
+const handleAcceptRequest = async (userId: number) => {
   try {
     const follower = await acceptFollower(userId);
     if (!follower) {
@@ -142,7 +142,7 @@ const handleAcceptRequest = async (userId: string) => {
 }
 
   // Handle reject request
-  const handleRejectRequest = async (userId: string) => {
+  const handleRejectRequest = async (userId: number) => {
     try {
       const responseFollower = await rejectFollower(userId);
       if (! responseFollower) {

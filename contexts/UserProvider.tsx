@@ -2,10 +2,11 @@
 
 import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
 import { User } from './user.types';
-import { acceptRequestBD } from "@/app/actions/follows";
+import {acceptRequestBD, followUserBD, unfollowUserBD} from "@/app/actions/follows";
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import {fetchUserMe} from "@/app/actions/auth";
 import {redirect} from "next/navigation";
+import Swal from "sweetalert2";
 
 export const getTokenFromStorage = () => {
   const token = getCookie('access_token');
@@ -17,7 +18,7 @@ interface FollowResponse {
   follower_id: number;
   following_id: number;
   created_at: string;
-  status: 'ACCEPTED' | 'REJECTED' | 'PENDING';
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'NONE';
   updated_at: string;
 }
 
@@ -28,11 +29,11 @@ interface UserContextType {
   setToken: (token: string | null, rememberMe: boolean, lang:string) => void;
   updateUser: (updatedFields: Partial<User>) => void;
   saveProfile: (updatedFields: Partial<User>) => Promise<void>;
-  acceptFollower: (followerId: string) => any;
-  removeFollower: (followerId: string) => void;
-  rejectFollower: (followerId: string) => any;
-  followUser: (followerId: string) => any;
-  unfollowUser: (followerId: string) => any;
+  acceptFollower: (followerId: number) => Promise<FollowResponse>;
+  removeFollower: (followerId: number) => void;
+  rejectFollower: (followerId: number) => Promise<FollowResponse>;
+  followUser: (followingId: number) => Promise<FollowResponse>;
+  unfollowUser: (followingId: number) => Promise<FollowResponse>;
   updateAvailability: (availabilities: User['availabilities']) => void;
   isSaving: boolean;
 }
@@ -47,6 +48,7 @@ export const UserProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [tokenState, setTokenState] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null)
 
   // NUEVO: Inicializa el token desde coockies al montar
   useEffect(() => {
@@ -108,14 +110,20 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
-  const acceptFollower = async (followerID: string) => {
-    if (!user || !tokenState) return;
+
+  const acceptFollower = async (followerId: number): Promise<FollowResponse> => {
+    if (!user || !tokenState) throw new Error("User not authenticated");
 
     setIsSaving(true);
     try {
-      const followersResponse = await acceptRequestBD(tokenState, followerID, user.language_preference);
-      console.log("Seguidores Actualizados con el nuevo Follow:", followersResponse);
-      return null;
+      const response = await acceptRequestBD(tokenState, followerId, user.language_preference);
+      return {
+        follower_id: Number(followerId),
+        following_id: user.id,
+        status: 'ACCEPTED',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
     } catch (error) {
       console.error("Error al aceptar el seguidor:", error);
       throw error;
@@ -124,7 +132,8 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
-  const removeFollower = (followerId: string) => {
+
+  const removeFollower = (followerId: number) => {
     if (!user) return;
     setUser({
       ...user,
@@ -132,19 +141,19 @@ export const UserProvider = ({ children }: Props) => {
     });
   };
 
-  const rejectFollower = async (followerId: string) => {
-    if (!user) return;
+  const rejectFollower = async (followerId: number): Promise<FollowResponse> => {
+    if (!user || !tokenState) throw new Error("User not authenticated");
 
     setIsSaving(true);
     try {
+      // Aquí deberías llamar a tu API para rechazar la solicitud
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      setUser({
-        ...user,
-        requests: (user.requests || []).filter(r => r.id !== followerId),
-      });
       return {
-        follower_id: followerId,
-        status: "REJECTED",
+        follower_id: Number(followerId),
+        following_id: user.id,
+        status: 'REJECTED',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
     } catch (error) {
       console.error("Error al rechazar el seguidor:", error);
@@ -154,23 +163,20 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
-  const followUser = async (followId: string) => {
-    if (!user) return;
+
+  const followUser = async (followingId: number): Promise<FollowResponse> => {
+    if (!user || !tokenState) throw new Error("User not authenticated");
 
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setUser({
-        ...user,
-        following: [...(user.following || []), { id: followId, name: '', username: '', role: '', isFollowing: true }],
-      });
-      return {
-        follower_id: user.id,
-        following_id: Number(followId),
-        created_at: new Date().toISOString(),
-        status: 'PENDING',
-        updated_at: new Date().toISOString(),
-      };
+      const response = await followUserBD(tokenState, followingId, user.language_preference);
+
+      if (response.statusCode !== 200) {
+        setError( response.message || "Failed to follow user");
+      }
+
+      return response.data as FollowResponse;
+
     } catch (error) {
       console.error("Error al seguir al usuario:", error);
       throw error;
@@ -179,21 +185,17 @@ export const UserProvider = ({ children }: Props) => {
     }
   };
 
-  const unfollowUser = async (followId: string) => {
-    if (!user) return;
+  const unfollowUser = async (followingId: number): Promise<FollowResponse> => {
+    if (!user || !tokenState) throw new Error("User not authenticated");
 
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setUser({
-        ...user,
-        following: (user.following || []).filter(f => f.id !== followId),
-      });
+      const response = await unfollowUserBD(tokenState, followingId, user.language_preference);
       return {
         follower_id: user.id,
-        following_id: Number(followId),
+        following_id: Number(followingId),
+        status: 'NONE',
         created_at: new Date().toISOString(),
-        status: 'ACCEPTED',
         updated_at: new Date().toISOString(),
       };
     } catch (error) {
@@ -203,6 +205,24 @@ export const UserProvider = ({ children }: Props) => {
       setIsSaving(false);
     }
   };
+
+  // Función para mostrar errores
+  const showErrorAlert = useCallback((errorMessage: string) => {
+    Swal.fire({
+      title: "Error",
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonText: 'Aceptar',
+      footer: 'Si es urgente, contacte a soporte inmediatamente'
+    });
+  }, []);
+  // Efecto para mostrar errores cuando cambien
+  useEffect(() => {
+    if (error) {
+      showErrorAlert(error);
+    }
+  }, [error, showErrorAlert]);
+
 
   const updateAvailability = (availabilities: User['availabilities']) => {
     if (!user) return;
