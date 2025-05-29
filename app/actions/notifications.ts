@@ -1,5 +1,4 @@
 "use server";
-import {  MOCK_BACKEND_ACTIVITIES } from "@/lib/helpers/notifications"
 import {redirect} from "next/navigation";
 
 const notification_URL = process.env.BASE_URL_BACK + "notifications/";

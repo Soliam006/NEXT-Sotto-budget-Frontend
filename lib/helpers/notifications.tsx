@@ -98,7 +98,6 @@ export const generateDetails = (activity: Activity, dictionary?: any): string =>
     // Basic information
     details += `${dict.project || "Project"}: ${activity.title_project}\n`
     details += `${dict.activityType || "Activity Type"}: ${activity.activity_type}\n`
-    details += `${dict.date || "Date"}: ${new Date(activity.created_at).toLocaleString()}\n\n`
 
     // Item-specific information
     if (activity.task) {
