@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import {useProject} from "@/contexts/project-context";
 
 // Esquema de validación para el formulario
 const taskFormSchema = z.object({
@@ -53,6 +54,7 @@ interface AddTaskDialogProps {
 export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDialogProps) {
     const [open, setOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const {selectedProject} = useProject()
 
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskFormSchema),
@@ -101,7 +103,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
     return (
       <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-              <Button size="sm" className="bg-primary hover:bg-primary/90 cursor-pointer">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 cursor-pointer"  disabled={!selectedProject}>
                   {dict.projects?.addTask || "Add Task"}
               </Button>
           </DialogTrigger>

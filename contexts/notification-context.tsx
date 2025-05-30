@@ -81,9 +81,16 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
         try {
             const response = await fetchNotificationsBD(getTokenFromStorage())
 
-            if (response.statusCode !== 200) {
+            if (response.statusCode === 500) {
+                console.log("Error fetching notifications:", response)
                 throw new Error(response.message || "Failed to fetch notifications")
             }
+            if(!response.data){
+                console.log("No notifications found")
+                setNotifications([])
+                return
+            }
+
             const activities: Activity[] = response.data.activities || []
             // For now, use mock data
             //await new Promise((resolve) => setTimeout(resolve, 1000))

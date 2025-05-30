@@ -113,16 +113,10 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   const handleFollowToggle = (userId: number, follow: boolean) => {
     try {
       if (follow) {
-        const follower = followUser(userId);
-        if (!follower) {
-          throw new Error("Error following user");
-        }
+        followUser(userId);
       } else {
         console.log("Unfollow User", userId);
-        const unfollower = unfollowUser(userId);
-        if (!unfollower) {
-          throw new Error("Error unfollowing user");
-        }
+        unfollowUser(userId);
       }
     } catch (error) {
       alert(`Error: ${error}`);
@@ -131,11 +125,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   // Handle accept request
 const handleAcceptRequest = async (userId: number) => {
   try {
-    const follower = await acceptFollower(userId);
-    if (!follower) {
-      throw new Error("Error accepting follower request");
-    }
-    console.log("User After Accept:", user);
+    await acceptFollower(userId);
   } catch (error) {
     alert(`Error: ${error}`);
   }
@@ -144,10 +134,7 @@ const handleAcceptRequest = async (userId: number) => {
   // Handle reject request
   const handleRejectRequest = async (userId: number) => {
     try {
-      const responseFollower = await rejectFollower(userId);
-      if (! responseFollower) {
-        throw new Error("Error rejecting follower request");
-      }
+      await rejectFollower(userId);
     } catch (error) {
       alert(`Error: ${error}`);
     }

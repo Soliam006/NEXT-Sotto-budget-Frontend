@@ -27,7 +27,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
     setIsClient(true)
   }, [])
 
-  if (!isClient || loadingState || !selectedProject) {
+  if (!isClient || loadingState) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="flex flex-col items-center">

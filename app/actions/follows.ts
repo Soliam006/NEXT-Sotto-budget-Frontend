@@ -96,20 +96,14 @@ export async function acceptRequestBD(token: string|null, userId: number, transl
         }).then(
             async (res) => {
                 const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Accept Follower", json);
-                    return json.data;
-                } else {
-                    return null
-                }
+                console.log("Accept Request", json);
+                return json;
             }
         )
     }catch ( error) {
         console.error("Error en la petición ACCEPT_FOLLOWER:", error);
         return null;
     }
-
-    return null
 }
 
 

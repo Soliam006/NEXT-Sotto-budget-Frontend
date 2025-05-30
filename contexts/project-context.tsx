@@ -87,9 +87,12 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
           if (response.data.length > 0) {
             setSelectedProjectId(response.data[0].id)
           }
-        } else {
+        } else if (response.statusCode === 500) {
           console.error("ERROR al cargar los proyectos:", response)
           setError("Error al cargar los proyectos")
+        } else {
+          setAllProjects ([])
+          console.warn("No projects found or error in response:", response)
         }
       })
 

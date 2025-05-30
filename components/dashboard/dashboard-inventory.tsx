@@ -240,14 +240,17 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
 
             {/* Contenedor de botones - Se mantiene a la derecha */}
             <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <Button variant="outline" className="gap-1 w-full sm:w-auto" onClick={handleExportPDF}>
+              <Button variant="outline" className="gap-1 w-full sm:w-auto cursor-pointer" onClick={handleExportPDF}
+                      disabled={!selectedProject} >
                 <FileDown className="h-4 w-4" />
                 <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
               </Button>
 
               <Button
-                  className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                  className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500
+                  hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
                   onClick={() => setShowAddDialog(true)}
+                  disabled={!selectedProject}
               >
                 <Plus className="h-4 w-4" />
                 <span>{dict.inventory?.addItem || "Add Item"}</span>
@@ -419,7 +422,9 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                       </p>
                       <Button
                           onClick={() => setShowAddDialog(true)}
-                          className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                          disabled={!selectedProject}
+                          className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500
+                          hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
                       >
                         <Plus className="h-4 w-4" />
                         <span>{dict.inventory?.addFirstItem || "Add your first item"}</span>

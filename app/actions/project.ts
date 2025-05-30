@@ -28,8 +28,6 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
             async (res) => {
                 const json = await res.json();
                 if (json.statusCode === 200) {
-                    console.log("Projects", json);
-                    console.log("TASKS:", json.data[0].tasks);
                     // Make Projects Objects from json response
                     json.data = json.data.map((project: Project) => {
                         const {tasks,expenses, ...rest} = project;
@@ -70,8 +68,7 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
                     });
                     return json;
                 } else {
-                    console.error("Error en la petición PROJECTS:", json);
-                    return null
+                    return json;
                 }
             }
         )

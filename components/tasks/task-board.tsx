@@ -68,7 +68,8 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                         </>
                       )}
                   </Button>
-                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} teamMembers={selectedProject?.team || []} />
+                  {selectedProject && (
+                  <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} teamMembers={selectedProject?.team || []} />)}
               </div>
           </div>
 
@@ -102,6 +103,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                               variant="ghost"
                               size="sm"
                               className="text-xs"
+                              disabled={!selectedProject}
                               onClick={() => {
                                   const newTask = {
                                       id: `task-${Date.now()}`,
