@@ -1,7 +1,7 @@
 "use client"
 
 import React, {createContext, useContext, useState, useEffect, type ReactNode, useCallback} from "react"
-import type { Project } from "@/components/dashboard/projects-selector"
+import type { Project } from "@/components/projects/projects-selector"
 import { isEqual } from "lodash"
 import {addProjectToBackend, fetchProjects, updateProjectToBackend} from "@/app/actions/project";
 import {getCookie} from "cookies-next";
@@ -145,8 +145,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     setIsSaving(true)
 
     try {
-      // Simular una llamada a la API
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Enviar el proyecto al backend
       addProjectToBackend(getToken(), project).then((response) => {
         if (response.statusCode === 200) {
           console.log("Proyecto añadido con éxito:", response.data)
@@ -165,6 +164,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
     } catch (error) {
       console.error("Error al añadir el proyecto:", error)
+      setError( error instanceof Error ? error.message : "Error al añadir el proyecto")
     } finally {
       setIsSaving(false)
     }

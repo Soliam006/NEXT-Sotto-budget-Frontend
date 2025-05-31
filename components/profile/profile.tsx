@@ -15,7 +15,7 @@ import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} fro
 import {Input} from "@/components/ui/input"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {useUser} from "@/contexts/UserProvider";
-import {EditProfileDialog} from "../edit-profile-dialog"
+import {EditProfileDialog} from "./edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
 import {getRole, getToken} from "@/app/services/auth-service";
 import {User as User_Type} from "@/contexts/user.types";
@@ -103,7 +103,7 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
     setFollowers(user?.followers || [])
     setFollowing(user?.following || [])
     setRequests(user?.requests || [])
-  }, [user])
+  }, [user, setUser])
 
   /**
    * Handle follow/unfollow toggle
@@ -126,6 +126,8 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 const handleAcceptRequest = async (userId: number) => {
   try {
     await acceptFollower(userId);
+    console.log("Request accepted for user ID:", userId);
+
   } catch (error) {
     alert(`Error: ${error}`);
   }
@@ -288,16 +290,18 @@ const handleAcceptRequest = async (userId: number) => {
                     <span className="text-xl font-bold text-cyan-400">{PROJECTS.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.projects}</span>
                   </Button>
-                  {user?.followers && user.followers.length>0 &&
+
+                  {((user?.followers) && user?.role === 'admin') && (
                       <Button
                     variant="ghost"
                     className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsFollowersDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{user.followers.length}</span>
+                    <span className="text-xl font-bold text-cyan-400">{user?.followers.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.followers}</span>
                   </Button>
-                  }
+                  )}
+                  {user?.role !== 'admin' && (
                   <Button
                     variant="ghost"
                     className="flex flex-col items-center hover:bg-secondary cursor-pointer"
@@ -306,6 +310,7 @@ const handleAcceptRequest = async (userId: number) => {
                     <span className="text-xl font-bold text-cyan-400">{user?.following?.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.following}</span>
                   </Button>
+                  )}
                 </div>
               </CardFooter>
             </Card>
@@ -625,14 +630,16 @@ const handleAcceptRequest = async (userId: number) => {
                           <p className="text-xs text-muted-foreground">{follower.role}</p>
                         </div>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-secondary/70 border-border hover:bg-secondary"
-                        onClick={() => handleFollowToggle(follower.id, ! follower.isFollowing)}
-                      >
-                        {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
-                      </Button>
+                      {(user.role !== "admin") && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-secondary/70 border-border hover:bg-secondary"
+                          onClick={() => handleFollowToggle(follower.id, ! follower.isFollowing)}
+                        >
+                          {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
+                        </Button>
+                      )}
                     </div>
                   ))
                 ) : (
@@ -703,7 +710,7 @@ const handleAcceptRequest = async (userId: number) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-secondary/70 border-border hover:bg-secondary"
+                        className="bg-secondary/70 border-border hover:bg-secondary cursor-pointer"
                         onClick={() => handleFollowToggle(follow.id, false)}
                       >
                         {dict.following.unfollow}

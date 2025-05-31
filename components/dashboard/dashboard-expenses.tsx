@@ -21,7 +21,7 @@ import {
   Tooltip,
   Legend,
 } from "@/components/ui/chat"
-import {ProjectsSelector} from "@/components/dashboard/projects-selector"
+import {ProjectsSelector} from "@/components/projects/projects-selector"
 import {useProject} from "@/contexts/project-context";
 
 interface DashboardExpensesProps {
@@ -196,7 +196,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                       <span className="text-muted-foreground text-sm">
                         {dict.dashboard?.totalBudget || "Total Budget"}
                       </span>
-                      <span className="text-2xl font-bold">${selectedProject.limitBudget.toLocaleString()}</span>
+                      <span className="text-2xl font-bold">${selectedProject.limit_budget}</span>
                       <div className="flex items-center text-xs text-muted-foreground mt-1">
                         <span>{dict.expenses?.projectBudget || "Project Budget"}</span>
                       </div>
@@ -211,10 +211,10 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                       <span className="text-muted-foreground text-sm">
                         {dict.expenses?.budgetUsed || "Total Spent"}
                       </span>
-                        <span className="text-2xl font-bold">${totalExpenses?.toLocaleString()}</span>
+                        <span className="text-2xl font-bold">${totalExpenses}</span>
                         <div className="flex items-center text-xs text-muted-foreground mt-1">
                         <span>
-                          {totalExpenses && (Math.round((totalExpenses / selectedProject.limitBudget) * 100))}%{" "}
+                          {totalExpenses && (Math.round((totalExpenses / selectedProject.limit_budget) * 100))}%{" "}
                           {dict.expenses?.ofBudget || "of budget"}
                         </span>
                         </div>
@@ -227,12 +227,12 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                       <div className="flex flex-col space-y-2">
                         <span className="text-muted-foreground text-sm">{dict.expenses?.budgetRemaining || "Remaining"}</span>
                         <span className="text-2xl font-bold">
-                        ${totalExpenses && ((selectedProject.limitBudget - totalExpenses).toLocaleString())}
+                        ${totalExpenses && ((selectedProject.limit_budget - totalExpenses).toLocaleString())}
                       </span>
                         <div className="flex items-center text-xs text-muted-foreground mt-1">
                         <span>
                           {totalExpenses && (Math.round(
-                            ((selectedProject.limitBudget - totalExpenses) / selectedProject.limitBudget) * 100,
+                            ((selectedProject.limit_budget - totalExpenses) / selectedProject.limit_budget) * 100,
                           ))}
                           % {dict.expenses?.remaining || "remaining"}
                         </span>
@@ -310,7 +310,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                           <TableRow key={expense.id} className="border-border">
                             <TableCell>{expense.expense_date}</TableCell>
                             <TableCell>{expense.category}</TableCell>
-                            <TableCell>${expense.amount.toLocaleString()}</TableCell>
+                            <TableCell>${expense.amount}</TableCell>
                             <TableCell>
                               <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
                             </TableCell>
@@ -393,7 +393,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                           <TableCell>{expense.expense_date}</TableCell>
                           <TableCell>{expense.category}</TableCell>
                           <TableCell>{expense.description}</TableCell>
-                          <TableCell>${expense.amount.toLocaleString()}</TableCell>
+                          <TableCell>${expense.amount}</TableCell>
                           <TableCell>
                             <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
                           </TableCell>

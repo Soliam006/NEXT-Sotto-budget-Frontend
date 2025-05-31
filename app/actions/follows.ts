@@ -37,6 +37,7 @@ export async function followUserBD(token: string|null, userId: number, translate
     if (!token) return null;
     try {
         console.log("URL Using in FOLLOW _________________________", `${api_URL}${userId}`);
+        console.log("Token Using in FOLLOW _________________________", token);
         return await fetch(`${api_URL}${userId}`, {
             method: "POST",
             headers: {
@@ -67,26 +68,20 @@ export async function unfollowUserBD(token: string|null, userId: number, transla
             }
         }).then(
             async (res) => {
-                const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Unfollow User", json);
-                    return json.data;
-                } else {
-                    return null
-                }
+                return await res.json();
             }
         )
     }catch ( error) {
         console.error("Error en la petición UNFOLLOW_USER:", error);
         return null;
     }
-
-    return null
 }
 
 export async function acceptRequestBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
+        console.log("URL Using in ACCEPT FOLLOW _________________________", `${api_URL}accept_follow/${userId}`);
+        console.log("Token Using in ACCEPT FOLLOW _________________________", token);
         return await fetch(`${api_URL}accept_follow/${userId}`, {
             method: "POST",
             headers: {
@@ -118,19 +113,11 @@ export async function rejectFollowerBD(token: string|null, userId: number, trans
             }
         }).then(
             async (res) => {
-                const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Reject Follower", json);
-                    return json.data;
-                } else {
-                    return null
-                }
+                return await res.json();
             }
         )
     }catch ( error) {
         console.error("Error en la petición REJECT_FOLLOWER:", error);
         return null;
     }
-
-    return null
 }

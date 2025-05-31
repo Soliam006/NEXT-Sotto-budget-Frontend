@@ -164,6 +164,7 @@ function validateResult(json: any, translates: any) {
             message: json.message,
         };
     }
+    console.log("Login successful, DATA:", json.data);
 
     return {
         status: "success",

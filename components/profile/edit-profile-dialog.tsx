@@ -18,7 +18,7 @@ import {
 import {Input} from "@/components/ui/input"
 import {Textarea} from "@/components/ui/textarea"
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover"
-import {Calendar} from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/calendar"
 import {Badge} from "@/components/ui/badge"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {Label} from "@/components/ui/label"
@@ -433,13 +433,16 @@ export function EditProfileDialog({
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={newAvailability.from}
-                          onSelect={(date: any) => setNewAvailability({...newAvailability, from: date})}
-                          initialFocus
-                          locale={lang === "es" ? es : enUS}
-                        />
+                      <Calendar
+                        selected={newAvailability.from}
+                        onSelect={(date: any) => setNewAvailability({...newAvailability, from: date})}
+                        disabled={(date: Date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return (newAvailability.to ? date > newAvailability.to : false) || date < today;
+                        }}
+                        /*locale=lang*/
+                      />
                       </PopoverContent>
                     </Popover>
                   </div>
@@ -462,11 +465,10 @@ export function EditProfileDialog({
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
                         <Calendar
-                          mode="single"
                           selected={newAvailability.to}
+                          disabled={(date: Date) => newAvailability.from ? date < newAvailability.from : false}
                           onSelect={(date: any) => setNewAvailability({...newAvailability, to: date})}
-                          initialFocus
-                          locale={lang === "es" ? es : enUS}
+                          /*locale={lang === "es" ? es : enUS*/
                         />
                       </PopoverContent>
                     </Popover>

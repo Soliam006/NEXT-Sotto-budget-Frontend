@@ -10,7 +10,6 @@ import { useState } from "react"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import { Button } from "@/components/ui/button"
 import { AddProjectDialog } from "@/components/projects/add-project-dialog"
-import {useUser} from "@/contexts/UserProvider";
 import {InventoryItem} from "@/lib/types/inventory-item";
 import {Task} from "@/lib/types/tasks";
 import {Expenses} from "@/lib/types/expenses";
@@ -20,7 +19,7 @@ export interface Project {
   title: string
   description: string
   admin: string
-  limitBudget: number
+  limit_budget: number
   currentSpent: number
   progress: {
     done: number
@@ -28,11 +27,11 @@ export interface Project {
     todo: number
   }
   location: string
-  startDate: string
-  endDate: string
+  start_date: string
+  end_date: string
   status: string
   clients?: {
-    id: string
+    id: number
     name: string
     username: string
     role: string
@@ -54,7 +53,6 @@ interface ProjectsSelectorProps {
 
 export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
   const { projects, selectedProject, hasChanges, setSelectedProjectById, saveChanges, discardChanges } = useProject()
-  const { user } = useUser()
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingProjectId, setPendingProjectId] = useState<number | null>(null)
@@ -160,14 +158,14 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                               <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-muted-foreground">
                             {dict.dashboard?.spent || "Spent"}: ${selectedProject.currentSpent}(
-                            {Math.round((selectedProject.currentSpent / selectedProject.limitBudget) * 100)}%)
+                            {Math.round((selectedProject.currentSpent / selectedProject.limit_budget) * 100)}%)
                           </span>
                                 <span className="text-muted-foreground">
-                            {dict.dashboard?.budget || "Budget"}: ${selectedProject.limitBudget}
+                            {dict.dashboard?.budget || "Budget"}: ${selectedProject.limit_budget}
                           </span>
                               </div>
                               <Progress
-                                  value={(selectedProject.currentSpent / selectedProject.limitBudget) * 100}
+                                  value={(selectedProject.currentSpent / selectedProject.limit_budget) * 100}
                                   indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500"
                                   className="h-2"
                               />
@@ -184,11 +182,11 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                               </div>
                               <div className="flex justify-between flex-col md:flex-row">
                                 <span className="text-muted-foreground">{dict.dashboard?.startDate || "Start Date"}:</span>
-                                <span>{selectedProject.startDate}</span>
+                                <span>{selectedProject.start_date? new Date(selectedProject.start_date).toLocaleDateString() : "N/A"}</span>
                               </div>
                               <div className="flex justify-between flex-col md:flex-row">
                                 <span className="text-muted-foreground">{dict.dashboard?.endDate || "End Date"}:</span>
-                                <span>{selectedProject.endDate}</span>
+                                <span>{selectedProject.end_date ? new Date(selectedProject.end_date).toLocaleDateString() : "N/A"}</span>
                               </div>
                             </div>
 
@@ -247,7 +245,7 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
             alternativeText={dict.common?.discardAndContinue || "Discard and Continue"}
         />
 
-        <AddProjectDialog open={showAddProject} onOpenChange={setShowAddProject} dict={dict} user={user} />
+        <AddProjectDialog open={showAddProject} onOpenChange={setShowAddProject} dict={dict} />
       </div>
   )
 }

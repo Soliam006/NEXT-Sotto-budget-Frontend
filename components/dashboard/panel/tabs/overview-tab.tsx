@@ -25,7 +25,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
         return { value: Math.max(0, Math.min(100, Math.round(porcentaje))), trend };
     };
 
-    const timelineMetrics = getTimelineMetrics(selectedProject?.startDate, selectedProject?.endDate);
+    const timelineMetrics = getTimelineMetrics(selectedProject?.start_date, selectedProject?.end_date);
 
     // Función para formatear fechas en formato legible
     function formatDate(dateString?: string) {
@@ -42,23 +42,23 @@ export function OverviewTab({ dict }: OverviewTabProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <MetricCard
           title={dict.dashboard?.budget || "Budget"}
-          value={selectedProject?.currentSpent !== undefined && selectedProject?.limitBudget
-              ? Math.round((selectedProject.currentSpent / selectedProject.limitBudget) * 100)
+          value={selectedProject?.currentSpent !== undefined && selectedProject?.limit_budget
+              ? Math.round((selectedProject.currentSpent / selectedProject.limit_budget) * 100)
               : 0}
           icon={DollarSign}
             trend={
               selectedProject?.currentSpent !== undefined &&
-              selectedProject?.limitBudget !== undefined &&
-              selectedProject.limitBudget > 0
-                ? selectedProject.currentSpent > selectedProject.limitBudget * 0.8
+              selectedProject?.limit_budget !== undefined &&
+              selectedProject.limit_budget > 0
+                ? selectedProject.currentSpent > selectedProject.limit_budget * 0.8
                   ? "up"
-                  : selectedProject.currentSpent < selectedProject.limitBudget * 0.3
+                  : selectedProject.currentSpent < selectedProject.limit_budget * 0.3
                     ? "down"
                     : "stable"
                 : "stable"
             }
           color="primary"
-          detail={`$${selectedProject?.currentSpent.toLocaleString()} / $${selectedProject?.limitBudget.toLocaleString()}`}
+          detail={`$${selectedProject?.currentSpent} / $${selectedProject?.limit_budget}`}
         />
         <MetricCard
           title={dict.dashboard?.tasks || "Tasks"}
@@ -90,7 +90,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
           icon={Timer}
           trend={timelineMetrics.trend}
           color="secondary"
-          detail={`${formatDate(selectedProject?.startDate)} - ${formatDate(selectedProject?.endDate)}`}
+          detail={`${formatDate(selectedProject?.start_date)} - ${formatDate(selectedProject?.end_date)}`}
         />
       </div>
 
@@ -129,13 +129,13 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                       <span className="text-muted-foreground">
                         {dict.projects?.startDate || "Start Date"}:
                       </span>
-                      <span>{formatDate(selectedProject?.startDate)}</span>
+                      <span>{formatDate(selectedProject?.start_date)}</span>
                     </div>
                     <div className="flex justify-between sm:flex-col sm:gap-1">
                       <span className="text-muted-foreground">
                         {dict.projects?.endDate || "End Date"}:
                       </span>
-                            <span>{formatDate(selectedProject?.endDate)}</span>
+                            <span>{formatDate(selectedProject?.end_date)}</span>
                     </div>
                 </div>
 

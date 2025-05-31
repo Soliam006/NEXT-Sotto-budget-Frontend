@@ -89,7 +89,7 @@ export function TopBar({
     try {
       if (currentStatus === 'NONE' || currentStatus === 'REJECTED') {
         // Seguir al usuario
-        await followUser(userId)
+        followUser(userId)
         setSearchResults(prev =>
             prev.map(user =>
                 user.id === userId
@@ -99,7 +99,7 @@ export function TopBar({
         )
       } else if (currentStatus === 'ACCEPTED') {
         // Dejar de seguir
-        await unfollowUser(userId)
+        unfollowUser(userId)
         setSearchResults(prev =>
             prev.map(user =>
                 user.id === userId
@@ -297,7 +297,7 @@ export function TopBar({
                                           ? "bg-secondary/70 border-border hover:bg-secondary"
                                           : user.status === 'PENDING'
                                               ? "bg-muted text-muted-foreground hover:bg-muted/80"
-                                              : "bg-primary hover:bg-primary/90"
+                                              : "bg-primary hover:bg-primary/90 cursor-pointer"
                                     }
                                     onClick={() => handleFollowToggle(user.id, user.status || 'NONE')}
                                     disabled={user.status === 'PENDING'}

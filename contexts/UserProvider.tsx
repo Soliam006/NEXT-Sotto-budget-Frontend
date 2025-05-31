@@ -2,7 +2,7 @@
 
 import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
 import {User, UserFollower} from './user.types';
-import {acceptRequestBD, followUserBD, unfollowUserBD} from "@/app/actions/follows";
+import {acceptRequestBD, followUserBD, rejectFollowerBD, unfollowUserBD} from "@/app/actions/follows";
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import {fetchUserMe} from "@/app/actions/auth";
 import {redirect} from "next/navigation";
@@ -22,7 +22,7 @@ interface UserContextType {
   saveProfile: (updatedFields: Partial<User>) => Promise<void>;
   acceptFollower: (followerId: number) => Promise<void>;
   removeFollower: (followerId: number) => void;
-  rejectFollower: (followerId: number) => Promise<void>;
+  rejectFollower: (followerId: number) => void;
   followUser: (followingId: number) => void;
   unfollowUser: (followingId: number) => void;
   updateAvailability: (availabilities: User['availabilities']) => void;
@@ -45,12 +45,13 @@ export const UserProvider = ({ children }: Props) => {
   useEffect(() => {
     const storedToken = getTokenFromStorage();
     if (storedToken) {
-      setTokenState(storedToken);
       // Cargar usuario desde backend
       fetchUserMe(storedToken, { serverError: "Something went Wrong" }).then(res => {
         if (res.statusCode === 200) {
           console.log("User datafetch ME:", res.data);
           setUser(res.data);
+          setTokenState(storedToken);
+
         } else {
           // Si error o token inválido, limpiar token y usuario
           setTokenState(null);
@@ -64,12 +65,10 @@ export const UserProvider = ({ children }: Props) => {
   }, []);
 
   const setToken = (newToken: string | null, rememberMe: boolean, lang: string) => {
-    if (!newToken) {
-      // Eliminar cookies
-      deleteCookie('access_token', { path: '/' });
-      deleteCookie('lang', { path: '/' });
-      return;
-    }
+    // Eliminar cookies
+    deleteCookie('access_token', { path: '/' });
+    deleteCookie('lang', { path: '/' });
+    if (!newToken)  return; // Si el token es nulo, no hacer nada
 
     // Establecer cookies
     const cookieOptions = {
@@ -79,6 +78,7 @@ export const UserProvider = ({ children }: Props) => {
 
     setCookie('access_token', newToken, cookieOptions);
     setCookie('lang', lang, cookieOptions);
+    setTokenState( newToken );
   };
 
   const updateUser = (updatedFields: Partial<User>) => {
@@ -103,11 +103,11 @@ export const UserProvider = ({ children }: Props) => {
 
 
   const acceptFollower = async (followerId: number): Promise<void> => {
-    if (!user || !tokenState) throw new Error("User not authenticated");
+    if (!user || !tokenState) setError("Please Login Again");
 
     setIsSaving(true);
     try {
-      const response = await acceptRequestBD(tokenState, followerId, user.language_preference);
+      const response = await acceptRequestBD(tokenState, followerId, user?.language_preference || 'es');
       // Verificar si la respuesta es válida
       if(!response) { setError( "Failed to accept follower"); return; }
 
@@ -123,6 +123,7 @@ export const UserProvider = ({ children }: Props) => {
           return {
               ...prevUser,
               followers: [...(prevUser.followers || []), followResponse],
+              requests: (prevUser.requests || []).filter(req => req.id !== followerId),
           };
       })
     } catch (error) {
@@ -142,13 +143,32 @@ export const UserProvider = ({ children }: Props) => {
     });
   };
 
-  const rejectFollower = async (followerId: number): Promise<void> => {
+  const rejectFollower = async (followerId: number) => {
     if (!user || !tokenState) throw new Error("User not authenticated");
 
     setIsSaving(true);
     try {
       // Aquí deberías llamar a tu API para rechazar la solicitud
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await rejectFollowerBD( tokenState, followerId, user.language_preference)
+        // Verificar si la respuesta es válida
+        if (!response) {
+            setError("Failed to reject follower");
+            return;
+        }
+        // Si la respuesta no es 200, manejar el error
+        if (response.statusCode !== 200) {
+            setError(response.message || "Failed to reject follower");
+            return;
+        }
+        // Actualizar el estado del usuario para reflejar el cambio
+        setUser((prevUser) => {
+            if (!prevUser) return null;
+            return {
+                ...prevUser,
+                requests: (prevUser.requests || []).filter(req => req.id !== followerId),
+                followers: (prevUser.followers || []).filter(f => f.id !== followerId),
+            };
+        })
 
     } catch (error) {
       console.error("Error al rechazar el seguidor:", error);

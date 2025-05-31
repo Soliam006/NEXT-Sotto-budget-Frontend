@@ -12,7 +12,7 @@ import { Package, Search, Plus, FileDown, Edit, Trash2, CheckCircle, Clock, File
 import { useProject } from "@/contexts/project-context"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import {InventoryItem} from "@/lib/types/inventory-item";
-import {ProjectsSelector} from "@/components/dashboard/projects-selector";
+import {ProjectsSelector} from "@/components/projects/projects-selector";
 import {AddInventoryItemDialog} from "@/components/dashboard/inventory/add-inventory-item-dialog";
 import {EditInventoryItemDialog} from "@/components/dashboard/inventory/edit-inventory-item-dialog";
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";

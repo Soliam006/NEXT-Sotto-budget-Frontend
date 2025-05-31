@@ -4,7 +4,7 @@ import {Activity, ClipboardList, Package, Users} from "lucide-react"
 import {useEffect, useState} from "react"
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
-import {ProjectsSelector} from "@/components/dashboard/projects-selector"
+import {ProjectsSelector} from "@/components/projects/projects-selector"
 import {OverviewTab} from "@/components/dashboard/panel/tabs/overview-tab"
 import {TasksTab} from "@/components/dashboard/panel/tabs/tasks-tab"
 import {TeamTab} from "@/components/dashboard/panel/tabs/team-tab"
@@ -21,7 +21,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
   const [activeTab, setActiveTab] = useState("overview")
 
   const [isClient, setIsClient] = useState(false)
-  const { loadingState, selectedProject } = useProject(); // Obtiene la función para establecer proyectos
+  const { loadingState } = useProject(); // Obtiene la función para establecer proyectos
   // Esto asegura que el código solo se ejecute en el cliente
   useEffect(() => {
     setIsClient(true)

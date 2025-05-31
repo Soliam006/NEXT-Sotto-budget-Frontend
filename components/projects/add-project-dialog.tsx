@@ -20,19 +20,20 @@ import {
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
+import {Calendar} from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { UserFollower } from "@/contexts/user.types"
+import {useUser} from "@/contexts/UserProvider";
+import {Project} from "@/components/projects/projects-selector";
 
 interface AddProjectDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   dict: any
-  user: any
 }
 
 const projectSchema = (dict: any) => z.object({
@@ -45,22 +46,23 @@ const projectSchema = (dict: any) => z.object({
   location: z.string().min(3, {
     message: dict.projects?.locationMinLength || "Location must be at least 3 characters.",
   }),
-  limitBudget: z.coerce.number().positive({
+  limit_budget: z.coerce.number().positive({
     message: dict.projects?.budgetPositive || "Budget must be a positive number.",
   }),
-  startDate: z.date({
+  start_date: z.date({
     required_error: dict.projects?.startDateRequired || "Start date is required.",
   }),
-  endDate: z.date({
+  end_date: z.date({
     required_error: dict.projects?.endDateRequired || "End date is required.",
   }),
-  clients: z.array(z.string()).min(1, {
+  clients_ids: z.array(z.number()).min(1, {
     message: dict.projects?.clientsMin || "At least one client must be selected.",
   }),
 })
 
-export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectDialogProps) {
+export function AddProjectDialog({ open, onOpenChange, dict }: AddProjectDialogProps) {
   const { addProject } = useProject()
+  const { user } = useUser()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedClients, setSelectedClients] = useState<UserFollower[]>([])
 
@@ -72,10 +74,10 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
       title: "",
       description: "",
       location: "",
-      limitBudget: 0,
-      startDate: new Date(),
-      endDate: new Date(new Date().setMonth(new Date().getMonth() + 6)),
-      clients: [],
+      limit_budget: 0,
+      start_date: new Date(),
+      end_date: new Date(new Date().setMonth(new Date().getMonth() + 6)),
+      clients_ids: [],
     },
   })
 
@@ -84,15 +86,15 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
 
     try {
       // Preparar los datos del proyecto
-      const newProject = {
+      const newProject: Omit<Project, "id"> = {
         title: values.title,
         description: values.description,
         location: values.location,
-        limitBudget: values.limitBudget,
-        startDate: format(values.startDate, "yyyy-MM-dd"),
-        endDate: format(values.endDate, "yyyy-MM-dd"),
-        admin: user.name || user.username,
-        status: "Planning",
+        limit_budget: values.limit_budget,
+        start_date: format(values.start_date, "yyyy-MM-dd"),
+        end_date: format(values.end_date, "yyyy-MM-dd"),
+        admin: user?.name || user?.username || "Unknown Admin",
+        status: "Active",
         currentSpent: 0,
         progress: {
           done: 0,
@@ -126,14 +128,14 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
     if (isSelected) {
       setSelectedClients(selectedClients.filter((c) => c.id !== client.id))
       form.setValue(
-        "clients",
-        selectedClients.filter((c) => c.id !== client.id).map((c) => c.id as string),
+        "clients_ids",
+        selectedClients.filter((c) => c.id !== client.id).map((c) => c.id),
       )
     } else {
       setSelectedClients([...selectedClients, client])
       form.setValue(
-        "clients",
-        [...selectedClients, client].map((c) => c.id as string),
+        "clients_ids",
+        [...selectedClients, client].map((c) => c.id),
       )
     }
   }
@@ -181,7 +183,7 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
 
               <FormField
                 control={form.control}
-                name="limitBudget"
+                name="limit_budget"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{dict.projects?.budget || "Budget"}</FormLabel>
@@ -196,10 +198,10 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
               <div className="grid grid-cols-2 gap-2">
                 <FormField
                   control={form.control}
-                  name="startDate"
+                  name="start_date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{dict.projects?.startDate || "Start Date"}</FormLabel>
+                      <FormLabel>{dict.projects?.start_date || "Start Date"}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -214,13 +216,12 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent className="w-auto p-0">
                           <Calendar
-                            mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
-                            initialFocus
+                            disabled={(date:any) => (date < new Date(new Date().setDate(new Date().getDate() - 1)
+                            ) || (date > form.getValues("end_date")))}
                           />
                         </PopoverContent>
                       </Popover>
@@ -231,10 +232,10 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
 
                 <FormField
                   control={form.control}
-                  name="endDate"
+                  name="end_date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>{dict.projects?.endDate || "End Date"}</FormLabel>
+                      <FormLabel>{dict.projects?.end_date || "End Date"}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -251,11 +252,9 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
-                            mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < form.getValues("startDate")}
-                            initialFocus
+                            disabled={(date:any) => date < form.getValues("start_date")}
                           />
                         </PopoverContent>
                       </Popover>
@@ -282,7 +281,7 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
 
             <FormField
               control={form.control}
-              name="clients"
+              name="clients_ids"
               render={() => (
                 <FormItem>
                   <FormLabel>{dict.projects?.clients || "Clients"}</FormLabel>
@@ -327,35 +326,37 @@ export function AddProjectDialog({ open, onOpenChange, dict, user }: AddProjectD
                           <CommandList>
                             <CommandEmpty>No clients found.</CommandEmpty>
                             <CommandGroup>
-                              {user.following && user.following.length > 0 ? (
-                                user.following.map((client: UserFollower) => {
-                                  const isSelected = selectedClients.some((c) => c.id === client.id)
-                                  return (
-                                    <CommandItem
-                                      key={client.id}
-                                      value={client.id as string}
-                                      onSelect={() => handleClientSelect(client)}
-                                    >
-                                      <div className="flex items-center gap-2 w-full">
-                                        <Avatar className="h-6 w-6">
-                                          <AvatarImage src={client.avatar || "/favicon.ico"} alt={client.name} />
-                                          <AvatarFallback className="text-xs">{client.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex flex-col">
-                                          <span className="text-sm">{client.name}</span>
-                                          <span className="text-xs text-muted-foreground">{client.role}</span>
-                                        </div>
-                                        <Check
-                                          className={cn("ml-auto h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
-                                        />
-                                      </div>
-                                    </CommandItem>
-                                  )
-                                })
+                              {user?.followers && user?.followers.length > 0 ? (
+                                  user?.followers
+                                      .filter((client: UserFollower) => client.role === "client")
+                                      .map((client: UserFollower) => {
+                                        const isSelected = selectedClients.some((c) => c.id === client.id)
+                                        return (
+                                            <CommandItem
+                                                key={client.id}
+                                                value={client.id as unknown as string}
+                                                onSelect={() => handleClientSelect(client)}
+                                            >
+                                            <div className="flex items-center gap-2 w-full">
+                                              <Avatar className="h-6 w-6">
+                                                <AvatarImage src={client.avatar || "/favicon.ico"} alt={client.name} />
+                                                <AvatarFallback className="text-xs">{client.name.charAt(0)}</AvatarFallback>
+                                              </Avatar>
+                                              <div className="flex flex-col">
+                                                <span className="text-sm">{client.name}</span>
+                                                <span className="text-xs text-muted-foreground">{client.role}</span>
+                                              </div>
+                                              <Check
+                                                className={cn("ml-auto h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
+                                              />
+                                            </div>
+                                          </CommandItem>
+                                        )
+                                      })
                               ) : (
                                 <div className="py-6 text-center text-sm text-muted-foreground">
                                   {dict.projects?.noClientsFound ||
-                                    "No clients found. Follow users to add them as clients."}
+                                    "No clients found. Users must follow you to add them as clients."}
                                 </div>
                               )}
                             </CommandGroup>

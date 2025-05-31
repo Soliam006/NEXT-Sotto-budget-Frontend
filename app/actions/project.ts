@@ -1,6 +1,6 @@
 "use server"
 import {redirect} from "next/navigation";
-import {Project} from "@/components/dashboard/projects-selector";
+import {Project} from "@/components/projects/projects-selector";
 import {Expenses} from "@/lib/types/expenses";
 import {Task} from "@/lib/types/tasks";
 
@@ -117,7 +117,7 @@ export async function addProjectToBackend(token: string | null, project: Omit<Pr
         redirect("/es/login")
 
     try {
-        return await fetch(`${project_URL}`, {
+        return await fetch(`${project_URL}create`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
