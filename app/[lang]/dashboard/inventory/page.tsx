@@ -20,6 +20,6 @@ export default function MaterialsPage() {
   }, [params?.lang]);
   if (!dictionary) return <LoadingView/>;
 
-  return <DashboardInventory dict={dictionary} lang={params.lang as string} />
+  return <DashboardInventory dict={dictionary}/>
 }
 
