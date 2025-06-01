@@ -261,7 +261,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                           >
                               {dict.common?.cancel || "Cancel"}
                           </Button>
-                          <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90 cursor-pointer">
+                          <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600 cursor-pointer">
                               {isSubmitting ? dict.common?.processing || "Processing..." : dict.tasks?.createTask || "Create Task"}
                           </Button>
                       </DialogFooter>

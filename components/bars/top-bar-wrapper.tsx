@@ -4,9 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useTheme as useNextTheme } from "next-themes"
-import { TopBar } from "@/components/top-bar"
-import type { User as UserType } from "@/contexts/user.types"
-import LoadingView from "@/components/loading-view";
+import { TopBar } from "@/components/bars/top-bar"
 
 interface TopBarWrapperProps {
     dictionary: any

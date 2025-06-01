@@ -4,11 +4,11 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
-import { DashboardBottomBar } from "@/components/dashboard/dashboard-bottom-bar"
+import { DashboardSidebar } from "@/components/bars/dashboard-sidebar"
+import { DashboardBottomBar } from "@/components/bars/dashboard-bottom-bar"
 import { useTheme } from "next-themes"
 import type { User as UserType } from "@/contexts/user.types"
-import {TopBarWrapper} from "@/components/top-bar-wrapper";
+import {TopBarWrapper} from "@/components/bars/top-bar-wrapper";
 import useAuthMiddleware from "@/lib/token-verification";
 import LoadingView from "@/components/loading-view";
 

@@ -131,6 +131,7 @@
     }
   },
   "common": {
+    "add": "Añadir",
     "loading": "Cargando...",
     "acept": "Aceptar",
     "edit": "Editar",
@@ -316,6 +317,9 @@
     "title": "Inventario",
     "summary": "Resumen de todos los artículos del inventario",
     "items": "Artículos de Inventario",
+    "addItemDescription": "Añade artículos a tu inventario del proyecto",
+    "itemName": "Nombre del Artículo",
+    "enterItemName": "Ingresa el nombre del artículo",
     "itemsFound": "artículos encontrados",
     "searchItems": "Buscar artículos...",
     "category": "Categoría",
@@ -336,6 +340,7 @@
     "noItemsFound": "No se encontraron artículos",
     "tryAdjustingFilters": "Intenta ajustar tus filtros o añade un nuevo artículo",
     "addFirstItem": "Añade tu primer artículo",
+    "enterSupplier": "Nombre del proveedor",
     "deleteItem": "Eliminar Artículo",
     "deleteItemConfirmation": "¿Estás seguro de que quieres eliminar este artículo? Esta acción no se puede deshacer.",
     "statusUpdated": "Estado Actualizado",

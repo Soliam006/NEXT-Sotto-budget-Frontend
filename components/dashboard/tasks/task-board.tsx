@@ -1,6 +1,6 @@
 "use client"
-import { TaskCard } from "@/components/tasks/task-card"
-import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
+import { TaskCard } from "@/components/dashboard/tasks/task-card"
+import { AddTaskDialog } from "@/components/dashboard/tasks/add-task-dialog"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Save, Loader2 } from "lucide-react"
 import { useProject } from "@/contexts/project-context"

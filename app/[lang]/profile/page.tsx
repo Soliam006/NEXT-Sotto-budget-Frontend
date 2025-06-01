@@ -5,7 +5,7 @@ import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
 import useAuthMiddleware from "@/lib/token-verification";
-import {TopBarWrapper} from "@/components/top-bar-wrapper";
+import {TopBarWrapper} from "@/components/bars/top-bar-wrapper";
 import {useUser} from "@/contexts/UserProvider";
 import {NotificationProvider} from "@/contexts/notification-context";
 

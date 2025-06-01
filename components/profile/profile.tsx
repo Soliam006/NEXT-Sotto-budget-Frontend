@@ -15,11 +15,12 @@ import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} fro
 import {Input} from "@/components/ui/input"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import {useUser} from "@/contexts/UserProvider";
-import {EditProfileDialog} from "./edit-profile-dialog"
+import {EditProfileDialog} from "./dialogs/edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
 import {getRole, getToken} from "@/app/services/auth-service";
 import {User as User_Type} from "@/contexts/user.types";
 import {updateUserInformation} from "@/app/actions/auth";
+import {FollowingProfileDialog} from "@/components/profile/dialogs/following-profile-dialog";
 
 
 // Mock data for projects
@@ -630,7 +631,7 @@ const handleAcceptRequest = async (userId: number) => {
                           <p className="text-xs text-muted-foreground">{follower.role}</p>
                         </div>
                       </div>
-                      {(user.role !== "admin") && (
+                      {/*(user.role !== "admin") && (
                         <Button
                           variant="outline"
                           size="sm"
@@ -639,7 +640,7 @@ const handleAcceptRequest = async (userId: number) => {
                         >
                           {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
                         </Button>
-                      )}
+                      )*/}
                     </div>
                   ))
                 ) : (
@@ -653,7 +654,13 @@ const handleAcceptRequest = async (userId: number) => {
         </DialogContent>
       </Dialog>
 
-      {/* Following Dialog */}
+      <FollowingProfileDialog setFollowingAction= {setFollowing} following={following}
+        isFollowingDialogOpen={isFollowingDialogOpen}
+        setIsFollowingDialogOpenAction={setIsFollowingDialogOpen}
+        handleFollowToggleAction={handleFollowToggle}
+        dict={dict}
+        />
+      {/* Following Dialog
       <Dialog open={isFollowingDialogOpen} onOpenChange={setIsFollowingDialogOpen}>
         <DialogContent className="bg-background border-border text-foreground max-w-2xl">
           <DialogHeader>
@@ -726,7 +733,7 @@ const handleAcceptRequest = async (userId: number) => {
             </ScrollArea>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {/* Requests Dialog */}
       <Dialog open={isRequestsDialogOpen} onOpenChange={setIsRequestsDialogOpen}>
@@ -808,28 +815,6 @@ function ActivityItem({icon, title, description, time, iconColor}: any) {
         <div className="text-xs text-muted-foreground">{description}</div>
       </div>
     </div>
-  )
-}
-
-// LogOut icon component
-function LogOut(props: any) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-      <polyline points="16 17 21 12 16 7"/>
-      <line x1="21" y1="12" x2="9" y2="12"/>
-    </svg>
   )
 }
 

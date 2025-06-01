@@ -3,7 +3,7 @@ import { getDictionary } from "@/lib/dictionary";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingView from "@/components/loading-view";
-import {TaskBoard} from "@/components/tasks/task-board";
+import {TaskBoard} from "@/components/dashboard/tasks/task-board";
 
 export default function TaskPage() {
     const params = useParams();

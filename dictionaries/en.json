@@ -131,6 +131,7 @@
     }
   },
   "common": {
+    "add": "Add",
     "loading": "Loading...",
     "acept": "Accept",
     "edit": "Edit",
@@ -316,6 +317,9 @@
     "title": "Inventory",
     "summary": "Summary of all inventory items",
     "items": "Inventory Items",
+    "addItemDescription": "Add a new item to your project inventory",
+    "itemName": "Item Name",
+    "enterItemName": "Enter item name",
     "itemsFound": "items found",
     "searchItems": "Search items...",
     "category": "Category",
@@ -336,6 +340,7 @@
     "noItemsFound": "No items found",
     "tryAdjustingFilters": "Try adjusting your filters or add a new item",
     "addFirstItem": "Add your first item",
+    "enterSupplier": "Enter supplier name",
     "deleteItem": "Delete Item",
     "deleteItemConfirmation": "Are you sure you want to delete this item? This action cannot be undone.",
     "statusUpdated": "Status Updated",
