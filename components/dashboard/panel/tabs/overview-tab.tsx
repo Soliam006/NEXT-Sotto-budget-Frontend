@@ -1,8 +1,9 @@
-import { CheckCircle2, DollarSign, LineChart, BarChart3, Timer } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import CustomPieChart from "@/components/custom-pie-chart"
-import { useProject } from "@/contexts/project-context"
+import { CheckCircle2, DollarSign, LineChart, BarChart3, Timer } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import CustomPieChart from "@/components/custom-pie-chart";
+import { useProject } from "@/contexts/project-context";
+import { formatDate } from "@/lib/helpers/projects";
 
 interface OverviewTabProps {
   dict: any
@@ -27,16 +28,6 @@ export function OverviewTab({ dict }: OverviewTabProps) {
 
     const timelineMetrics = getTimelineMetrics(selectedProject?.start_date, selectedProject?.end_date);
 
-    // Función para formatear fechas en formato legible
-    function formatDate(dateString?: string) {
-        if (!dateString) return "";
-        const date = new Date(dateString);
-        return date.toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-        });
-    }
   return (
     <div className="space-y-6 mt-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

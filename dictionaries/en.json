@@ -419,7 +419,7 @@
   },
   "expenses": {
     "title": "Expense Management",
-    "expenseOverview": "Expense Overview",
+    "expenseOverview": "Expense",
     "overview": "Overview",
     "expenseList": "List",
     "charts": "Charts",

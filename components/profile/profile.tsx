@@ -11,9 +11,6 @@ import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Badge} from "@/components/ui/badge"
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog"
-import {Input} from "@/components/ui/input"
-import {ScrollArea} from "@/components/ui/scroll-area"
 import {useUser} from "@/contexts/UserProvider";
 import {EditProfileDialog} from "./dialogs/edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
@@ -21,62 +18,11 @@ import {getRole, getToken} from "@/app/services/auth-service";
 import {User as User_Type} from "@/contexts/user.types";
 import {updateUserInformation} from "@/app/actions/auth";
 import {FollowingProfileDialog} from "@/components/profile/dialogs/following-profile-dialog";
-
-
-// Mock data for projects
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Modern Residential Complex",
-    description: "A 12-unit modern residential complex with sustainable features",
-    status: "In Progress",
-    completion: 65,
-    role: "Project Manager",
-    image: "https://th.bing.com/th/id/R.d284962ea61b482b58c6d65052f03a29?rik=%2fGV0UPT9hgsgqw&riu=http%3a%2f%2fguiasde.com%2fmaterialescentenario%2fwp-content%2fuploads%2f2021%2f10%2fremodelacion.jpg&ehk=aKhpFHH8%2fN0RFpFYMAlR0Fyt%2fK3ScltMbFFG7f2A6N4%3d&risl=&pid=ImgRaw&r=0",
-    location: "Oakland, CA",
-  },
-  {
-    id: 2,
-    title: "Commercial Office Renovation",
-    description: "Complete renovation of a 5-story commercial office building",
-    status: "Completed",
-    completion: 100,
-    role: "Lead Manager",
-    image: "https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png",
-    location: "San Francisco, CA",
-  },
-  {
-    id: 3,
-    title: "Eco-Friendly School Building",
-    description: "Construction of a new eco-friendly elementary school",
-    status: "In Progress",
-    completion: 42,
-    role: "Consultant",
-    image: "https://a.storyblok.com/f/88871/1254x836/6ea6ef0e4a/realkredit-modernisierung.jpg",
-    location: "Berkeley, CA",
-  },
-  {
-    id: 4,
-    title: "Hospital Wing Addition",
-    description: "Adding a new specialized care wing to existing hospital",
-    status: "Planning",
-    completion: 15,
-    role: "Project Manager",
-    image: "https://th.bing.com/th/id/R.d284962ea61b482b58c6d65052f03a29?rik=%2fGV0UPT9hgsgqw&riu=http%3a%2f%2fguiasde.com%2fmaterialescentenario%2fwp-content%2fuploads%2f2021%2f10%2fremodelacion.jpg&ehk=aKhpFHH8%2fN0RFpFYMAlR0Fyt%2fK3ScltMbFFG7f2A6N4%3d&risl=&pid=ImgRaw&r=0",
-    location: "San Jose, CA",
-  },
-  {
-    id: 5,
-    title: "Historic Building Restoration",
-    description: "Careful restoration of a 19th century historic building",
-    status: "Completed",
-    completion: 100,
-    role: "Restoration Specialist",
-    image: "https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png",
-    location: "San Francisco, CA",
-  },
-]
-
+import {FollowersProfileDialog} from "@/components/profile/dialogs/followers-profile-dialog";
+import {RequestsProfileDialog} from "@/components/profile/dialogs/request-profile-dialog";
+import {ProjectsProfileDialog} from "@/components/profile/dialogs/projects-details-profile-dialog";
+import {useProject} from "@/contexts/project-context";
+import {getStatusTranslation} from "@/lib/helpers/projects";
 
 export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
@@ -87,6 +33,8 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
     followUser,
     unfollowUser,
     isSaving} = useUser();
+
+  const {projects} = useProject()
 
   const [user_data, setUser_data] = useState<User_Type | null>(user);
 
@@ -189,19 +137,6 @@ const handleAcceptRequest = async (userId: number) => {
       router.push(`/${updatedUser.language_preference}/profile`);
     }
   };
-  // Get status translation
-  const getStatusTranslation = (status: string) => {
-    switch (status) {
-      case "Completed":
-        return dict.projects.status.completed
-      case "In Progress":
-        return dict.projects.status.inProgress
-      case "Planning":
-        return dict.projects.status.planning
-      default:
-        return status
-    }
-  }
 
   function generateInicials(name: string) {
     return name.split(" ").map((part) => part.charAt(0)).join("")
@@ -288,7 +223,7 @@ const handleAcceptRequest = async (userId: number) => {
                     className="flex flex-col items-center hover:bg-secondary cursor-pointer"
                     onClick={() => setIsProjectsDialogOpen(true)}
                   >
-                    <span className="text-xl font-bold text-cyan-400">{PROJECTS.length}</span>
+                    <span className="text-xl font-bold text-cyan-400">{projects.length}</span>
                     <span className="text-xs text-muted-foreground">{dict.profile.projects}</span>
                   </Button>
 
@@ -403,11 +338,11 @@ const handleAcceptRequest = async (userId: number) => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {PROJECTS.slice(0, 4).map((project) => (
+                  {projects.slice(0, 4).map((project) => (
                     <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
                       <div className="h-32 w-full">
                         <img
-                          src={project.image || "/placeholder.svg"}
+                          src={"https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png"}
                           alt={project.title}
                           className="h-full w-full object-cover"
                         />
@@ -431,9 +366,9 @@ const handleAcceptRequest = async (userId: number) => {
                           }
                           `}
                         >
-                          {getStatusTranslation(project.status)}
+                          {getStatusTranslation(project.status, dict)}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">{project.role}</span>
+                        <span className="text-xs text-muted-foreground">{project.admin}</span>
                       </CardFooter>
                     </Card>
                   ))}
@@ -501,303 +436,37 @@ const handleAcceptRequest = async (userId: number) => {
         dictionary={dict}
         lang={lang}
       />
-
       {/* Projects Dialog */}
-      <Dialog open={isProjectsDialogOpen} onOpenChange={setIsProjectsDialogOpen}>
-        <DialogContent className="bg-background border-border text-foreground w-md-[50vw]">
-        <DialogHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <DialogTitle className="text-xl flex items-center">
-                  <Building className="mr-2 h-5 w-5 text-cyan-500"/>
-                  {dict.profile.projects}
-                </DialogTitle>
-                <DialogDescription className="text-muted-foreground">
-                  {dict.projects.allProjects.replace("{name}", user?.name || user?.username)}
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <ScrollArea className="h-[70vh] pr-4 mt-4 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {PROJECTS.map((project) => (
-                <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
-                  <div className="h-32 w-full">
-                    <img
-                      src={project.image || "/placeholder.svg"}
-                      alt={project.title}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <CardHeader className="p-3">
-                    <CardTitle className="text-base">{project.title}</CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground line-clamp-2">
-                      {project.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-3 pt-0">
-                    <div className="flex items-center text-xs text-muted-foreground mb-2">
-                      <MapPin className="h-3 w-3 mr-1"/>
-                      {project.location}
-                    </div>
-                    <div className="w-full bg-slate-700/50 h-1.5 rounded-full">
-                      <div
-                        className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
-                        style={{width: `${project.completion}%`}}
-                      />
-                    </div>
-                    <div className="flex justify-between mt-1 text-xs">
-                      <span className="text-muted-foreground">{dict.projects.completion}</span>
-                      <span className="text-cyan-400">{project.completion}%</span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-3 pt-0 flex justify-between">
-                    <Badge
-                      variant="outline"
-                      className={`
-                  ${
-                        project.status === "Completed"
-                          ? "bg-green-500/10 text-green-400 border-green-500/30"
-                          : project.status === "In Progress"
-                            ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
-                            : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                      }
-                `}
-                    >
-                      {getStatusTranslation(project.status)}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">{project.role}</span>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
-
-
-      {/* Followers Dialog */}
-      <Dialog open={isFollowersDialogOpen} onOpenChange={setIsFollowersDialogOpen}>
-        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center">
-              <Users className="mr-2 h-5 w-5 text-cyan-500"/>
-              {dict.followers.title}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              {dict.followers.description.replace("{name}", user?.name || user?.username)}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-4">
-            <Input
-              placeholder={dict.profile.searchFollowers}
-              className="bg-background border-input mb-4"
-              onChange={(e) => {
-                const query = e.target.value
-                if (query.trim() === "") {
-                  setFollowers(followers)
-                } else {
-                  setFollowers(
-                    followers.filter(
-                      (user) =>
-                        user.name.toLowerCase().includes(query.toLowerCase()) ||
-                        user.username.toLowerCase().includes(query.toLowerCase()) ||
-                        user.role.toLowerCase().includes(query.toLowerCase()),
-                    ) || []
-                  )
-                }
-              }}
-            />
-
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-4">
-                {user?.followers&& user.followers.length > 0 ? (
-                  followers.map((follower) => (
-                    <div
-                      key={follower.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
-                    >
-                      <div className="flex items-center">
-                        <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={follower.avatar} alt={follower.name}/>
-                          <AvatarFallback className="bg-slate-700 text-cyan-500">
-                            {follower.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium">{follower.name}</p>
-                          <p className="text-xs text-muted-foreground">{follower.role}</p>
-                        </div>
-                      </div>
-                      {/*(user.role !== "admin") && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-secondary/70 border-border hover:bg-secondary"
-                          onClick={() => handleFollowToggle(follower.id, ! follower.isFollowing)}
-                        >
-                          {follower&& follower.isFollowing ? dict.followers.following : dict.followers.followBack}
-                        </Button>
-                      )*/}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>{dict.followers.noFollowers}</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </DialogContent>
-      </Dialog>
-
+      <ProjectsProfileDialog
+        isProjectsDialogOpen={isProjectsDialogOpen}
+        setIsProjectsDialogOpenAction={setIsProjectsDialogOpen}
+        dict={dict}
+        />
+      { /* Followers Dialog */}
+      <FollowersProfileDialog
+        isFollowersDialogOpen={isFollowersDialogOpen}
+        setIsFollowersDialogOpenAction={setIsFollowersDialogOpen}
+        followers={followers}
+        setFollowersAction={setFollowers}
+        handleFollowToggleAction={handleFollowToggle}
+        dict={dict}
+        />
+      {/* Following Dialog*/}
       <FollowingProfileDialog setFollowingAction= {setFollowing} following={following}
         isFollowingDialogOpen={isFollowingDialogOpen}
         setIsFollowingDialogOpenAction={setIsFollowingDialogOpen}
         handleFollowToggleAction={handleFollowToggle}
         dict={dict}
         />
-      {/* Following Dialog
-      <Dialog open={isFollowingDialogOpen} onOpenChange={setIsFollowingDialogOpen}>
-        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center">
-              <Users className="mr-2 h-5 w-5 text-cyan-500"/>
-              {dict.following.title}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              {dict.following.description.replace("{name}", user?.name || user?.username)}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-4">
-            <Input
-              placeholder={dict.profile.searchFollowing}
-              className="bg-background border-input mb-4"
-              onChange={(e) => {
-                const query = e.target.value
-                if (query.trim() === "") {
-                  setFollowing(following)
-                } else {
-                  setFollowing(
-                    following.filter(
-                      (user) =>
-                        user.name.toLowerCase().includes(query.toLowerCase()) ||
-                        user.username.toLowerCase().includes(query.toLowerCase()) ||
-                        user.role.toLowerCase().includes(query.toLowerCase()),
-                    ),
-                  )
-                }
-              }}
-            />
-
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-4">
-                {user?.following && user.following.length > 0 ? (
-                  following.map((follow) => (
-                    <div
-                      key={follow.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
-                    >
-                      <div className="flex items-center">
-                        <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={follow.avatar} alt={follow.name}/>
-                          <AvatarFallback className="bg-slate-700 text-cyan-500">
-                            {follow.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium">{follow.name}</p>
-                          <p className="text-xs text-muted-foreground">{follow.role}</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-secondary/70 border-border hover:bg-secondary cursor-pointer"
-                        onClick={() => handleFollowToggle(follow.id, false)}
-                      >
-                        {dict.following.unfollow}
-                      </Button>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>{dict.following.noFollowing}</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </DialogContent>
-      </Dialog> */}
-
       {/* Requests Dialog */}
-      <Dialog open={isRequestsDialogOpen} onOpenChange={setIsRequestsDialogOpen}>
-        <DialogContent className="bg-background border-border text-foreground max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center">
-              <UserPlus className="mr-2 h-5 w-5 text-cyan-500"/>
-              {dict.requests.title}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              {dict.requests.description.replace("{name}", user?.name || user?.username)}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-4">
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-4">
-                {user?.requests && user.requests.length > 0 ? (
-                  requests.map((request) => (
-                    <div
-                      key={request.id}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
-                    >
-                      <div className="flex items-center">
-                        <Avatar className="h-10 w-10 mr-3">
-                          <AvatarImage src={request.avatar} alt={request.name}/>
-                          <AvatarFallback className="bg-slate-700 text-cyan-500">
-                            {request.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium">{request.name}</p>
-                          <p className="text-xs text-muted-foreground">{request.role}</p>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          className="bg-primary hover:bg-primary/90"
-                          onClick={() => handleAcceptRequest(request.id)}
-                        >
-                          {dict.requests.accept}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="bg-secondary/70 border-border hover:bg-secondary"
-                          onClick={() => handleRejectRequest(request.id)}
-                        >
-                          {dict.requests.decline}
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>{dict.requests.noRequests}</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <RequestsProfileDialog
+        isRequestsDialogOpen={isRequestsDialogOpen}
+        setIsRequestsDialogOpenAction={setIsRequestsDialogOpen}
+        requests={requests}
+        handleAcceptRequestAction={handleAcceptRequest}
+        handleRejectRequestAction={handleRejectRequest}
+        dict={dict}
+        />
     </div>
   )
 }

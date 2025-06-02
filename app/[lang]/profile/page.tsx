@@ -8,6 +8,7 @@ import useAuthMiddleware from "@/lib/token-verification";
 import {TopBarWrapper} from "@/components/bars/top-bar-wrapper";
 import {useUser} from "@/contexts/UserProvider";
 import {NotificationProvider} from "@/contexts/notification-context";
+import {ProjectProvider} from "@/contexts/project-context";
 
 export default function  Profile() {
 
@@ -28,12 +29,14 @@ export default function  Profile() {
 
   return (
       <NotificationProvider dictionary={dictionary}>
+        <ProjectProvider dictionary= {dictionary}>
           <div className="min-h-screen bg-background">
             <TopBarWrapper dictionary={dictionary} lang={params.lang as string} />
             <div className="container mx-auto px-4 py-6 md:pt-16">
               <ProfilePage dict={dictionary} lang={params.lang as string} />
             </div>
           </div>
+        </ProjectProvider>
       </NotificationProvider>
   )
 }
