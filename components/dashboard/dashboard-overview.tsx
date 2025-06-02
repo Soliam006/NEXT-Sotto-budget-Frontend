@@ -67,29 +67,49 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
                   value="overview"
                   className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
                 >
-                  <Activity className="h-4 w-4 mr-2"/>
-                  {activeTab === "overview" && <>{dict.dashboard?.overview || "Overview"}</>}
+                <Activity className="h-4 w-4 mr-2"/>
+                  <span className={`lg:hidden ${activeTab === "overview" ? "" : "hidden"}`}>
+                    {dict.dashboard?.overview || "Overview"}
+                  </span>
+                  <span className="hidden lg:inline">
+                    {dict.dashboard?.overview || "Overview"}
+                  </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="tasks"
                   className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
                 >
                   <ClipboardList className="h-4 w-4 mr-2"/>
-                  {activeTab === "tasks" && <>{dict.dashboard?.tasks || "Tasks"}</>}
+                    <span className={`lg:hidden ${activeTab === "tasks" ? "" : "hidden"}`}>
+                        {dict.dashboard?.tasks || "Tasks"}
+                    </span>
+                    <span className="hidden lg:inline">
+                        {dict.dashboard?.tasks || "Tasks"}
+                    </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="team"
                   className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
                 >
                   <Users className="h-4 w-4 mr-2"/>
-                  {activeTab === "team" && <>{dict.dashboard?.team || "Team"}</>}
+                    <span className={`lg:hidden ${activeTab === "team" ? "" : "hidden"}`}>
+                        {dict.dashboard?.team || "Team"}
+                    </span>
+                    <span className="hidden lg:inline">
+                        {dict.dashboard?.team || "Team"}
+                    </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="materials"
                   className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
                 >
                   <Package className="h-4 w-4 mr-2"/>
-                  {activeTab === "materials" && <>{dict.dashboard?.inventory || "Inventory"}</>}
+                    <span className={`lg:hidden ${activeTab === "materials" ? "" : "hidden"}`}>
+                        {dict.dashboard?.inventory || "Inventory"}
+                    </span>
+                    <span className="hidden lg:inline">
+                        {dict.dashboard?.inventory || "Inventory"}
+                    </span>
                 </TabsTrigger>
               </TabsList>
 

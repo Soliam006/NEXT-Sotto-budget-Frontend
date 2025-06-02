@@ -21,7 +21,7 @@ export function InventoryTab({ dict }: MaterialsTabProps) {
         return "bg-green-500/20 text-green-500 border-green-500/50"
       case "Pending":
         return "bg-amber-500/20 text-amber-500 border-amber-500/50"
-      case "in_budget":
+      case "In_Budget":
         return "bg-blue-500/20 text-blue-500 border-blue-500/50"
       default:
         return "bg-muted/20 text-muted-foreground border-muted/50"
@@ -35,7 +35,7 @@ export function InventoryTab({ dict }: MaterialsTabProps) {
         return dict.inventory?.installed || "Installed"
       case "Pending":
         return dict.inventory?.pending || "Pending"
-      case "in_budget":
+      case "In_Budget":
         return dict.inventory?.inBudget || "In Budget"
       default:
         return status

@@ -55,11 +55,11 @@ const renderActiveShape = (props: any) => {
         fill="none"
       />
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text className="text-white"
+      <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
         y={ey}
         textAnchor={textAnchor}
-        fill="#333"
+        fill="#777"
       >{`Total ${value}`}</text>
       <text
         x={ex + (cos >= 0 ? 1 : -1) * 12}
@@ -103,8 +103,6 @@ export default function CustomPieChart(props: {selectedProject: Project}) {
     { name: "ToDo", value: selectedProject.progress?.todo },
     { name: "Done", value: selectedProject.progress?.done },
   ];
-
-
 
   return (
     <PieChart width={400} height={400}>

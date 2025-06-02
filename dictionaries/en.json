@@ -132,6 +132,7 @@
   },
   "common": {
     "add": "Add",
+    "save": "Save",
     "loading": "Loading...",
     "acept": "Accept",
     "edit": "Edit",
@@ -342,7 +343,7 @@
     "addFirstItem": "Add your first item",
     "enterSupplier": "Enter supplier name",
     "deleteItem": "Delete Item",
-    "deleteItemConfirmation": "Are you sure you want to delete this item? This action cannot be undone.",
+    "deleteItemConfirmation": "Are you sure you want to delete this item?",
     "statusUpdated": "Status Updated",
     "movedTo": "moved to",
     "itemDeleted": "Item Deleted",
@@ -416,6 +417,11 @@
     "changesSaved": "Changes saved",
     "noChanges": "No changes to save",
     "noChangesDescription": "There are no task status changes to save"
+  },
+  "tooltips": {
+    "aboveRange": "Above expected range (needs attention)",
+    "belowRange": "Below expected range (good)",
+    "withinRange": "Within expected range (normal)"
   },
   "expenses": {
     "title": "Expense Management",

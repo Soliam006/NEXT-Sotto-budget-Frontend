@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import CustomPieChart from "@/components/custom-pie-chart";
 import { useProject } from "@/contexts/project-context";
 import { formatDate } from "@/lib/helpers/projects";
+import {MetricCard} from "@/components/dashboard/panel/tabs/metric-card";
 
 interface OverviewTabProps {
   dict: any
@@ -50,6 +51,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
             }
           color="primary"
           detail={`$${selectedProject?.currentSpent} / $${selectedProject?.limit_budget}`}
+            dict={dict}
         />
         <MetricCard
           title={dict.dashboard?.tasks || "Tasks"}
@@ -74,6 +76,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                 } ${dict.dashboard?.complete || "Complete"}`
               : `0 / 0 ${dict.dashboard?.complete || "Complete"}`
           }
+            dict={dict}
         />
         <MetricCard
           title={dict.dashboard?.timeline || "Timeline"}
@@ -82,6 +85,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
           trend={timelineMetrics.trend}
           color="secondary"
           detail={`${formatDate(selectedProject?.start_date)} - ${formatDate(selectedProject?.end_date)}`}
+            dict={dict}
         />
       </div>
 
@@ -292,64 +296,6 @@ function ActivityItem({
         </div>
         <div className="text-xs text-muted-foreground">{description}</div>
       </div>
-    </div>
-  )
-}
-
-// Component for metric cards
-function MetricCard({
-                      title,
-                      value,
-                      icon: Icon,
-                      trend,
-                      color,
-                      detail,
-                    }: {
-  title: string
-  value: number
-  icon: any
-  trend: "up" | "down" | "stable"
-  color: string
-  detail: string
-}) {
-  const getColor = () => {
-    switch (color) {
-      case "primary":
-        return "from-primary to-primary/70 border-primary/30"
-      case "secondary":
-        return "from-secondary to-secondary/70 border-secondary/30"
-      case "accent":
-        return "from-accent to-accent/70 border-accent/30"
-      default:
-        return "from-primary to-primary/70 border-primary/30"
-    }
-  }
-
-  const getTrendIcon = () => {
-    switch (trend) {
-      case "up":
-        return <BarChart3 className="h-4 w-4 text-warning" />
-      case "down":
-        return <BarChart3 className="h-4 w-4 rotate-180 text-success" />
-      case "stable":
-        return <LineChart className="h-4 w-4 text-info" />
-      default:
-        return null
-    }
-  }
-
-  return (
-    <div className={`bg-muted/50 rounded-lg border shadow-lg ${getColor()} p-4 relative overflow-hidden`}>
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm text-muted-foreground">{title}</div>
-        <Icon className={`h-5 w-5 text-${color}`} />
-      </div>
-      <div className="text-2xl font-bold mb-1 bg-gradient-to-r bg-clip-text text-transparent from-foreground to-foreground/80">
-        {value}%
-      </div>
-      <div className="text-xs text-muted-foreground">{detail}</div>
-      <div className="absolute bottom-2 right-2 flex items-center">{getTrendIcon()}</div>
-      <div className="absolute -bottom-6 -right-6 h-16 w-16 rounded-full bg-gradient-to-r opacity-20 blur-xl from-primary to-primary/70"></div>
     </div>
   )
 }

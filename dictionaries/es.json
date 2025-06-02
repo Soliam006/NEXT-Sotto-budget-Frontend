@@ -132,6 +132,7 @@
   },
   "common": {
     "add": "Añadir",
+    "save": "Guardar",
     "loading": "Cargando...",
     "acept": "Aceptar",
     "edit": "Editar",
@@ -342,7 +343,7 @@
     "addFirstItem": "Añade tu primer artículo",
     "enterSupplier": "Nombre del proveedor",
     "deleteItem": "Eliminar Artículo",
-    "deleteItemConfirmation": "¿Estás seguro de que quieres eliminar este artículo? Esta acción no se puede deshacer.",
+    "deleteItemConfirmation": "¿Estás seguro de que quieres eliminar este artículo?",
     "statusUpdated": "Estado Actualizado",
     "movedTo": "movido a",
     "itemDeleted": "Artículo Eliminado",
@@ -416,6 +417,11 @@
     "changesSaved": "Cambios guardados",
     "noChanges": "No hay cambios para guardar",
     "noChangesDescription": "No hay cambios de estado de tareas para guardar"
+  },
+  "tooltips": {
+    "aboveRange": "Por encima del rango esperado (necesita atención)",
+    "belowRange": "Por debajo del rango esperado (bueno)",
+    "withinRange": "Dentro del rango esperado (normal)"
   },
   "expenses": {
     "title": "Gestión de Gastos",
