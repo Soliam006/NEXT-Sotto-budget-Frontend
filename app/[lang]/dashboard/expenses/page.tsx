@@ -21,6 +21,6 @@ export default function ExpensesPage() {
 
   if (!dictionary) return <LoadingView/>;
 
-  return <DashboardExpenses dict={dictionary} lang={params?.lamg as string} />
+  return <DashboardExpenses dict={dictionary} lang={params?.lang as string} />
 }
 

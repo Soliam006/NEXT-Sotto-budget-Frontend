@@ -116,7 +116,9 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
     if (!hasExpenses) return []
 
     const monthlyData: { [key: string]: number } = {};
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    const months = lang === "es" ? ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"] :
+        ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
     selectedProject.expenses.forEach((expense) => {
       const expense_date = new Date(expense.expense_date)
