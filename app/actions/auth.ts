@@ -12,7 +12,6 @@ export async function signup(
     formData: FormData,
     validationMessages: any)  {
 
-    console.log("ENTRANDO A SIGNUP")
     // Crear el esquema con los mensajes traducidos
     const signUpSchema = createSignUpSchema(validationMessages)
 
@@ -61,8 +60,6 @@ export async function signup(
         });
 
         const json = await response.json();
-        console.log("Response JSON:", json);
-        console.log("API_URL", api_URL);
 
         // Si hay un error en la petición, devolverlo
         if (json.statusCode === 400 || json.statusCode === 409) {
@@ -128,7 +125,6 @@ export async function logIn(prevState: ExpectedType, formData: FormData, transla
         const json = await response.json();
         return validateResult(json, translates);
     } catch (error) {
-        console.error("Network or server error:", error);
         return {
             status: "error",
             message: translates.serverError,

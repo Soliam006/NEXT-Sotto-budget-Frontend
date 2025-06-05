@@ -34,6 +34,28 @@ export interface User {
   followers?: UserFollower[]
   following?: UserFollower[]
   requests?: UserFollower[]
+  client?: {
+    client_id: number
+    budget_limit: number
+  }
+  worker?: WorkerData
+  admin?: AdminData
+}
+export interface AdminData {
+  admin_id: number
+  workers: WorkerData[]
+}
+export interface WorkerData {
+  id: number
+  name: string
+  role: string
+  skills: string[]
+  availability: string
+  contact: string
+  projects: string[]
+  tasksCompleted: number
+  tasksInProgress: number
+  efficiency: number
 }
 
 export interface User_Search {

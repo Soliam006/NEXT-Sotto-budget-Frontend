@@ -28,6 +28,7 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
             async (res) => {
                 const json = await res.json();
                 if (json.statusCode === 200) {
+                    console.log("Project Object", json);
                     // Make Projects Objects from json response
                     json.data = json.data.map((project: Project) => {
                         const {tasks,expenses, ...rest} = project;
@@ -61,9 +62,8 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
                                         updated_at: expense.project_info.updated_at
                                     }
                                 }
-                            }),
+                            })
                         }
-                        console.log("Expenses:", newProject.expenses);
                         return newProject;
                     });
                     return json;

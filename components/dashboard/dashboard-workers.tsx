@@ -5,75 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-
-// Mock data for workers
-const WORKERS = [
-  {
-    id: 1,
-    name: "Mike Johnson",
-    role: "Lead Carpenter",
-    avatar: "/placeholder.svg?height=64&width=64&text=MJ",
-    tasksCompleted: 12,
-    tasksInProgress: 2,
-    efficiency: 92,
-    availability: "Full-time",
-    contact: "mike.j@example.com",
-    skills: ["Carpentry", "Woodworking", "Framing", "Finishing"],
-    projects: ["Kitchen Renovation", "Basement Finishing"],
-  },
-  {
-    id: 2,
-    name: "Sarah Williams",
-    role: "Electrician",
-    avatar: "/placeholder.svg?height=64&width=64&text=SW",
-    tasksCompleted: 8,
-    tasksInProgress: 3,
-    efficiency: 85,
-    availability: "Full-time",
-    contact: "sarah.w@example.com",
-    skills: ["Electrical", "Wiring", "Lighting", "Troubleshooting"],
-    projects: ["Kitchen Renovation", "Bathroom Remodel"],
-  },
-  {
-    id: 3,
-    name: "David Smith",
-    role: "Plumber",
-    avatar: "/placeholder.svg?height=64&width=64&text=DS",
-    tasksCompleted: 6,
-    tasksInProgress: 1,
-    efficiency: 88,
-    availability: "Part-time",
-    contact: "david.s@example.com",
-    skills: ["Plumbing", "Pipe Fitting", "Fixture Installation"],
-    projects: ["Bathroom Remodel"],
-  },
-  {
-    id: 4,
-    name: "Lisa Brown",
-    role: "Interior Designer",
-    avatar: "/placeholder.svg?height=64&width=64&text=LB",
-    tasksCompleted: 5,
-    tasksInProgress: 4,
-    efficiency: 79,
-    availability: "Contract",
-    contact: "lisa.b@example.com",
-    skills: ["Design", "Color Theory", "Space Planning", "Material Selection"],
-    projects: ["Kitchen Renovation", "Bathroom Remodel"],
-  },
-  {
-    id: 5,
-    name: "Robert Davis",
-    role: "General Contractor",
-    avatar: "/placeholder.svg?height=64&width=64&text=RD",
-    tasksCompleted: 15,
-    tasksInProgress: 5,
-    efficiency: 90,
-    availability: "Full-time",
-    contact: "robert.d@example.com",
-    skills: ["Project Management", "Scheduling", "Budgeting", "Coordination"],
-    projects: ["Kitchen Renovation", "Bathroom Remodel", "Basement Finishing"],
-  },
-]
+import {useUser} from "@/contexts/UserProvider";
 
 interface DashboardWorkersProps {
   dict: any
@@ -81,8 +13,11 @@ interface DashboardWorkersProps {
 }
 
 export function DashboardWorkers({ dict, lang }: DashboardWorkersProps) {
+  const {user} = useUser()
+  const WORKERS = user?.admin?.workers || []
+
   return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-4 md:p-6">
         <h1 className="text-2xl font-bold">{dict.workers?.title || "Workers Management"}</h1>
 
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
@@ -98,7 +33,7 @@ export function DashboardWorkers({ dict, lang }: DashboardWorkersProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4 grid grid-cols-1 xl:grid-cols-2 gap-4">
               {WORKERS.map((worker) => (
                   <WorkerCard key={worker.id} worker={worker} dict={dict} />
               ))}
@@ -112,42 +47,43 @@ export function DashboardWorkers({ dict, lang }: DashboardWorkersProps) {
 function WorkerCard({ worker, dict }: { worker: any; dict: any }) {
   return (
       <div className="bg-muted/50 rounded-lg border border-border/50 p-4">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex-shrink-0">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-shrink-0 flex justify-center md:justify-start">
             <Avatar className="h-16 w-16">
               <AvatarImage src={worker.avatar} alt={worker.name} />
               <AvatarFallback className="bg-muted text-primary">{worker.name.charAt(0)}</AvatarFallback>
             </Avatar>
           </div>
 
-          <div className="flex-grow">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+          <div className="flex-grow space-y-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
               <div>
                 <h3 className="text-lg font-medium">{worker.name}</h3>
                 <p className="text-sm text-muted-foreground">{worker.role}</p>
-              </div>
-              <Badge className="bg-primary/20 text-primary border-primary/50 mt-1 md:mt-0 w-fit">
-                {worker.efficiency}% {dict.workers?.efficient || "Efficient"}
-              </Badge>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.availability || "Availability"}:</span>
-                  <span>{worker.availability}</span>
-                </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{dict.workers?.contact || "Contact"}:</span>
                   <span>{worker.contact}</span>
                 </div>
+              </div>
+              <Badge className="bg-primary/20 text-primary border-primary/50 w-fit">
+                {worker.efficiency}% {dict.workers?.efficient || "Efficient"}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                {worker.availability? (<div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{dict.workers?.availability || "Availability"}:</span>
+                  <span>{worker.availability}</span>
+                </div>): ( <></>)}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{dict.workers?.projects || "Projects"}:</span>
                   <span>{worker.projects.length}</span>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">{dict.workers?.tasksCompleted || "Tasks Completed"}:</span>
                   <span className="text-success">{worker.tasksCompleted}</span>
@@ -165,7 +101,7 @@ function WorkerCard({ worker, dict }: { worker: any; dict: any }) {
               </div>
             </div>
 
-            <div className="mt-3">
+            <div className="pt-1">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-muted-foreground">{dict.workers?.skills || "Skills"}:</span>
                 <span className="text-muted-foreground">
@@ -174,14 +110,14 @@ function WorkerCard({ worker, dict }: { worker: any; dict: any }) {
               </div>
               <div className="flex flex-wrap gap-1">
                 {worker.skills.map((skill:any, index:number) => (
-                    <Badge key={index} variant="outline" className="bg-muted/50 border-border">
+                    <Badge key={index} variant="outline" className="bg-muted/50 border-border text-xs">
                       {skill}
                     </Badge>
                 ))}
               </div>
             </div>
 
-            <div className="mt-3">
+            <div className="pt-1">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-muted-foreground">{dict.workers?.performance || "Performance"}:</span>
                 <span className="text-muted-foreground">{worker.efficiency}%</span>
@@ -198,4 +134,3 @@ function WorkerCard({ worker, dict }: { worker: any; dict: any }) {
       </div>
   )
 }
-
