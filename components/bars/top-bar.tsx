@@ -168,7 +168,7 @@ export function TopBar({
 
           <div className="flex items-center space-x-3">
             <Select value={lang} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-[70px] md:w-[100px] bg-secondary border-border text-muted-foreground">
+              <SelectTrigger className="w-[70px] md:w-[100px] bg-secondary border-border text-muted-foreground cursor-pointer">
                 <SelectValue placeholder={dictionary.language[lang]}/>
               </SelectTrigger>
               <SelectContent className="bg-popover border-border">
@@ -186,7 +186,7 @@ export function TopBar({
                       variant="ghost"
                       size="icon"
                       onClick={toggleTheme}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                   </Button>
@@ -199,7 +199,7 @@ export function TopBar({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full cursor-pointer">
                   <Avatar>
                     <AvatarImage
                         src={
@@ -213,7 +213,7 @@ export function TopBar({
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuContent className="w-56 p-2" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">{currentUser?.name || currentUser?.username}</p>

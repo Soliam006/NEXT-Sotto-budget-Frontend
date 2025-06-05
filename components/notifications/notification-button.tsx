@@ -25,7 +25,7 @@ export function NotificationButton({ dictionary }: NotificationButtonProps) {
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="relative text-muted-foreground hover:text-foreground"
+                            className="relative text-muted-foreground hover:text-foreground cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
                             <Bell className="h-5 w-5" />
