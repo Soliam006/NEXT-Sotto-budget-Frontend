@@ -65,7 +65,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
               <TabsList className="w-full border-b rounded-none p-0 h-auto flex space-x-2">
                 <TabsTrigger
                   value="overview"
-                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3 cursor-pointer"
                 >
                 <Activity className="h-4 w-4 mr-2"/>
                   <span className={`lg:hidden ${activeTab === "overview" ? "" : "hidden"}`}>
@@ -77,7 +77,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
                 </TabsTrigger>
                 <TabsTrigger
                   value="tasks"
-                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3 cursor-pointer"
                 >
                   <ClipboardList className="h-4 w-4 mr-2"/>
                     <span className={`lg:hidden ${activeTab === "tasks" ? "" : "hidden"}`}>
@@ -89,7 +89,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
                 </TabsTrigger>
                 <TabsTrigger
                   value="team"
-                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3 cursor-pointer"
                 >
                   <Users className="h-4 w-4 mr-2"/>
                     <span className={`lg:hidden ${activeTab === "team" ? "" : "hidden"}`}>
@@ -101,7 +101,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
                 </TabsTrigger>
                 <TabsTrigger
                   value="materials"
-                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3"
+                  className="flex-1 rounded-b-none data-[state=active]:border-b-2 data-[state=active]:border-primary py-3 cursor-pointer"
                 >
                   <Package className="h-4 w-4 mr-2"/>
                     <span className={`lg:hidden ${activeTab === "materials" ? "" : "hidden"}`}>
