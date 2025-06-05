@@ -36,10 +36,19 @@ interface AddProjectDialogProps {
   dict: any
 }
 
-const projectSchema = (dict: any) => z.object({
-  title: z.string().min(3, {
-    message: dict.projects?.titleMinLength || "Title must be at least 3 characters.",
-  }),
+const projectSchema =
+    (dict: any, projects: Project[] = [])=> z.object({
+  title: z.string()
+      .min(3, {
+        message: dict.projects?.titleMinLength || "Title must be at least 3 characters.",
+      }).refine(
+          (title) => !projects.some(project =>
+              project.title.toLowerCase() === title.toLowerCase()
+          ),
+      {
+        message: dict.projects?.titleUnique || "Project title must be unique.",
+      }
+  ),
   description: z.string().min(10, {
     message: dict.projects?.descriptionMinLength || "Description must be at least 10 characters.",
   }),
@@ -61,12 +70,12 @@ const projectSchema = (dict: any) => z.object({
 })
 
 export function AddProjectDialog({ open, onOpenChange, dict }: AddProjectDialogProps) {
-  const { addProject } = useProject()
+  const { addProject, projects } = useProject()
   const { user } = useUser()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedClients, setSelectedClients] = useState<UserFollower[]>([])
 
-  const schema = projectSchema(dict)
+  const schema = projectSchema(dict, projects)
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -86,7 +95,7 @@ export function AddProjectDialog({ open, onOpenChange, dict }: AddProjectDialogP
 
     try {
       // Preparar los datos del proyecto
-      const newProject: Omit<Project, "id"> = {
+      const newProject: Partial<Project>  = {
         title: values.title,
         description: values.description,
         location: values.location,
@@ -95,17 +104,10 @@ export function AddProjectDialog({ open, onOpenChange, dict }: AddProjectDialogP
         end_date: format(values.end_date, "yyyy-MM-dd"),
         admin: user?.name || user?.username || "Unknown Admin",
         status: "Active",
-        currentSpent: 0,
-        progress: {
-          done: 0,
-          inProgress: 0,
-          todo: 0,
-        },
-        clients: selectedClients,
+        clients_ids: values.clients_ids,
         tasks: [],
         team: [],
         expenses: [],
-        expenseCategories: {},
         inventory: [],
       }
       // Añadir el proyecto
@@ -374,7 +376,9 @@ export function AddProjectDialog({ open, onOpenChange, dict }: AddProjectDialogP
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                 {dict.common?.cancel || "Cancel"}
               </Button>
-              <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600">
+              <Button type="submit" disabled={isSubmitting}
+                      className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer
+                      hover:from-cyan-600 hover:to-blue-600">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

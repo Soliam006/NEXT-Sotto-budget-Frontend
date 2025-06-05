@@ -276,7 +276,8 @@
     "quickStats": "Estadísticas Rápidas",
     "totalProjects": "Proyectos Totales",
     "activeProjects": "Proyectos Activos",
-    "totalBudget": "Presupuesto Total"
+    "totalBudget": "Presupuesto Total",
+    "noProjectSelected" : "No se ha seleccionado ningún proyecto"
   },
   "calendar": {
     "title": "Calendario de Presupuesto",
@@ -486,7 +487,7 @@
     "saveAsCSV": "Guardar como CSV"
   },
   "notifications": {
-    "title": "Notificaciones",
+    "title_Not": "Notificaciones",
     "detail": "Detalle de Notificación",
     "all": "Todas",
     "unread": "No leídas",
@@ -536,7 +537,10 @@
     "additionalInfo": "Información Adicional",
     "contactAdmin": "Contactar al administrador",
     "urgentHelp": "Si es urgente, contacte a soporte inmediatamente",
-    "failedToLoad": "No se pudieron cargar las notificaciones"
+    "failedToLoad": "No se pudieron cargar las notificaciones",
+    "assignee": "Asignado a",
+    "due_date": "Vence",
+    "title": "Título"
   },
   "followers": {
     "title": "Seguidores",

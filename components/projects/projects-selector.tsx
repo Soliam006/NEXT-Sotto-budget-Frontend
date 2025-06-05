@@ -30,6 +30,7 @@ export interface Project {
   start_date: string
   end_date: string
   status: string
+  clients_ids?: number[]
   clients?: {
     id: number
     name: string

@@ -168,15 +168,15 @@ const handleAcceptRequest = async (userId: number) => {
               <Edit className="h-4 w-4 mr-2"/>
               {dict.profile.edit.button}
             </Button>
-            <Button className="bg-primary hover:bg-primary/90 cursor-pointer">
+            {/*<Button className="bg-primary hover:bg-primary/90 cursor-pointer">
               <Share2 className="h-4 w-4 mr-2"/>
               {dict.profile.share}
-            </Button>
+            </Button> */}
           </div>
         </div>
 
         {/* Profile Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-16">
+        <div className={`grid grid-cols-1 ${projects.length > 0 ? 'lg:grid-cols-3' : ''} gap-6 mt-16`}>
           {/* Left Column - User Info */}
           <div className="space-y-6">
             <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
@@ -319,111 +319,113 @@ const handleAcceptRequest = async (userId: number) => {
           </div>
 
           {/* Right Column - Projects and Activity */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center">
-                    <Building className="h-5 w-5 mr-2 text-cyan-500"/>
-                    {dict.profile.recentProjects}
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    className="text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
-                    onClick={() => setIsProjectsDialogOpen(true)}
-                  >
-                    {dict.profile.viewAll}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {projects.slice(0, 4).map((project) => (
-                    <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
-                      <div className="h-32 w-full">
-                        <img
-                          src={"https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png"}
-                          alt={project.title}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <CardHeader className="p-3">
-                        <CardTitle className="text-base">{project.title}</CardTitle>
-                        <CardDescription className="text-xs text-muted-foreground line-clamp-2">
-                          {project.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardFooter className="p-3 pt-0 flex justify-between">
-                        <Badge
-                          variant="outline"
-                          className={`
-                            ${
-                            project.status === "Completed"
-                              ? "bg-green-500/10 text-green-400 border-green-500/30"
-                              : project.status === "In Progress"
-                                ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
-                                : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                          }
-                          `}
-                        >
-                          {getStatusTranslation(project.status, dict)}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">{project.admin}</span>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {projects.length > 0 && (
+            <div className="lg:col-span-2 space-y-6">
+              <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center">
+                      <Building className="h-5 w-5 mr-2 text-cyan-500"/>
+                      {dict.profile.recentProjects}
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      className="text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
+                      onClick={() => setIsProjectsDialogOpen(true)}
+                    >
+                      {dict.profile.viewAll}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {projects.slice(0, 4).map((project) => (
+                      <Card key={project.id} className="bg-card/80 border-border/30 overflow-hidden">
+                        <div className="h-32 w-full">
+                          <img
+                            src={"https://www.echeverrimontes.com/hubfs/remodelaci%C3%B3n%20de%20casas%20peque%C3%B1as.png"}
+                            alt={project.title}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <CardHeader className="p-3">
+                          <CardTitle className="text-base">{project.title}</CardTitle>
+                          <CardDescription className="text-xs text-muted-foreground line-clamp-2">
+                            {project.description}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardFooter className="p-3 pt-0 flex justify-between">
+                          <Badge
+                            variant="outline"
+                            className={`
+                              ${
+                              project.status === "Completed"
+                                ? "bg-green-500/10 text-green-400 border-green-500/30"
+                                : project.status === "In Progress"
+                                  ? "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                                  : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                            }
+                            `}
+                          >
+                            {getStatusTranslation(project.status, dict)}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">{project.admin}</span>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Activity className="h-5 w-5 mr-2 text-cyan-500"/>
-                  {dict.profile.recentActivity}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <ActivityItem
-                    icon={<FileText className="h-4 w-4"/>}
-                    title="Updated project documentation"
-                    description="Modern Residential Complex"
-                    time="2 hours ago"
-                    iconColor="bg-blue-500/20 text-blue-400"
-                  />
-                  <ActivityItem
-                    icon={<MessageSquare className="h-4 w-4"/>}
-                    title="Commented on a task"
-                    description="Electrical wiring needs to be completed by Friday"
-                    time="Yesterday"
-                    iconColor="bg-purple-500/20 text-purple-400"
-                  />
-                  <ActivityItem
-                    icon={<Check className="h-4 w-4"/>}
-                    title="Completed milestone"
-                    description="Foundation work for Eco-Friendly School Building"
-                    time="3 days ago"
-                    iconColor="bg-green-500/20 text-green-400"
-                  />
-                  <ActivityItem
-                    icon={<Users className="h-4 w-4"/>}
-                    title="Added new team members"
-                    description="3 new members added to Hospital Wing Addition"
-                    time="1 week ago"
-                    iconColor="bg-cyan-500/20 text-cyan-400"
-                  />
-                  <ActivityItem
-                    icon={<AlertCircle className="h-4 w-4"/>}
-                    title="Reported an issue"
-                    description="Material delivery delay for Commercial Office Renovation"
-                    time="1 week ago"
-                    iconColor="bg-amber-500/20 text-amber-400"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center">
+                    <Activity className="h-5 w-5 mr-2 text-cyan-500"/>
+                    {dict.profile.recentActivity}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <ActivityItem
+                      icon={<FileText className="h-4 w-4"/>}
+                      title="Updated project documentation"
+                      description="Modern Residential Complex"
+                      time="2 hours ago"
+                      iconColor="bg-blue-500/20 text-blue-400"
+                    />
+                    <ActivityItem
+                      icon={<MessageSquare className="h-4 w-4"/>}
+                      title="Commented on a task"
+                      description="Electrical wiring needs to be completed by Friday"
+                      time="Yesterday"
+                      iconColor="bg-purple-500/20 text-purple-400"
+                    />
+                    <ActivityItem
+                      icon={<Check className="h-4 w-4"/>}
+                      title="Completed milestone"
+                      description="Foundation work for Eco-Friendly School Building"
+                      time="3 days ago"
+                      iconColor="bg-green-500/20 text-green-400"
+                    />
+                    <ActivityItem
+                      icon={<Users className="h-4 w-4"/>}
+                      title="Added new team members"
+                      description="3 new members added to Hospital Wing Addition"
+                      time="1 week ago"
+                      iconColor="bg-cyan-500/20 text-cyan-400"
+                    />
+                    <ActivityItem
+                      icon={<AlertCircle className="h-4 w-4"/>}
+                      title="Reported an issue"
+                      description="Material delivery delay for Commercial Office Renovation"
+                      time="1 week ago"
+                      iconColor="bg-amber-500/20 text-amber-400"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
 

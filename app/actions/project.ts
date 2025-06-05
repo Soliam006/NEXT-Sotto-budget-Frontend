@@ -112,7 +112,7 @@ export async function fetchProjectDetailWithID( token: string | null, id: string
 
 
 // ADD
-export async function addProjectToBackend(token: string | null, project: Omit<Project, "id">) {
+export async function addProjectToBackend(token: string | null, project: Partial<Project>) {
     if (!token)
         redirect("/es/login")
 
@@ -143,7 +143,7 @@ export async function addProjectToBackend(token: string | null, project: Omit<Pr
 
 
 // UPDATE
-export async function updateProjectToBackend(token: string | null, project: Project) {
+export async function updateProjectToBackend(token: string | null, project:Partial<Project>) {
     if (!token)
         redirect("/es/login")
 

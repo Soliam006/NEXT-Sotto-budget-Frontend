@@ -12,11 +12,12 @@ interface ProjectContextType {
   projects: Project[]
   selectedProject: Project | null
   originalSelectedProject: Project | null
+  pendingChanges: Partial<Project> | null // Nuevo: cambios pendientes
   setAllProjects: (projects: Project[]) => void
   setSelectedProjectById: (id: number) => void
 
   // Métodos para modificar el proyecto
-  addProject: (project: Omit<Project, "id">) => Promise<void>
+  addProject: (project: Partial<Project>) => Promise<void>
   addTeamMember: (member: any) => void
   addTask: (task: any) => void
   updateTask: (taskId: number, updatedTask: any) => void
@@ -28,6 +29,12 @@ interface ProjectContextType {
   updateInventoryItem: (itemId: number, updatedItem: any) => void
   deleteInventoryItem: (itemId: number) => void
   updateInventoryItemStatus: (itemId: number, newStatus: "Installed" | "Pending" | "In_Budget") => void
+
+  // Métodos para los gastos
+  addExpense: (expense: any) => void
+  updateExpense: (expenseId: number, updatedExpense: any) => void
+  deleteExpense: (expenseId: number) => void
+  updateExpenseStatus: (expenseId: number, newStatus: "approved" | "pending" | "rejected") => void
 
   // Métodos para guardar/descartar cambios
   hasChanges: boolean
@@ -68,6 +75,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [originalSelectedProject, setOriginalSelectedProject] = useState<Project | null>(null)
+  const [pendingChanges, setPendingChanges] = useState<Partial<Project> | null>(null) // Nuevo: cambios pendientes
   // Estado para rastrear cambios y guardado
   const [hasChanges, setHasChanges] = useState<boolean>(false)
   const [isSaving, setIsSaving] = useState<boolean>(false)
@@ -91,11 +99,10 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
           console.error("ERROR al cargar los proyectos:", response)
           setError("Error al cargar los proyectos")
         } else {
-          setAllProjects ([])
+          setAllProjects([])
           console.warn("No projects found or error in response:", response)
         }
       })
-
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error occurred')
       console.error("Error fetching projects:", err)
@@ -103,11 +110,11 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       setLoading(false)
     }
   }
+
   // Cargar de proyectos desde una API
   useEffect(() => {
     cargarProjectos()
   }, [])
-
 
   // Actualizar el proyecto seleccionado cuando cambia el ID
   useEffect(() => {
@@ -117,17 +124,18 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       const projectCopy = JSON.parse(JSON.stringify(project))
       setSelectedProject(projectCopy)
       setOriginalSelectedProject(projectCopy)
+      setPendingChanges(null) // Limpiar cambios pendientes al cambiar de proyecto
     }
   }, [selectedProjectId, projects])
 
   // Detectar cambios en el proyecto seleccionado
   useEffect(() => {
-    if (selectedProject && originalSelectedProject) {
-      // Comparar el proyecto seleccionado con su versión original
-      const projectChanged = !isEqual(selectedProject, originalSelectedProject)
-      setHasChanges(projectChanged)
+    if (pendingChanges) {
+      setHasChanges(true)
+    } else {
+      setHasChanges(false)
     }
-  }, [selectedProject, originalSelectedProject])
+  }, [pendingChanges])
 
   // Función para seleccionar un proyecto por ID
   const setSelectedProjectById = (id: number) => {
@@ -137,12 +145,16 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   // Función para establecer todos los proyectos
   const setAllProjects = (projects: Project[]) => {
     setProjects(projects)
-    setSelectedProjectId(projects[0].id)
+    if (projects.length > 0) {
+      setSelectedProjectId(projects[0].id)
+    }
   }
 
   // Función para añadir un nuevo proyecto
-  const addProject = async (project: Omit<Project, "id">) => {
+  const addProject = async (project: Partial<Project>) => {
     setIsSaving(true)
+
+    console.log("Añadiendo proyecto:", project)
 
     try {
       // Enviar el proyecto al backend
@@ -158,30 +170,33 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
           return newProject
         } else {
           console.error("Error al añadir el proyecto:", response)
-          throw new Error("Error al añadir el proyecto")
+          setError(response.message || "Error al añadir el proyecto")
         }
       })
-
     } catch (error) {
       console.error("Error al añadir el proyecto:", error)
-      setError( error instanceof Error ? error.message : "Error al añadir el proyecto")
+      setError(error instanceof Error ? error.message : "Error al añadir el proyecto")
     } finally {
       setIsSaving(false)
     }
   }
 
-
   // Guardar cambios
   const saveChanges = async () => {
-    if (!hasChanges || !selectedProject) return
+    if (!hasChanges || !selectedProject || !pendingChanges) return
     setIsSaving(true) // Iniciar el estado de guardado
 
     try {
-      // Simular una llamada a la API
-      const response = await updateProjectToBackend(getToken(), selectedProject)
+      // Crear el objeto con los cambios para enviar al backend
+      const changesToSend = {
+        id: selectedProject.id,
+        ...pendingChanges
+      };
+
+      const response = await updateProjectToBackend(getToken(), changesToSend)
       if (response.statusCode !== 200) {
-          console.error("Error al guardar los cambios:", response)
-          throw new Error("Error al guardar los cambios")
+        console.error("Error al guardar los cambios:", response)
+        throw new Error("Error al guardar los cambios")
       }
 
       const updatedProject = response.data;
@@ -196,95 +211,122 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       // Actualizar la versión original del proyecto seleccionado
       setSelectedProject(updatedProject)
       setOriginalSelectedProject(updatedProject)
+      setPendingChanges(null) // Limpiar cambios pendientes
       console.log("Cambios guardados con éxito")
     } catch (error) {
+      setError(error instanceof Error ? error.message : "Error al guardar los cambios")
       console.error("Error al guardar los cambios:", error)
     } finally {
       setIsSaving(false)
     }
   }
 
+  // Helper function para actualizar cambios pendientes
+  const updatePendingChanges = (updates: Partial<Project>) => {
+    setPendingChanges(prev => ({
+      ...prev,
+      ...updates
+    }));
+  }
+
   const addTeamMember = (member: any) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        team: [...(prev.team || []), member],
-      };
+    if (!selectedProject) return;
+
+    const updatedTeam = [...(selectedProject.team || []), member];
+    setSelectedProject(prev => prev ? {...prev, team: updatedTeam} : prev);
+
+    updatePendingChanges({
+      team: updatedTeam
     });
   }
 
-    // Añadir una tarea
+  // Añadir una tarea
   const addTask = (task: any) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      const newTasks = [...(prev.tasks || []), task];
-      const progress = {
-        ...prev.progress,
-        todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
-        done: newTasks.filter((t: any) => t.status === "done").length || 0,
-        inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
-      };
-      return {
-        ...prev,
-        tasks: newTasks,
-        progress,
-      };
+    if (!selectedProject) return;
+
+    const newTasks = [...(selectedProject.tasks || []), task];
+    const progress = {
+      ...selectedProject.progress,
+      todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
+      done: newTasks.filter((t: any) => t.status === "done").length || 0,
+      inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
+    };
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      tasks: newTasks,
+      progress,
+    } : prev);
+
+    updatePendingChanges({
+      tasks: newTasks
     });
   }
 
   // Actualizar una tarea
   const updateTask = (taskId: number, updatedTask: any) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        tasks: prev.tasks?.map((task: any) => (task.id === taskId ? { ...task, ...updatedTask } : task)),
-      };
+    if (!selectedProject) return;
+
+    const updatedTasks = selectedProject.tasks?.map((task: any) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+    ) || [];
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      tasks: updatedTasks,
+    } : prev);
+
+    updatePendingChanges({
+      tasks: updatedTasks
     });
   }
 
   // Eliminar una tarea
   const deleteTask = (taskId: number) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      const newTasks = prev.tasks?.filter((task: any) => task.id !== taskId) || [];
-      const progress = {
-        ...prev.progress,
-        todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
-        done: newTasks.filter((t: any) => t.status === "done").length || 0,
-        inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
-      };
-      return {
-        ...prev,
-        tasks: newTasks,
-        progress,
-      };
+    if (!selectedProject) return;
+
+    const newTasks = selectedProject.tasks?.filter((task: any) => task.id !== taskId) || [];
+    const progress = {
+      ...selectedProject.progress,
+      todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
+      done: newTasks.filter((t: any) => t.status === "done").length || 0,
+      inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
+    };
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      tasks: newTasks,
+      progress,
+    } : prev);
+
+    updatePendingChanges({
+      tasks: newTasks
     });
   }
 
   // Actualizar el estado de una tarea
   const updateTaskStatus = (taskId: number, newStatus: string) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      // Actualizar el estado de la tarea
-      const updatedTasks = prev.tasks?.map((task: any) =>
-          task.id === taskId ? { ...task, status: newStatus } : task
-      ) || [];
+    if (!selectedProject) return;
 
-      // Recalcular el progreso
-      const progress = {
-        ...prev.progress,
-        todo: updatedTasks.filter((task: any) => task.status === "todo").length || 0,
-        done: updatedTasks.filter((task: any) => task.status === "done").length || 0,
-        inProgress: updatedTasks.filter((task: any) => task.status === "in_progress").length || 0,
-      };
+    const updatedTasks = selectedProject.tasks?.map((task: any) =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+    ) || [];
 
-      return {
-        ...prev,
-        tasks: updatedTasks,
-        progress,
-      };
+    const progress = {
+      ...selectedProject.progress,
+      todo: updatedTasks.filter((task: any) => task.status === "todo").length || 0,
+      done: updatedTasks.filter((task: any) => task.status === "done").length || 0,
+      inProgress: updatedTasks.filter((task: any) => task.status === "in_progress").length || 0,
+    };
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      tasks: updatedTasks,
+      progress,
+    } : prev);
+
+    updatePendingChanges({
+      tasks: updatedTasks
     });
   }
 
@@ -292,57 +334,206 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
   // Añadir un item al inventario
   const addInventoryItem = (item: any) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        inventory: [
-          ...(prev.inventory || []),
-          {
-            ...item,
-            id: Math.max(0, ...(prev.inventory?.map(i => i.id ?? 0) || [])) + 1
-          }
-        ],
-      };
+    if (!selectedProject) return;
+
+    const newItem = {
+      ...item,
+      id: Math.max(0, ...(selectedProject.inventory?.map(i => i.id ?? 0) || [])) + 1
+    };
+
+    const updatedInventory = [...(selectedProject.inventory || []), newItem];
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      inventory: updatedInventory,
+    } : prev);
+
+    updatePendingChanges({
+      inventory: updatedInventory
     });
   }
+
   // Actualizar un item del inventario
   const updateInventoryItem = (itemId: number, updatedItem: any) => {
-    setSelectedProject((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        inventory: prev.inventory?.map((item) =>
-            item.id === itemId ? { ...item, ...updatedItem } : item
-        ),
-      };
+    if (!selectedProject) return;
+
+    const updatedInventory = selectedProject.inventory?.map((item) =>
+        item.id === itemId ? { ...item, ...updatedItem } : item
+    ) || [];
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      inventory: updatedInventory,
+    } : prev);
+
+    updatePendingChanges({
+      inventory: updatedInventory
     });
   }
+
   // Eliminar un item del inventario
   const deleteInventoryItem = (itemId: number) => {
-    setSelectedProject((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            inventory: prev.inventory?.filter((item) => item.id !== itemId),
-          }
-        }
-    )
+    if (!selectedProject) return;
+
+    const updatedInventory = selectedProject.inventory?.filter((item) => item.id !== itemId) || [];
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      inventory: updatedInventory,
+    } : prev);
+
+    updatePendingChanges({
+      inventory: updatedInventory
+    });
   }
 
   // Actualizar el estado de un item del inventario
-  const updateInventoryItemStatus =
-      (itemId: number, newStatus: "Installed" | "Pending" | "In_Budget") => {
-        setSelectedProject((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            inventory: prev.inventory?.map((item) =>
-                item.id === itemId ? { ...item, status: newStatus } : item
-            ),
-          };
-        })
+  const updateInventoryItemStatus = (itemId: number, newStatus: "Installed" | "Pending" | "In_Budget") => {
+    if (!selectedProject) return;
+
+    const updatedInventory = selectedProject.inventory?.map((item) =>
+        item.id === itemId ? { ...item, status: newStatus } : item
+    ) || [];
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      inventory: updatedInventory,
+    } : prev);
+
+    updatePendingChanges({
+      inventory: updatedInventory
+    });
   }
+
+  // Añadir un gasto
+  const addExpense = (expense: any) => {
+    if (!selectedProject) return;
+
+    const newExpense = {
+      ...expense,
+      id: Math.max(0, ...(selectedProject.expenses?.map(e => e.id ?? 0) || [])) + 1
+    };
+
+    const updatedExpenses = [...(selectedProject.expenses || []), newExpense];
+
+    // Calcular nuevo currentSpent
+    const newCurrentSpent = updatedExpenses
+        .filter(e => e.status === 'approved')
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    // Actualizar categorías de gastos
+    const updatedExpenseCategories = { ...selectedProject.expenseCategories };
+    if (expense.category) {
+      updatedExpenseCategories[expense.category] =
+          (updatedExpenseCategories[expense.category] || 0) + (expense.amount || 0);
+    }
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      expenses: updatedExpenses,
+      currentSpent: newCurrentSpent,
+      expenseCategories: updatedExpenseCategories
+    } : prev);
+
+    updatePendingChanges({
+      expenses: updatedExpenses
+    });
+  }
+
+// Actualizar un gasto
+  const updateExpense = (expenseId: number, updatedExpense: any) => {
+    if (!selectedProject) return;
+
+    const updatedExpenses = selectedProject.expenses?.map((expense) =>
+        expense.id === expenseId ? { ...expense, ...updatedExpense } : expense
+    ) || [];
+
+    // Recalcular currentSpent y categorías si cambió el amount o status
+    let newCurrentSpent = selectedProject.currentSpent;
+    let updatedExpenseCategories = { ...selectedProject.expenseCategories };
+
+    if (updatedExpense.amount || updatedExpense.status || updatedExpense.category) {
+      newCurrentSpent = updatedExpenses
+          .filter(e => e.status === 'approved')
+          .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+      // Recalcular todas las categorías desde cero
+      updatedExpenseCategories = {};
+      updatedExpenses.forEach(expense => {
+        if (expense.category && expense.amount) {
+          updatedExpenseCategories[expense.category] =
+              (updatedExpenseCategories[expense.category] || 0) + expense.amount;
+        }
+      });
+    }
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      expenses: updatedExpenses,
+      currentSpent: newCurrentSpent,
+      expenseCategories: updatedExpenseCategories
+    } : prev);
+
+    updatePendingChanges({
+      expenses: updatedExpenses
+    });
+  }
+
+// Eliminar un gasto
+  const deleteExpense = (expenseId: number) => {
+    if (!selectedProject) return;
+
+    const expenseToDelete = selectedProject.expenses?.find(e => e.id === expenseId);
+    const updatedExpenses = selectedProject.expenses?.filter((expense) => expense.id !== expenseId) || [];
+
+    // Calcular nuevo currentSpent
+    const newCurrentSpent = updatedExpenses
+        .filter(e => e.status === 'approved')
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    // Actualizar categorías de gastos
+    const updatedExpenseCategories = { ...selectedProject.expenseCategories };
+    if (expenseToDelete?.category && expenseToDelete.amount) {
+      updatedExpenseCategories[expenseToDelete.category] =
+          Math.max(0, (updatedExpenseCategories[expenseToDelete.category] || 0) - expenseToDelete.amount);
+    }
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      expenses: updatedExpenses,
+      currentSpent: newCurrentSpent,
+      expenseCategories: updatedExpenseCategories
+    } : prev);
+
+    updatePendingChanges({
+      expenses: updatedExpenses
+    });
+  }
+
+// Actualizar el estado de un gasto
+  const updateExpenseStatus = (expenseId: number, newStatus: "approved" | "pending" | "rejected") => {
+    if (!selectedProject) return;
+
+    const updatedExpenses = selectedProject.expenses?.map((expense) =>
+        expense.id === expenseId ? { ...expense, status: newStatus } : expense
+    ) || [];
+
+    // Recalcular currentSpent basado en gastos aprobados
+    const newCurrentSpent = updatedExpenses
+        .filter(e => e.status === 'approved')
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    setSelectedProject(prev => prev ? {
+      ...prev,
+      expenses: updatedExpenses,
+      currentSpent: newCurrentSpent
+    } : prev);
+
+    updatePendingChanges({
+      expenses: updatedExpenses
+    });
+  }
+
 
   // Función para mostrar errores
   const showErrorAlert = useCallback((errorMessage: string) => {
@@ -362,12 +553,12 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     }
   }, [error, showErrorAlert]);
 
-
   // Descartar cambios
   const discardChanges = () => {
     // Restaurar el proyecto seleccionado a su versión original
     if (originalSelectedProject) {
       setSelectedProject({ ...originalSelectedProject })
+      setPendingChanges(null)
     }
   }
 
@@ -377,6 +568,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     setAllProjects,
     selectedProject,
     originalSelectedProject,
+    pendingChanges, // Exponer cambios pendientes
     hasChanges,
     setSelectedProjectById,
     addProject,
@@ -391,12 +583,17 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     updateInventoryItem,
     deleteInventoryItem,
     updateInventoryItemStatus,
+    // Métodos para los gastos
+    addExpense,
+    updateExpense,
+    deleteExpense,
+    updateExpenseStatus,
     // Métodos para guardar/descartar cambios
     saveChanges,
     discardChanges,
     isSaving,
-    loadingState : loading,
-    errorState : error,
+    loadingState: loading,
+    errorState: error,
   }
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>

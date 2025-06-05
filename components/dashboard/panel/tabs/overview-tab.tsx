@@ -5,6 +5,7 @@ import CustomPieChart from "@/components/custom-pie-chart";
 import { useProject } from "@/contexts/project-context";
 import { formatDate } from "@/lib/helpers/projects";
 import {MetricCard} from "@/components/dashboard/panel/tabs/metric-card";
+import {NotificationsOverview} from "@/components/notifications/recents-notifications";
 
 interface OverviewTabProps {
   dict: any
@@ -50,7 +51,11 @@ export function OverviewTab({ dict }: OverviewTabProps) {
                 : "stable"
             }
           color="primary"
-          detail={`$${selectedProject?.currentSpent} / $${selectedProject?.limit_budget}`}
+            detail={
+              selectedProject?.currentSpent !== undefined && selectedProject?.limit_budget !== undefined
+                ? `$${selectedProject.currentSpent} / $${selectedProject.limit_budget}`
+                : dict.dashboard?.noProjectSelected || "No hay proyecto seleccionado"
+            }
             dict={dict}
         />
         <MetricCard
@@ -84,7 +89,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
           icon={Timer}
           trend={timelineMetrics.trend}
           color="secondary"
-          detail={`${formatDate(selectedProject?.start_date)} - ${formatDate(selectedProject?.end_date)}`}
+            detail={selectedProject ? `${formatDate(selectedProject?.start_date)} - ${formatDate(selectedProject?.end_date)}` : ""}
             dict={dict}
         />
       </div>
@@ -222,29 +227,9 @@ export function OverviewTab({ dict }: OverviewTabProps) {
 
         {/* Recent activity */}
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-          <CardHeader className="pb-2">
-            <CardTitle>{dict.dashboard?.recentActivity || "Recent Activity"}</CardTitle>
-          </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <ActivityItem
-                title={dict.dashboard?.materialDelivered || "Material Delivered"}
-                time="14:32:12"
-                description={dict.dashboard?.cabinetsDelivered || "Kitchen cabinets delivered to site"}
-                type="info"
-              />
-              <ActivityItem
-                title={dict.dashboard?.taskCompleted || "Task Completed"}
-                time="13:45:06"
-                description={dict.dashboard?.electricalCompleted || "Mike completed electrical wiring"}
-                type="success"
-              />
-              <ActivityItem
-                title={dict.dashboard?.budgetWarning || "Budget Warning"}
-                time="09:12:45"
-                description={dict.dashboard?.approachingBudget || "Approaching 80% of budget limit"}
-                type="warning"
-              />
+              <NotificationsOverview dictionary={ dict } />
             </div>
           </CardContent>
         </Card>

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { ActivityItem } from "./activity-item"
 import { useNotifications } from "@/contexts/notification-context"
 import { CheckCircle2, AlertCircle, Info, Activity } from "lucide-react"
+import {formatRelativeTime} from "@/lib/helpers/notifications";
+import { NotificationItem } from "@/components/notifications/notification-item"
 
 // Helper functions for notification styling
 const getNotificationTypeStyles = (type: string) => {
@@ -75,42 +77,20 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
         }
     }
 
-    // Format relative time
-    const formatRelativeTime = (dateString: string) => {
-        const date = new Date(dateString)
-        const now = new Date()
-        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-        if (diffInSeconds < 60) {
-            return `${diffInSeconds}s ago`
-        } else if (diffInSeconds < 3600) {
-            const diffInMinutes = Math.floor(diffInSeconds / 60)
-            return dictionary.time?.minutesAgo?.replace("{minutes}", diffInMinutes.toString()) || `${diffInMinutes}m ago`
-        } else if (diffInSeconds < 86400) {
-            const diffInHours = Math.floor(diffInSeconds / 3600)
-            return dictionary.time?.hoursAgo?.replace("{hours}", diffInHours.toString()) || `${diffInHours}h ago`
-        } else if (diffInSeconds < 604800) {
-            const diffInDays = Math.floor(diffInSeconds / 86400)
-            return dictionary.time?.daysAgo?.replace("{days}", diffInDays.toString()) || `${diffInDays}d ago`
-        } else {
-            return date.toLocaleDateString()
-        }
-    }
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
           <DialogContent className={
                 `sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 
-            ${selectedNotification ? "w-full max-w-[95vw] h-[95vh]" : ""} 
-            max-h-[95vh] flex flex-col`
+            ${selectedNotification ? "w-full max-w-[95vw] h-[60vh] ld:h-[45vh]" : ""} 
+            max-h-[60vh] flex flex-col`
             }>
             { /* If a notification is selected, show its details */ }
             {selectedNotification ? (
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full pt-6">
                     {/* Header */}
 
                     {/* Content - Scrollable area */}
-                    <ScrollArea className="max-h-[75vh] flex-1">
+                    <ScrollArea className="max-h-[50vh] flex-1">
                     <div className="flex items-center justify-between p-4 md:p-6 border-b border-border/50">
                         <div className="flex items-center space-x-3">
                             <div className={`p-2 rounded-full ${getNotificationTypeStyles(selectedNotification.type).bgColor}`}>
@@ -120,7 +100,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                 <DialogTitle className="text-lg font-semibold">
                                     {dictionary.notifications?.detail || "Notification Detail"}
                                 </DialogTitle>
-                                <p className="text-sm text-muted-foreground">{formatRelativeTime(selectedNotification.time)}</p>
+                                <p className="text-sm text-muted-foreground">{formatRelativeTime(selectedNotification.time, dictionary)}</p>
                             </div>
                         </div>
                         <Button
@@ -150,9 +130,11 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                         <div className="h-px bg-gradient-to-l from-border to-transparent flex-1" />
                                     </div>
                                     <div className="bg-muted/30 rounded-lg p-4 border border-border/30">
-                                        <p className="text-sm text-foreground/90 whitespace-pre-line leading-relaxed">
-                                            {selectedNotification.details}
-                                        </p>
+                                        <NotificationItem
+                                            metadatas={selectedNotification.metadatas}
+                                            activity_type={selectedNotification.activity_type}
+                                            dict={dictionary}
+                                        ></NotificationItem>
                                     </div>
                                 </div>
                             )}
@@ -171,23 +153,24 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                 </div>
                             </div>
                         </div>
+                        {/* Footer */}
+                        {selectedNotification.link && (
+                           <div className="p-4 md:p-6 border-t border-border/50 bg-secondary/20 flex justify-center items-center">
+                               <Button
+                                   className="bg-gradient-to-r from-cyan-500 to-blue-500
+                                   hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg cursor-pointer"
+                                   onClick={() => {
+                                       window.location.href = selectedNotification.link!
+                                       onOpenChange(false)
+                                   }}
+                               >
+                                   <Bell className="mr-2 h-4 w-4" />
+                                   {dictionary.notifications?.viewRelated || "View Related Content"}
+                               </Button>
+                           </div>
+                        )}
                     </ScrollArea>
 
-                    {/* Footer */}
-                    {selectedNotification.link && (
-                        <div className="p-4 md:p-6 border-t border-border/50 bg-secondary/20">
-                            <Button
-                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg"
-                                onClick={() => {
-                                    window.location.href = selectedNotification.link!
-                                    onOpenChange(false)
-                                }}
-                            >
-                                <Bell className="mr-2 h-4 w-4" />
-                                {dictionary.notifications?.viewRelated || "View Related Content"}
-                            </Button>
-                        </div>
-                    )}
                 </div>
             ) : (
                 // List of notifications
@@ -196,7 +179,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                         <div className="flex items-center justify-between">
                             <DialogTitle className="text-xl flex items-center">
                                 <Bell className="mr-2 h-5 w-5 text-cyan-500" />
-                                {dictionary.notifications?.title || "Notifications"}
+                                {dictionary.notifications?.title_Not || "Notifications"}
                             </DialogTitle>
                             {unreadCount > 0 && (
                                 <Button
@@ -233,7 +216,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                                 id={notification.id}
                                                 title={notification.title}
                                                 description={notification.description}
-                                                time={formatRelativeTime(notification.time)}
+                                                time={formatRelativeTime(notification.time, dictionary)}
                                                 type={notification.type}
                                                 read={notification.read}
                                                 onClick={handleNotificationClick}
@@ -258,7 +241,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                                 id={notification.id}
                                                 title={notification.title}
                                                 description={notification.description}
-                                                time={formatRelativeTime(notification.time)}
+                                                time={formatRelativeTime(notification.time, dictionary)}
                                                 type={notification.type}
                                                 read={notification.read}
                                                 onClick={handleNotificationClick}

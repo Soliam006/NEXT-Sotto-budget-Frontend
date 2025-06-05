@@ -276,7 +276,8 @@
     "quickStats": "Quick Stats",
     "totalProjects": "Total Projects",
     "activeProjects": "Active Projects",
-    "totalBudget": "Total Budget"
+    "totalBudget": "Total Budget",
+    "noProjectSelected": "No project selected"
   },
   "calendar": {
     "title": "Budget Calendar",
@@ -486,7 +487,7 @@
     "saveAsCSV": "Save as CSV"
   },
   "notifications": {
-    "title": "Notifications",
+    "title_Not": "Notifications",
     "detail": "Notification Detail",
     "all": "All",
     "unread": "Unread",
@@ -536,7 +537,10 @@
     "additionalInfo": "Additional Information",
     "contactAdmin": "Contact Admin",
     "urgentHelp": "If this is urgent, please contact support immediately",
-    "failedToLoad": "Failed to load notifications"
+    "failedToLoad": "Failed to load notifications",
+    "assignee": "Assignee to",
+    "due_date": "Due",
+    "title": "Title"
   },
   "followers": {
     "title": "Followers",

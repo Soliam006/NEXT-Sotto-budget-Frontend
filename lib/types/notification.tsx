@@ -13,17 +13,9 @@ export interface ActivityItemProps {
     onClick?: (id: string) => void
 }
 export type ActivityType =
-    | "task_created"
-    | "task_completed"
-    | "task_updated"
-    | "task_deleted"
-    | "expense_added"
-    | "expense_approved"
-    | "expense_updated"
-    | "expense_deleted"
-    | "inventory_added"
-    | "inventory_updated"
-    | "inventory_deleted"
+    | "task_created" | "task_updated" | "task_completed" | "task_deleted"
+    | "expense_added" | "expense_updated" | "expense_approved" | "expense_deleted"
+    | "inventory_added" | "inventory_updated" | "inventory_deleted"
 
 export interface BasicInfo {
     id: number
@@ -39,7 +31,61 @@ export interface Activity {
     project: BasicInfo
     task?: BasicInfo
     expense?: BasicInfo
-    metadatas: Record<string, any>
+    inventory_item?: BasicInfo
+    metadatas: {
+
+        // Data Updated
+        changes?: {
+            [key: string]: {
+                old: any
+                new: any
+            }
+        }
+
+        // Task created
+        assignee?: string
+        due_date?: string
+        task_title?: string
+
+        // Task deleted
+        deleted_task?: {
+            id: number
+            title: string
+            status: string
+        }
+
+        // Expense added
+        id?: number
+        date?: string
+        title?: string
+        amount?: number
+        status?: string
+        category?: string
+        description?: string
+
+        // Expense deleted
+        deleted_expense?: {
+            id: number
+            title: string
+            amount: number
+            category: string
+        }
+
+        // Inventory added
+        unit?: string
+        quantity?: number
+        item_name?: string
+        unit_cost?: number
+
+        // Inventory deleted
+        deleted_item?: {
+            name: string
+            unit: string
+            used: number
+            total: number
+            unit_cost: number
+        }
+    }
 }
 
 // UI types for display
