@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoadingView from "@/components/loading-view";
 import {TaskBoard} from "@/components/dashboard/tasks/task-board";
+import {ProjectsSelector} from "@/components/projects/projects-selector";
 
 export default function TaskPage() {
     const params = useParams();
@@ -22,7 +23,8 @@ export default function TaskPage() {
     if (!dictionary) return <LoadingView/>;
 
     return (
-        <div className="container mx-auto p-4 md:p-6">
+        <div className="container mx-auto p-4 md:p-6 flex flex-col space-y-6">
+            <ProjectsSelector dict= {dictionary} />
             <TaskBoard dict= {dictionary} lang={params.lang as string} />
         </div>
     )

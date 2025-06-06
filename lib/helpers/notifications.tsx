@@ -83,8 +83,7 @@ export const generateDescription = (activity: Activity, dictionary?: any): strin
 
 const getItemName = (activity: Activity): string => {
     if (activity.metadatas) {
-        return activity.metadatas.task_title ||
-            activity.metadatas.title ||
+        return activity.metadatas.title ||
             activity.metadatas.item_name ||
             activity.metadatas.deleted_task?.title ||
             activity.metadatas.deleted_expense?.title ||

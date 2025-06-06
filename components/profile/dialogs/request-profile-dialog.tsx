@@ -3,7 +3,7 @@ import {UserPlus} from "lucide-react";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
-import {UserFollower} from "@/contexts/user.types";
+import {UserFollower} from "@/lib/types/user.types";
 import {useUser} from "@/contexts/UserProvider";
 
 interface RequestsProps {

@@ -1,4 +1,4 @@
-// app/context/user.types.ts
+// app/lib/types/user.types.ts
 export type UserRole = 'admin' | 'client' | 'worker';
 export type Language = 'es' | 'en' | 'ca';
 
@@ -49,6 +49,7 @@ export interface WorkerData {
   id: number
   name: string
   role: string
+  phone: string
   skills: string[]
   availability: string
   contact: string

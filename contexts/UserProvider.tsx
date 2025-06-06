@@ -1,7 +1,7 @@
 'use client';
 
 import React, {createContext, useContext, useState, useEffect, useCallback} from 'react';
-import {User, UserFollower} from './user.types';
+import {User, UserFollower} from '../lib/types/user.types';
 import {acceptRequestBD, followUserBD, rejectFollowerBD, unfollowUserBD} from "@/app/actions/follows";
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import {fetchUserMe} from "@/app/actions/auth";

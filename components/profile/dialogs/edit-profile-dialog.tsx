@@ -42,7 +42,7 @@ const createProfileSchema = (translates: any) => {
     language_preference: z.enum(["en", "es"]),
   })
 }
-import {User, Availability} from "@/contexts/user.types"
+import {User, Availability} from "@/lib/types/user.types"
 
 import isEqual from 'lodash.isequal';
 

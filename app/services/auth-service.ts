@@ -1,5 +1,5 @@
 "use client";
-import {UserRole} from "@/contexts/user.types";
+import {UserRole} from "@/lib/types/user.types";
 
 export function setToken(token: string, rememberMe: boolean, lang:string): void {
     if (typeof window !== 'undefined') {

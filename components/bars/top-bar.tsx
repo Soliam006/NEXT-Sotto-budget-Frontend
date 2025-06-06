@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User_Search} from "@/contexts/user.types"
+import { User_Search} from "@/lib/types/user.types"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -225,7 +225,7 @@ export function TopBar({
                   <User className="mr-2 h-4 w-4" />
                   <span>{dictionary.nav?.profile || "Profile"}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleNavigate("/dashboard")}>
+                <DropdownMenuItem onClick={() => handleNavigate( currentUser?.role === "admin" ? "/dashboard" : "/dashboard/tasks")}>
                   <Home className="mr-2 h-4 w-4" />
                   <span>{dictionary.nav?.dashboard || "Dashboard"}</span>
                 </DropdownMenuItem>

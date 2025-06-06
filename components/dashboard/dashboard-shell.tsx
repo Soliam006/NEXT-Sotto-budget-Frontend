@@ -6,11 +6,9 @@ import { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { DashboardSidebar } from "@/components/bars/dashboard-sidebar"
 import { DashboardBottomBar } from "@/components/bars/dashboard-bottom-bar"
-import { useTheme } from "next-themes"
-import type { User as UserType } from "@/contexts/user.types"
 import {TopBarWrapper} from "@/components/bars/top-bar-wrapper";
-import useAuthMiddleware from "@/lib/token-verification";
 import LoadingView from "@/components/loading-view";
+import {useUser} from "@/contexts/UserProvider";
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -23,6 +21,7 @@ export function DashboardShell({ children, dictionary, lang }: DashboardShellPro
   const [isMobile, setIsMobile] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const {user} = useUser()
 
   // Check if mobile on mount and window resize
   useEffect(() => {
@@ -53,7 +52,12 @@ export function DashboardShell({ children, dictionary, lang }: DashboardShellPro
     if (pathname?.includes("/dashboard/inventory")) return "inventory"
     if (pathname?.includes("/dashboard/projects")) return "projects"
     if (pathname?.includes("/dashboard/expenses")) return "expenses"
-    return "dashboard"
+    if (pathname?.includes("/dashboard/tasks")) return "tasks"
+
+    const path = user?.role === "admin" ? "dashboard" : "dashboard/tasks"
+
+    return path
+
   }
 
   if (!dictionary ) return <LoadingView/>; // Muestra un estado de carga mientras se obtiene el diccionario

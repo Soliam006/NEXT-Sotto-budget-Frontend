@@ -1,18 +1,16 @@
 "use client"
 
-import { Users } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {CheckCircle, Clock, MapPin, Phone, Star, Users} from "lucide-react"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import {useUser} from "@/contexts/UserProvider";
 
 interface DashboardWorkersProps {
   dict: any
-  lang: string
 }
 
-export function DashboardWorkers({ dict, lang }: DashboardWorkersProps) {
+export function DashboardWorkers({ dict }: DashboardWorkersProps) {
   const {user} = useUser()
   const WORKERS = user?.admin?.workers || []
 
@@ -33,7 +31,7 @@ export function DashboardWorkers({ dict, lang }: DashboardWorkersProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="space-y-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
               {WORKERS.map((worker) => (
                   <WorkerCard key={worker.id} worker={worker} dict={dict} />
               ))}
@@ -43,94 +41,106 @@ export function DashboardWorkers({ dict, lang }: DashboardWorkersProps) {
       </div>
   )
 }
+const getAvailabilityColor = (availability: string) => {
+  switch (availability) {
+    case "Available":
+      return "bg-green-500/10 text-green-500 border-green-500/30"
+    case "Busy":
+      return "bg-red-500/10 text-red-500 border-red-500/30"
+    case "Part-time":
+      return "bg-yellow-500/10 text-yellow-500 border-yellow-500/30"
+    case "Full-time":
+      return "bg-blue-500/10 text-blue-500 border-blue-500/30"
+    default:
+      return "bg-gray-500/10 text-gray-500 border-gray-500/30"
+  }
+}
 
 function WorkerCard({ worker, dict }: { worker: any; dict: any }) {
   return (
-      <div className="bg-muted/50 rounded-lg border border-border/50 p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-shrink-0 flex justify-center md:justify-start">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={worker.avatar} alt={worker.name} />
-              <AvatarFallback className="bg-muted text-primary">{worker.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+      <Card key={worker.id} className="bg-card/50 border-border/50 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg">{worker.name}</CardTitle>
+              <CardDescription>{worker.role}</CardDescription>
+            </div>
+            <Badge variant="outline" className={getAvailabilityColor(worker.availability)}>
+              {worker.availability}
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Contact Info */}
+          <div className="space-y-2">
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Phone className="h-4 w-4 mr-2" />
+              {worker.phone}
+            </div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 mr-2" />
+              {worker.contact}
+            </div>
           </div>
 
-          <div className="flex-grow space-y-3">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div>
-                <h3 className="text-lg font-medium">{worker.name}</h3>
-                <p className="text-sm text-muted-foreground">{worker.role}</p>
-
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.contact || "Contact"}:</span>
-                  <span>{worker.contact}</span>
-                </div>
-              </div>
-              <Badge className="bg-primary/20 text-primary border-primary/50 w-fit">
-                {worker.efficiency}% {dict.workers?.efficient || "Efficient"}
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                {worker.availability? (<div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.availability || "Availability"}:</span>
-                  <span>{worker.availability}</span>
-                </div>): ( <></>)}
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.projects || "Projects"}:</span>
-                  <span>{worker.projects.length}</span>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.tasksCompleted || "Tasks Completed"}:</span>
-                  <span className="text-success">{worker.tasksCompleted}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.tasksInProgress || "Tasks In Progress"}:</span>
-                  <span className="text-info">{worker.tasksInProgress}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dict.workers?.workload || "Workload"}:</span>
-                  <span>
-                  {Math.round((worker.tasksInProgress / (worker.tasksCompleted + worker.tasksInProgress)) * 100)}%
-                </span>
-                </div>
+          {/* Performance */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">{dict.workers?.performance || "Performance"}</span>
+              <div className="flex items-center">
+                <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                <span className="text-sm font-medium">{worker.efficiency}%</span>
               </div>
             </div>
+            <Progress value={worker.efficiency} className="h-2" />
+          </div>
 
-            <div className="pt-1">
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-muted-foreground">{dict.workers?.skills || "Skills"}:</span>
-                <span className="text-muted-foreground">
-                {worker.skills.length} {dict.workers?.skillsTotal || "total"}
-              </span>
+          {/* Tasks */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                <span className="text-sm font-medium">{worker.tasksCompleted}</span>
               </div>
-              <div className="flex flex-wrap gap-1">
-                {worker.skills.map((skill:any, index:number) => (
-                    <Badge key={index} variant="outline" className="bg-muted/50 border-border text-xs">
-                      {skill}
-                    </Badge>
-                ))}
-              </div>
+              <p className="text-xs text-muted-foreground">{dict.workers?.tasksCompleted || "Completed"}</p>
             </div>
-
-            <div className="pt-1">
-              <div className="flex justify-between text-xs mb-1">
-                <span className="text-muted-foreground">{dict.workers?.performance || "Performance"}:</span>
-                <span className="text-muted-foreground">{worker.efficiency}%</span>
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-1">
+                <Clock className="h-4 w-4 text-blue-500 mr-1" />
+                <span className="text-sm font-medium">{worker.tasksInProgress}</span>
               </div>
-              <Progress value={worker.efficiency} className="h-1.5">
-                <div
-                    className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
-                    style={{ width: `${worker.efficiency}%` }}
-                />
-              </Progress>
+              <p className="text-xs text-muted-foreground">{dict.workers?.tasksInProgress || "In Progress"}</p>
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* Skills */}
+          {worker.skills.length>0 ? (<div>
+            <p className="text-sm font-medium mb-2">{dict.workers?.skills || "Skills"}</p>
+            <div className="flex flex-wrap gap-1">
+              {worker.skills.map((skill:any , index:any) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {skill}
+                  </Badge>
+              ))}
+            </div>
+          </div>): (<></>)}
+
+          {/* Current Projects */}
+          <div>
+            <p className="text-sm font-medium mb-2">{dict.workers?.projects || "Current Projects"}</p>
+            <div className="space-y-1">
+              {worker.projects.map((project:any, index:any) => (
+                  <p key={index} className="text-xs text-muted-foreground">
+                    • {project}
+                  </p>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
   )
 }

@@ -26,7 +26,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import type { UserFollower } from "@/contexts/user.types"
+import type { UserFollower } from "@/lib/types/user.types"
 import {useUser} from "@/contexts/UserProvider";
 import {Project} from "@/components/projects/projects-selector";
 

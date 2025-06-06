@@ -15,7 +15,7 @@ import {useUser} from "@/contexts/UserProvider";
 import {EditProfileDialog} from "./dialogs/edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
 import {getRole, getToken} from "@/app/services/auth-service";
-import {User as User_Type} from "@/contexts/user.types";
+import {User as User_Type} from "@/lib/types/user.types";
 import {updateUserInformation} from "@/app/actions/auth";
 import {FollowingProfileDialog} from "@/components/profile/dialogs/following-profile-dialog";
 import {FollowersProfileDialog} from "@/components/profile/dialogs/followers-profile-dialog";
