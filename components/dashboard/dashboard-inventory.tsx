@@ -16,6 +16,7 @@ import {ProjectsSelector} from "@/components/projects/projects-selector";
 import {AddInventoryItemDialog} from "@/components/dashboard/inventory/add-inventory-item-dialog";
 import {EditInventoryItemDialog} from "@/components/dashboard/inventory/edit-inventory-item-dialog";
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
+import {useUser} from "@/contexts/UserProvider";
 
 interface DashboardInventoryProps {
   dict: any
@@ -23,6 +24,7 @@ interface DashboardInventoryProps {
 
 export function DashboardInventory({ dict }: DashboardInventoryProps) {
   const { selectedProject, updateInventoryItemStatus, deleteInventoryItem } = useProject()
+  const {user:currentUser} = useUser()
 
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
@@ -31,13 +33,12 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [currentItem, setCurrentItem] = useState<InventoryItem | null>(null)
-  //const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([])
 
   // Inicializar el inventario si no existe
   const inventory = selectedProject?.inventory || []
 
   // Filtrar elementos según los criterios de búsqueda y filtros
-// Reemplaza el useEffect con un useMemo para calcular filteredItems
+  // Reemplaza el useEffect con un useMemo para calcular filteredItems
   const filteredItems = useMemo(() => {
     let filtered = [...inventory]
 
@@ -239,23 +240,25 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             </div>
 
             {/* Contenedor de botones - Se mantiene a la derecha */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <Button variant="outline" className="gap-1 w-full sm:w-auto cursor-pointer" onClick={handleExportPDF}
-                      disabled={!selectedProject} >
-                <FileDown className="h-4 w-4" />
-                <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
-              </Button>
+            {(currentUser?.role === "admin") && (
+              <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <Button variant="outline" className="gap-1 w-full sm:w-auto cursor-pointer" onClick={handleExportPDF}
+                        disabled={!selectedProject} >
+                  <FileDown className="h-4 w-4" />
+                  <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
+                </Button>
 
-              <Button
-                  className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500
-                  hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
-                  onClick={() => setShowAddDialog(true)}
-                  disabled={!selectedProject}
-              >
-                <Plus className="h-4 w-4" />
-                <span>{dict.inventory?.addItem || "Add Item"}</span>
-              </Button>
-            </div>
+                <Button
+                    className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500
+                    hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
+                    onClick={() => setShowAddDialog(true)}
+                    disabled={!selectedProject}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>{dict.inventory?.addItem || "Add Item"}</span>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -339,75 +342,77 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                               </div>
                             </div>
 
-                            <div className="flex flex-col justify-end gap-2">
-                              <div className="flex flex-row md:flex-col gap-2">
-                              <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-4"
-                                  onClick={() => {
-                                    setCurrentItem(item)
-                                    setShowEditDialog(true)
-                                  }}
-                              >
-                                <Edit className="h-4 w-4" />
-                                <span>{dict.common?.edit || "Edit"}</span>
-                              </Button>
+                            {(currentUser?.role === "admin") && (
+                              <div className="flex flex-col justify-end gap-2">
+                                <div className="flex flex-row md:flex-col gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-4"
+                                    onClick={() => {
+                                      setCurrentItem(item)
+                                      setShowEditDialog(true)
+                                    }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                  <span>{dict.common?.edit || "Edit"}</span>
+                                </Button>
 
-                              <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
-                                  onClick={() => {
-                                    setCurrentItem(item)
-                                    setShowDeleteDialog(true)
-                                  }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                                <span>{dict.common?.delete || "Delete"}</span>
-                              </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
+                                    onClick={() => {
+                                      setCurrentItem(item)
+                                      setShowDeleteDialog(true)
+                                    }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  <span>{dict.common?.delete || "Delete"}</span>
+                                </Button>
 
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+
+                                {item.status !== "In_Budget" && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-1 text-blue-500 border-blue-500/30 hover:bg-blue-500/10"
+                                        onClick={() => handleStatusChange(item, "In_Budget")}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                      <span>{dict.inventory?.moveToInBudget || "Move to Budget"}</span>
+                                    </Button>
+                                )}
+
+                                {item.status !== "Pending" && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-1 text-amber-500 border-amber-500/30 hover:bg-amber-500/10"
+                                        onClick={() => handleStatusChange(item, "Pending")}
+                                    >
+                                      <Clock className="h-4 w-4" />
+                                      <span>{dict.inventory?.moveToPending || "Move to Pending"}</span>
+                                    </Button>
+                                )}
+
+                                {item.status !== "Installed" && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-1 text-green-500 border-green-500/30 hover:bg-green-500/10"
+                                        onClick={() => handleStatusChange(item, "Installed")}
+                                    >
+                                      <CheckCircle className="h-4 w-4" />
+                                      <span>{dict.inventory?.moveToInstalled || "Move to Installed"}</span>
+                                    </Button>
+                                )}
+                                </div>
                               </div>
-
-                              <div className="flex flex-col gap-2">
-
-                              {item.status !== "In_Budget" && (
-                                  <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="gap-1 text-blue-500 border-blue-500/30 hover:bg-blue-500/10"
-                                      onClick={() => handleStatusChange(item, "In_Budget")}
-                                  >
-                                    <FileText className="h-4 w-4" />
-                                    <span>{dict.inventory?.moveToInBudget || "Move to Budget"}</span>
-                                  </Button>
-                              )}
-
-                              {item.status !== "Pending" && (
-                                  <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="gap-1 text-amber-500 border-amber-500/30 hover:bg-amber-500/10"
-                                      onClick={() => handleStatusChange(item, "Pending")}
-                                  >
-                                    <Clock className="h-4 w-4" />
-                                    <span>{dict.inventory?.moveToPending || "Move to Pending"}</span>
-                                  </Button>
-                              )}
-
-                              {item.status !== "Installed" && (
-                                  <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="gap-1 text-green-500 border-green-500/30 hover:bg-green-500/10"
-                                      onClick={() => handleStatusChange(item, "Installed")}
-                                  >
-                                    <CheckCircle className="h-4 w-4" />
-                                    <span>{dict.inventory?.moveToInstalled || "Move to Installed"}</span>
-                                  </Button>
-                              )}
-                              </div>
-                            </div>
+                            )}
                           </div>
                         </div>
                     ))
@@ -420,15 +425,17 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                       <p className="text-muted-foreground mb-4">
                         {dict.inventory?.tryAdjustingFilters || "Try adjusting your filters or add a new item"}
                       </p>
-                      <Button
-                          onClick={() => setShowAddDialog(true)}
-                          disabled={!selectedProject}
-                          className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500
-                          hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
-                      >
-                        <Plus className="h-4 w-4" />
-                        <span>{dict.inventory?.addFirstItem || "Add your first item"}</span>
-                      </Button>
+                      {(currentUser?.role === "admin") && (
+                        <Button
+                            onClick={() => setShowAddDialog(true)}
+                            disabled={!selectedProject}
+                            className="gap-1 bg-gradient-to-r from-cyan-500 to-blue-500
+                            hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
+                        >
+                          <Plus className="h-4 w-4" />
+                          <span>{dict.inventory?.addFirstItem || "Add your first item"}</span>
+                        </Button>
+                      )}
                     </div>
                 )}
               </div>

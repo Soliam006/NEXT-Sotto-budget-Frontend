@@ -4,8 +4,8 @@ export type Language = 'es' | 'en' | 'ca';
 
 export interface Availability {
   id?: string // Para identificación local
-  from: string // ISO 8601 e.g. '2025-03-20T10:00:00Z'
-  to: string
+  start_date: string // ISO 8601 e.g. '2025-03-20T10:00:00Z'
+  end_date: string
 }
 
 export interface UserFollower {
@@ -30,13 +30,13 @@ export interface User {
   description?: string
   avatar?: string // URL to the avatar image
   created_at?: string // ISO 8601 e.g. '2025-03-20T10:00:00Z'
-  availabilities?: Availability[]
   followers?: UserFollower[]
   following?: UserFollower[]
   requests?: UserFollower[]
   client?: {
-    client_id: number
-    budget_limit: number
+    client_id?: number
+    budget_limit?: number
+    availabilities?: Availability[]
   }
   worker?: WorkerData
   admin?: AdminData

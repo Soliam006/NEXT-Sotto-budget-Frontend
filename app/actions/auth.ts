@@ -223,16 +223,11 @@ export async function updateUserInformation(updateData: User, actual_user:User|n
 
     } catch (error) {
         return {
-            status: 'error',
+            status: 500,
             data: null,
             message: translates.serverError,
         };
     }
-    const json = await response.json();
-    console.log("JSON RESPONSE", json)
-
-    if(json.detail) redirect(`/es/login`)
-
-    return {status: 'success', message: 'User updated successfully', data: json};
+    return await response.json()
 }
 

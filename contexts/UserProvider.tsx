@@ -4,7 +4,7 @@ import React, {createContext, useContext, useState, useEffect, useCallback} from
 import {User, UserFollower} from '../lib/types/user.types';
 import {acceptRequestBD, followUserBD, rejectFollowerBD, unfollowUserBD} from "@/app/actions/follows";
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
-import {fetchUserMe} from "@/app/actions/auth";
+import {fetchUserMe, updateUserInformation} from "@/app/actions/auth";
 import {redirect} from "next/navigation";
 import Swal from "sweetalert2";
 
@@ -19,13 +19,12 @@ interface UserContextType {
   token: string | null;
   setToken: (token: string | null, rememberMe: boolean, lang:string) => void;
   updateUser: (updatedFields: Partial<User>) => void;
-  saveProfile: (updatedFields: Partial<User>) => Promise<void>;
-  acceptFollower: (followerId: number) => Promise<void>;
+  saveProfile: (updatedFields: User) => Promise<number>;
+  acceptFollower: (followerId: number) => void;
   removeFollower: (followerId: number) => void;
   rejectFollower: (followerId: number) => void;
   followUser: (followingId: number) => void;
   unfollowUser: (followingId: number) => void;
-  updateAvailability: (availabilities: User['availabilities']) => void;
   isSaving: boolean;
 }
 
@@ -40,6 +39,7 @@ export const UserProvider = ({ children }: Props) => {
   const [tokenState, setTokenState] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null);
 
   // NUEVO: Inicializa el token desde coockies al montar
   useEffect(() => {
@@ -86,23 +86,34 @@ export const UserProvider = ({ children }: Props) => {
     setUser({ ...user, ...updatedFields });
   };
 
-  const saveProfile = async (updatedFields: Partial<User>): Promise<void> => {
-    if (!user) return;
+  const saveProfile = async (updatedFields: User) : Promise<number> => {
+    if (!user) return 500; // Si no hay usuario, retornar error
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await updateUserInformation( updatedFields, user, tokenState, { serverError: "Something went Wrong" });
+      // Verificar si la respuesta es válida
+      if (!response) {
+          return 500;
+      }
+      // Si la respuesta no es 200, manejar el error
+      if (response.statusCode !== 200) {
+          return response.statusCode;
+      }
+      // Actualizar el usuario en el estado
       updateUser(updatedFields);
-      console.log("Perfil actualizado con éxito");
+      setInfo( "Profile updated successfully" );
+      return response.statusCode;
+
     } catch (error) {
       console.error("Error al actualizar el perfil:", error);
-      throw error;
+      return 500; // Retornar un código de error genérico
     } finally {
       setIsSaving(false);
     }
   };
 
 
-  const acceptFollower = async (followerId: number): Promise<void> => {
+  const acceptFollower = async (followerId: number) => {
     if (!user || !tokenState) setError("Please Login Again");
 
     setIsSaving(true);
@@ -172,7 +183,7 @@ export const UserProvider = ({ children }: Props) => {
 
     } catch (error) {
       console.error("Error al rechazar el seguidor:", error);
-      throw error;
+      setError( error instanceof Error ? error.message : "Failed to reject follower");
     } finally {
       setIsSaving(false);
     }
@@ -241,14 +252,20 @@ export const UserProvider = ({ children }: Props) => {
     }
   }, [error, showErrorAlert]);
 
-
-  const updateAvailability = (availabilities: User['availabilities']) => {
-    if (!user) return;
-    setUser({
-      ...user,
-      availabilities,
+  const showInfoAlert = useCallback((infoMessage: string) => {
+    Swal.fire({
+      title: "Info",
+      text: infoMessage,
+      icon: 'info',
+      confirmButtonText: 'Aceptar',
     });
-  };
+  }, []);
+  // Efecto para mostrar información cuando cambie
+  useEffect(() => {
+    if (info) {
+      showInfoAlert(info);
+    }
+  }, [info, showInfoAlert]);
 
   const value: UserContextType = {
     user,
@@ -262,7 +279,6 @@ export const UserProvider = ({ children }: Props) => {
     rejectFollower,
     followUser,
     unfollowUser,
-    updateAvailability,
     isSaving
   };
 

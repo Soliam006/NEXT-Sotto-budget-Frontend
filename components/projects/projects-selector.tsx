@@ -13,6 +13,7 @@ import { AddProjectDialog } from "@/components/projects/add-project-dialog"
 import {InventoryItem} from "@/lib/types/inventory-item";
 import {Task} from "@/lib/types/tasks";
 import {Expenses} from "@/lib/types/expenses";
+import {useUser} from "@/contexts/UserProvider";
 
 export interface Project {
   id: number
@@ -54,6 +55,7 @@ interface ProjectsSelectorProps {
 
 export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
   const { projects, selectedProject, hasChanges, setSelectedProjectById, saveChanges, discardChanges } = useProject()
+  const {user:currentUser} = useUser()
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingProjectId, setPendingProjectId] = useState<number | null>(null)
@@ -107,15 +109,18 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                     <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
                       {projects.length} {dict.dashboard?.projects || "Projects"}
                     </Badge>
-                    <Button
-                        variant="outline"
-                        className="h-8 px-2 bg-primary/10 text-primary hover:bg-primary/20 flex items-center gap-1 cursor-pointer"
-                        onClick={() => setShowAddProject(true)}
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span className="text-xs">{dict.projects?.addProject || "Add Project"}</span>
-                    </Button>
-                  </div>
+                    {currentUser?.role === "admin" ? (
+                        <Button
+                            variant="outline"
+                            className="h-8 px-2 bg-primary/10 text-primary hover:bg-primary/20 flex items-center gap-1 cursor-pointer"
+                            onClick={() => setShowAddProject(true)}
+                        >
+                          <Plus className="h-4 w-4" />
+                          <span className="text-xs">{dict.projects?.addProject || "Add Project"}</span>
+                        </Button>
+                      ): (<></>)
+                  }
+              </div>
               )}
             </div>
           </CardHeader>
@@ -215,14 +220,16 @@ export function ProjectsSelector({ dict }: ProjectsSelectorProps) {
                   <div className="flex flex-col items-center justify-center p-8 gap-4">
                     <div className="text-center text-muted-foreground">
                       <p className="mb-4">{dict.dashboard?.noProjectsAvailable || "No projects available"}</p>
-                      <Button
-                          variant="default"
-                          className="bg-primary hover:bg-primary/90 h-10 px-6 flex items-center gap-2 cursor-pointer"
-                          onClick={() => setShowAddProject(true)}
-                      >
-                        <Plus className="h-5 w-5" />
-                        <span>{dict.projects?.addProject || "Add Project"}</span>
-                      </Button>
+                      {(currentUser?.role === "admin") && (
+                        <Button
+                            variant="default"
+                            className="bg-primary hover:bg-primary/90 h-10 px-6 flex items-center gap-2 cursor-pointer"
+                            onClick={() => setShowAddProject(true)}
+                        >
+                          <Plus className="h-5 w-5" />
+                          <span>{dict.projects?.addProject || "Add Project"}</span>
+                        </Button>
+                      )}
                     </div>
                   </div>
               )}

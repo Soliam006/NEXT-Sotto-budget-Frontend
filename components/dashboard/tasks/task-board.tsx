@@ -6,6 +6,7 @@ import { PlusCircle, Save, Loader2 } from "lucide-react"
 import { useProject } from "@/contexts/project-context"
 import {useEffect} from "react";
 import { Task } from "@/lib/types/tasks"
+import {useUser} from "@/contexts/UserProvider";
 
 interface TaskBoardProps {
     dict: any
@@ -15,6 +16,7 @@ interface TaskBoardProps {
 export function TaskBoard({ dict, lang }: TaskBoardProps) {
     const { selectedProject, addTask, updateTask, deleteTask, updateTaskStatus, saveChanges, hasChanges, isSaving } =
       useProject()
+    const { user:currentUser } = useUser()
 
     useEffect(() => {
         console.log("Selected Project IN TAAAAABS:", selectedProject)
@@ -48,6 +50,8 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
       <div className="space-y-6">
           <div className="flex flex-col md:flex-row justify-between gap-1 items-center">
               <h2 className="text-xl font-bold">{dict.tasks?.taskBoard || "Task Board"}</h2>
+
+              {(currentUser?.role === "admin" ) && (
               <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -68,9 +72,10 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                         </>
                       )}
                   </Button>
-                  {selectedProject && (
+                  {(selectedProject && currentUser?.role === "admin" ) && (
                   <AddTaskDialog dict={dict} lang={lang} onAddTask={handleAddTask} teamMembers={selectedProject?.team || []} />)}
               </div>
+              )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

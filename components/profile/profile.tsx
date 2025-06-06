@@ -3,7 +3,7 @@
 import {useEffect, useState} from "react"
 import {
   Activity, AlertCircle, Bell, Building, Calendar, Check, Edit, FileText, Mail,
-  MapPin, MessageSquare, Phone, Share2, UserPlus, Users, X,
+  MapPin, MessageSquare, Phone, Users, X,
 } from "lucide-react"
 import {useRouter} from "next/navigation"
 
@@ -14,9 +14,8 @@ import {Badge} from "@/components/ui/badge"
 import {useUser} from "@/contexts/UserProvider";
 import {EditProfileDialog} from "./dialogs/edit-profile-dialog"
 import {AvailabilityDisplay} from "./availability-display"
-import {getRole, getToken} from "@/app/services/auth-service";
+import {getRole} from "@/app/services/auth-service";
 import {User as User_Type} from "@/lib/types/user.types";
-import {updateUserInformation} from "@/app/actions/auth";
 import {FollowingProfileDialog} from "@/components/profile/dialogs/following-profile-dialog";
 import {FollowersProfileDialog} from "@/components/profile/dialogs/followers-profile-dialog";
 import {RequestsProfileDialog} from "@/components/profile/dialogs/request-profile-dialog";
@@ -32,11 +31,11 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
     rejectFollower,
     followUser,
     unfollowUser,
-    isSaving} = useUser();
+    isSaving,
+    saveProfile
+  } = useUser();
 
   const {projects} = useProject()
-
-  const [user_data, setUser_data] = useState<User_Type | null>(user);
 
   const [isProjectsDialogOpen, setIsProjectsDialogOpen] = useState(false)
   const [isFollowersDialogOpen, setIsFollowersDialogOpen] = useState(false)
@@ -72,23 +71,13 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
     }
   }
   // Handle accept request
-const handleAcceptRequest = async (userId: number) => {
-  try {
-    await acceptFollower(userId);
-    console.log("Request accepted for user ID:", userId);
-
-  } catch (error) {
-    alert(`Error: ${error}`);
+  const handleAcceptRequest = async (userId: number) => {
+      acceptFollower(userId);
   }
-}
 
   // Handle reject request
   const handleRejectRequest = async (userId: number) => {
-    try {
-      await rejectFollower(userId);
-    } catch (error) {
-      alert(`Error: ${error}`);
-    }
+     rejectFollower(userId);
   }
   /**
    * Handle save profile
@@ -97,40 +86,22 @@ const handleAcceptRequest = async (userId: number) => {
    */
   const handleSaveProfile = async (updatedUser: User_Type): Promise<void> => {
     // Simulate API call
-    const response = await updateUserInformation(updatedUser, user_data, getToken(), dict.common);
+    const statusCode = await saveProfile(updatedUser);
 
-    console.log("Response:", response);
-    if (response.status !== "success") {
-      throw new Error(response.message);
-    }
-
-    if (response.data) {
-      const json = response.data;
-      if (json.statusCode === 400) {
-        throw new Error(
+    if (statusCode === 400) {
+      throw new Error(
           JSON.stringify({
             email: dict.signup.validation.emailTaken || "Email slslsls already taken",
           })
-        );
-      }
-      if (json.statusCode === 409) {
-        throw new Error(
+      );
+    }
+    if (statusCode === 409) {
+      throw new Error(
           JSON.stringify({
             username: dict.signup.validation.userTaken || "Username sksksksk already taken",
           })
-        );
-      }
-    } else {
-      throw new Error(dict.common.serverError);
+      );
     }
-
-    console.log("GUARDANDO USUARIO", updatedUser);
-    // Update user_data state
-    setUser_data(updatedUser);
-    setUser(updatedUser);
-
-    // Show success message
-    alert(`Title: ${dict.profile.edit.successTitle} Message: ${dict.profile.edit.successMessage}`);
 
     // If language preference changed, redirect to new language
     if (updatedUser.language_preference !== lang) {
@@ -252,7 +223,7 @@ const handleAcceptRequest = async (userId: number) => {
             </Card>
 
             {/* Availability Display */}
-            <AvailabilityDisplay availabilities={user?.availabilities || []} lang={lang} dictionary={dict}/>
+            <AvailabilityDisplay availabilities={user?.client?.availabilities || []} lang={lang} dictionary={dict}/>
 
             {/* Follow Requests */}
             {user?.requests &&( user.requests.length > 0 ) && (
@@ -431,7 +402,6 @@ const handleAcceptRequest = async (userId: number) => {
 
       {/* Edit Profile Dialog */}
       <EditProfileDialog
-        user={user}
         open={isEditProfileOpen}
         onOpenChange={setIsEditProfileOpen}
         onSave={handleSaveProfile}

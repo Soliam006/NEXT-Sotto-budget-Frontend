@@ -60,11 +60,11 @@ export function AvailabilityDisplay({
               <div key={availability.id || index} className="p-3 rounded-md bg-secondary/30 border border-border/50">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                    {formatDate(availability.from)}
+                    {formatDate(availability.start_date)}
                   </Badge>
                   <span className="hidden sm:inline text-muted-foreground">→</span>
                   <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                    {formatDate(availability.to)}
+                    {formatDate(availability.end_date)}
                   </Badge>
                 </div>
               </div>

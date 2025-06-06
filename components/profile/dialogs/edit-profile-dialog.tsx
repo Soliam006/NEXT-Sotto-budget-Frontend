@@ -45,35 +45,36 @@ const createProfileSchema = (translates: any) => {
 import {User, Availability} from "@/lib/types/user.types"
 
 import isEqual from 'lodash.isequal';
+import {useUser} from "@/contexts/UserProvider";
 
 export function EditProfileDialog({
-                                    user,
                                     open,
                                     onOpenChange,
                                     onSave,
                                     dictionary,
                                     lang,
                                   }: {
-  user: User | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSave: (user: User) => Promise<void>
   dictionary: any
   lang: string
 }) {
+  const {user} = useUser()
+
   if (!user) return null
   const t = dictionary.profile.edit
   const t_validation = dictionary.signup.validation
   const formRef = useRef<HTMLFormElement>(null)
-  const [availabilities, setAvailabilities] = useState<Availability[]>(user.availabilities || [])
+  const [availabilities, setAvailabilities] = useState<Availability[]>(user.client?.availabilities || [])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [noChangeDetected, setNoChangeDetected] = useState(true)
   const [newAvailability, setNewAvailability] = useState<{
-    from: Date | undefined
-    to: Date | undefined
+    start_date: Date | undefined
+    end_date: Date | undefined
   }>({
-    from: undefined,
-    to: undefined,
+    start_date: undefined,
+    end_date: undefined,
   })
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
 
@@ -122,8 +123,12 @@ export function EditProfileDialog({
       const updatedUser: User = {
         ...user,
         ...validationResult.data,
-        availabilities,
+        client: {
+          ...user.client,
+          availabilities,
+        },
       }
+
       try {
         await onSave(updatedUser)
       } catch (error: any) {
@@ -138,7 +143,6 @@ export function EditProfileDialog({
         setErrors({
           ...formattedErrors,
         });
-        alert("No se pudo guardar el perfil");
         return;
       }
 
@@ -155,8 +159,8 @@ export function EditProfileDialog({
   // Validar disponibilidades
   const validateAvailabilities = (availabilities: Availability[]) => {
     for (const availability of availabilities) {
-      const fromDate = new Date(availability.from)
-      const toDate = new Date(availability.to)
+      const fromDate = new Date(availability.start_date)
+      const toDate = new Date(availability.end_date)
 
       if (fromDate >= toDate) {
         return {
@@ -170,10 +174,10 @@ export function EditProfileDialog({
 
   // Agregar nueva disponibilidad
   const addAvailability = () => {
-    if (!newAvailability.from || !newAvailability.to) return
+    if (!newAvailability.start_date || !newAvailability.end_date) return
 
-    const fromDate = newAvailability.from
-    const toDate = newAvailability.to
+    const fromDate = newAvailability.start_date
+    const toDate = newAvailability.end_date
 
     if (fromDate >= toDate) {
       setErrors({
@@ -184,13 +188,13 @@ export function EditProfileDialog({
 
     const newItem: Availability = {
       id: `avail-${Date.now()}`,
-      from: fromDate.toISOString(),
-      to: toDate.toISOString(),
+      start_date: fromDate.toISOString(),
+      end_date: toDate.toISOString(),
     }
 
     const updated = [...availabilities, newItem]
     setAvailabilities(updated)
-    setNewAvailability({from: undefined, to: undefined})
+    setNewAvailability({start_date: undefined, end_date: undefined})
     setErrors({...errors, newAvailability: undefined})
     handleChanges(updated) // <-- pasamos el array actualizado
   }
@@ -229,7 +233,7 @@ export function EditProfileDialog({
       location !== user.location ||
       description !== user.description ||
       language_preference !== user.language_preference ||
-      (!isEqual(currentAvailabilities, user?.availabilities))
+      (!isEqual(currentAvailabilities, user?.client?.availabilities))
     ) {
       setNoChangeDetected(false)
     } else {
@@ -381,18 +385,18 @@ export function EditProfileDialog({
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-foreground">{t.currentAvailabilities}</h4>
                   <div className="space-y-2">
-                    {availabilities.map((availability) => (
+                    {availabilities.map((availability:Availability) => (
                       <div
                         key={availability.id}
                         className="flex items-center justify-between p-3 rounded-md bg-secondary/50 border border-border"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                           <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                            {formatDate(availability.from)}
+                            {formatDate(availability.start_date)}
                           </Badge>
                           <span className="hidden sm:inline text-muted-foreground">→</span>
                           <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                            {formatDate(availability.to)}
+                            {formatDate(availability.end_date)}
                           </Badge>
                         </div>
                         <Button
@@ -425,8 +429,8 @@ export function EditProfileDialog({
                           className="w-full justify-start text-left font-normal bg-background border-input text-foreground"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4"/>
-                          {newAvailability.from ? (
-                            format(newAvailability.from, "PPP", {locale: lang === "es" ? es : enUS})
+                          {newAvailability.start_date ? (
+                            format(newAvailability.start_date, "PPP", {locale: lang === "es" ? es : enUS})
                           ) : (
                             <span className="text-muted-foreground">{t.selectStartDate}</span>
                           )}
@@ -434,12 +438,12 @@ export function EditProfileDialog({
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
                       <Calendar
-                        selected={newAvailability.from}
-                        onSelect={(date: any) => setNewAvailability({...newAvailability, from: date})}
+                        selected={newAvailability.start_date}
+                        onSelect={(date: any) => setNewAvailability({...newAvailability, start_date: date})}
                         disabled={(date: Date) => {
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
-                          return (newAvailability.to ? date > newAvailability.to : false) || date < today;
+                          return (newAvailability.end_date ? date > newAvailability.end_date : false) || date < today;
                         }}
                         /*locale=lang*/
                       />
@@ -456,8 +460,8 @@ export function EditProfileDialog({
                           className="w-full justify-start text-left font-normal bg-background border-input text-foreground"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4"/>
-                          {newAvailability.to ? (
-                            format(newAvailability.to, "PPP", {locale: lang === "es" ? es : enUS})
+                          {newAvailability.end_date ? (
+                            format(newAvailability.end_date, "PPP", {locale: lang === "es" ? es : enUS})
                           ) : (
                             <span className="text-muted-foreground">{t.selectEndDate}</span>
                           )}
@@ -465,9 +469,9 @@ export function EditProfileDialog({
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
                         <Calendar
-                          selected={newAvailability.to}
-                          disabled={(date: Date) => newAvailability.from ? date < newAvailability.from : false}
-                          onSelect={(date: any) => setNewAvailability({...newAvailability, to: date})}
+                          selected={newAvailability.end_date}
+                          disabled={(date: Date) => newAvailability.start_date ? date < newAvailability.start_date : false}
+                          onSelect={(date: any) => setNewAvailability({...newAvailability, end_date: date})}
                           /*locale={lang === "es" ? es : enUS*/
                         />
                       </PopoverContent>
@@ -477,7 +481,7 @@ export function EditProfileDialog({
                   <Button
                     type="button"
                     onClick={addAvailability}
-                    disabled={!newAvailability.from || !newAvailability.to}
+                    disabled={!newAvailability.start_date || !newAvailability.end_date}
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <PlusCircle className="h-4 w-4 mr-2"/>
