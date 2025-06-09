@@ -17,6 +17,8 @@ import {AddInventoryItemDialog} from "@/components/dashboard/inventory/add-inven
 import {EditInventoryItemDialog} from "@/components/dashboard/inventory/edit-inventory-item-dialog";
 import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
 import {useUser} from "@/contexts/UserProvider";
+import {InventoryPDFTemplate} from "@/components/pdf/inventory-pdf";
+import {PDFDownloadLink, PDFViewer} from "@react-pdf/renderer";
 
 interface DashboardInventoryProps {
   dict: any
@@ -39,7 +41,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
 
   // Filtrar elementos según los criterios de búsqueda y filtros
   // Reemplaza el useEffect con un useMemo para calcular filteredItems
-  const filteredItems = useMemo(() => {
+  const filteredItems:InventoryItem[] = useMemo(() => {
     let filtered = [...inventory]
 
     if (searchQuery) {
@@ -99,15 +101,6 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
     }
   }
 
-  // Manejar exportación a PDF
-  const handleExportPDF = () => {
-    /*toast({
-      title: dict.inventory?.exportStarted || "Export Started",
-      description: dict.inventory?.exportDescription || "Your inventory report is being generated",
-    })*/
-    // Aquí iría la lógica real de exportación a PDF
-  }
-
   function get_status_translate(status: string) {
     switch (status) {
       case "In_Budget":
@@ -135,10 +128,12 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
         return category
     }
   }
+  const canGeneratePDF = selectedProject && filteredItems.length > 0;
 
   return (
       <div className="space-y-4">
         <div className="flex flex-col lg:flex-row gap-4">
+
           {/* Tarjeta de resumen */}
           <Card className="flex-1">
             <CardHeader className="pb-2">
@@ -157,7 +152,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                       {inBudgetItems.length}
                     </Badge>
                   </div>
-                  <div className="text-2xl font-bold">${inBudgetCost.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">€{inBudgetCost.toLocaleString()}</div>
                   <Progress value={(inBudgetCost / totalCost) * 100} className="h-2 mt-2"
                             indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500"/>
                 </div>
@@ -169,7 +164,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                       {pendingItems.length}
                     </Badge>
                   </div>
-                  <div className="text-2xl font-bold">${pendingCost.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">€{pendingCost.toLocaleString()}</div>
                   <Progress value={(pendingCost / totalCost) * 100} className="h-2 mt-2"
                             indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500" />
                 </div>
@@ -181,7 +176,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                       {installedItems.length}
                     </Badge>
                   </div>
-                  <div className="text-2xl font-bold">${installedCost.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">€{installedCost.toLocaleString()}</div>
                   <Progress value={(installedCost / totalCost) * 100} className="h-2 mt-2"
                             indicatorClassName="bg-gradient-to-r from-cyan-500 to-blue-500" />
                 </div>
@@ -195,6 +190,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
           />
           </div>
         </div>
+
         {/* Barra de acciones - Versión corregida */}
         <div className="flex flex-col xl:flex-row gap-4 w-full items-stretch xl:items-center">
           {/* Contenedor del buscador - Ocupa espacio disponible */}
@@ -242,11 +238,31 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             {/* Contenedor de botones - Se mantiene a la derecha */}
             {(currentUser?.role === "admin") && (
               <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                <Button variant="outline" className="gap-1 w-full sm:w-auto cursor-pointer" onClick={handleExportPDF}
-                        disabled={!selectedProject} >
-                  <FileDown className="h-4 w-4" />
-                  <span>{dict.inventory?.exportPDF || "Export PDF"}</span>
-                </Button>
+              <PDFDownloadLink
+                document={
+                  <InventoryPDFTemplate
+                      inventory={inventory}
+                      projectName={selectedProject?.title}
+                      dict={dict}
+                  />}
+                fileName={`inventory-${selectedProject?.title || "project"}.pdf`}
+                className="w-full sm:w-auto"
+              >
+                {({ loading }) => (
+                  <Button
+                    variant="outline"
+                    className="gap-1 w-full sm:w-auto cursor-pointer"
+                    disabled={!selectedProject || loading}
+                  >
+                    <FileDown className="h-4 w-4" />
+                    <span>
+                      {loading
+                        ? dict.inventory?.generatingPDF || "Generando PDF..."
+                        : dict.inventory?.exportPDF || "Exportar PDF"}
+                    </span>
+                  </Button>
+                )}
+              </PDFDownloadLink>
 
                 <Button
                     className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500
@@ -319,11 +335,11 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
                                 </div>
                                 <div>
                                   <p className="text-sm text-muted-foreground">{dict.inventory?.unit_cost || "Unit Cost"}</p>
-                                  <p className="font-medium">${item.unit_cost.toLocaleString()}</p>
+                                  <p className="font-medium">€{item.unit_cost.toLocaleString()}</p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-muted-foreground">{dict.inventory?.totalCost || "Total Cost"}</p>
-                                  <p className="font-medium">${(item.total * item.unit_cost).toLocaleString()}</p>
+                                  <p className="font-medium">€{(item.total * item.unit_cost).toLocaleString()}</p>
                                 </div>
                               </div>
 

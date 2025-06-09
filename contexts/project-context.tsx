@@ -81,6 +81,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null)
 
   function cargarProjectos() {
     setLoading(true) // Iniciar el estado de carga
@@ -336,21 +337,28 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   const addInventoryItem = (item: any) => {
     if (!selectedProject) return;
 
-    const newItem = {
-      ...item,
-      id: Math.max(0, ...(selectedProject.inventory?.map(i => i.id ?? 0) || [])) + 1
-    };
+    try {
+      const newItem = {
+        ...item,
+        id: Math.max(0, ...(selectedProject.inventory?.map(i => i.id ?? 0) || [])) + 1
+      };
 
-    const updatedInventory = [...(selectedProject.inventory || []), newItem];
+      const updatedInventory = [...(selectedProject.inventory || []), newItem];
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      inventory: updatedInventory,
-    } : prev);
+      setSelectedProject(prev => prev ? {
+        ...prev,
+        inventory: updatedInventory,
+      } : prev);
 
-    updatePendingChanges({
-      inventory: updatedInventory
-    });
+      updatePendingChanges({
+        inventory: updatedInventory
+      });
+    } catch (error) {
+        console.error("Error al añadir el item al inventario:", error);
+        setError(error instanceof Error ? error.message : "Error al añadir el item al inventario");
+    } finally {
+      setInfo("Item added to inventory successfully");
+    }
   }
 
   // Actualizar un item del inventario
@@ -552,6 +560,24 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       showErrorAlert(error);
     }
   }, [error, showErrorAlert]);
+
+    // Efecto para mostrar información cuando cambie
+    const showInfoAlert = useCallback((infoMessage: string) => {
+      Swal.fire({
+        title: dictionary?.common?.infoTitle || 'Info',
+        text: infoMessage,
+        icon: 'info',
+        confirmButtonText: dictionary?.common.acept || 'Aceptar',
+      });
+    }, [dictionary]);
+
+    // Efecto para mostrar información cuando cambie
+    useEffect(() => {
+        if (info) {
+            showInfoAlert(info);
+        }
+
+    }, [info, showInfoAlert]);
 
   // Descartar cambios
   const discardChanges = () => {

@@ -20,7 +20,6 @@ export async function fetchNotificationsBD(token: string | null) {
         })
 
     } catch (error) {
-        console.error("Error fetching notifications:", error)
         return null;
     }
 }

@@ -219,7 +219,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                           <span className="text-muted-foreground text-sm">
                             {dict.dashboard?.totalBudget || "Total Budget"}
                           </span>
-                              <span className="text-2xl font-bold">${selectedProject.limit_budget}</span>
+                              <span className="text-2xl font-bold">€{selectedProject.limit_budget}</span>
                               <div className="flex items-center text-xs text-muted-foreground mt-1">
                                 <span>{dict.expenses?.projectBudget || "Project Budget"}</span>
                               </div>
@@ -234,7 +234,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                             <span className="text-muted-foreground text-sm">
                               {dict.expenses?.budgetUsed || "Total Spent"}
                             </span>
-                                <span className="text-2xl font-bold">${totalExpenses}</span>
+                                <span className="text-2xl font-bold">€{totalExpenses}</span>
                                 <div className="flex items-center text-xs text-muted-foreground mt-1">
                               <span>
                                 {Math.round((totalExpenses / selectedProject.limit_budget) * 100)}%{" "}
@@ -295,7 +295,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                             <Cell key={`cell-${index}`} fill={entry.color}/>
                                         ))}
                                       </Pie>
-                                      <Tooltip formatter={(value: string) => `$${value}`}/>
+                                      <Tooltip formatter={(value: string) => `€${value}`}/>
                                     </PieChart>
                                   </ResponsiveContainer>
                                 </div>
@@ -304,7 +304,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                       <div key={index} className="flex items-center">
                                         <div className="h-3 w-3 rounded-full mr-2" style={{backgroundColor: entry.color}}></div>
                                         <span className="text-sm">
-                                  {entry.name}: ${entry.value.toLocaleString()}
+                                  {entry.name}: €{entry.value.toLocaleString()}
                                 </span>
                                       </div>
                                   ))}
@@ -336,7 +336,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                         <TableRow key={expense.id} className="border-border">
                                           <TableCell>{formatDate(expense.expense_date) || expense.expense_date}</TableCell>
                                           <TableCell>{expense.category}</TableCell>
-                                          <TableCell>${expense.amount}</TableCell>
+                                          <TableCell>€{expense.amount}</TableCell>
                                           <TableCell>
                                             <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
                                           </TableCell>
@@ -440,7 +440,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                             <TableCell>{formatDate(expense.expense_date) || expense.expense_date}</TableCell>
                                             <TableCell>{expense.category}</TableCell>
                                             <TableCell>{expense.description}</TableCell>
-                                            <TableCell>${expense.amount}</TableCell>
+                                            <TableCell>€{expense.amount}</TableCell>
                                             <TableCell>
                                               <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
                                             </TableCell>
@@ -488,7 +488,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                     <BarChart data={monthlyExpenses}>
                                       <XAxis dataKey="name"/>
                                       <YAxis/>
-                                      <Tooltip formatter={(value: string) => `$${value}`}/>
+                                      <Tooltip formatter={(value: string) => `€${value}`}/>
                                       <Legend/>
                                       <Bar dataKey="amount" name={dict.expenses?.amount || "Amount"} fill="#3b82f6"/>
                                     </BarChart>
@@ -514,13 +514,13 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                           cy="50%"
                                           outerRadius={120}
                                           dataKey="value"
-                                          label={({name, value, percent}: any) => `${name}: $${value} (${(percent * 100).toFixed(0)}%)`}
+                                          label={({name, value, percent}: any) => `${name}: €${value} (${(percent * 100).toFixed(0)}%)`}
                                       >
                                         {pieChartData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color}/>
                                         ))}
                                       </Pie>
-                                      <Tooltip formatter={(value: string) => `$${value}`}/>
+                                      <Tooltip formatter={(value: string) => `€${value}`}/>
                                       <Legend/>
                                     </PieChart>
                                   </ResponsiveContainer>

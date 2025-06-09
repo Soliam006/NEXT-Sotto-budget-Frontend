@@ -1,6 +1,7 @@
 "use server"
 import {redirect} from "next/navigation";
 import {InventoryItem} from "@/lib/types/inventory-item";
+
 const inventory_URL = process.env.BASE_URL_BACK + "inventory/"
 
 
@@ -19,17 +20,10 @@ export async function createInventory(token: string | null, data: InventoryItem)
             body: JSON.stringify(data)
         }).then(
             async (res) => {
-                const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Inventory", json);
-                } else {
-                    console.error("Error en la petición INVENTORY:", json);
-                }
-                return json;
+                return await res.json();
             }
         )
     }catch ( error) {
-        console.error("Error en la petición INVENTORY:", error);
         return null;
     }
 }

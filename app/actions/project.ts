@@ -5,16 +5,12 @@ import {Expenses} from "@/lib/types/expenses";
 import {Task} from "@/lib/types/tasks";
 
 const project_URL = process.env.BASE_URL_BACK + "projects/"
-const team_URL = process.env.BASE_URL_BACK + "teams/"
-const tasks_URL = process.env.BASE_URL_BACK + "tasks/"
-const expenses_URL = process.env.BASE_URL_BACK + "expenses/"
 
 
 export async function fetchProjects(token: string |null): Promise<any | null> {
 
     if (!token) {
         redirect("/es/login")
-        return null;
     }
 
     try {
@@ -28,7 +24,6 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
             async (res) => {
                 const json = await res.json();
                 if (json.statusCode === 200) {
-                    console.log("Project Object", json);
                     // Make Projects Objects from json response
                     json.data = json.data.map((project: Project) => {
                         const {tasks,expenses, ...rest} = project;
@@ -73,7 +68,6 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
             }
         )
     }catch ( error) {
-        console.error("Error en la petición PROJECTS:", error);
         return null;
     }
 }
@@ -96,16 +90,13 @@ export async function fetchProjectDetailWithID( token: string | null, id: string
             async (res) => {
                 const json = await res.json();
                 if (json.statusCode === 200) {
-                    console.log("Project Detail", json);
                     return json.data;
                 } else {
-                    console.error("Error en la petición PROJECTS:", json);
                     return null
                 }
             }
         )
     }catch ( error) {
-        console.error("Error en la petición PROJECTS:", error);
         return null;
     }
 }
@@ -126,17 +117,10 @@ export async function addProjectToBackend(token: string | null, project: Partial
             body: JSON.stringify(project),
         }).then(
             async (res) => {
-                const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Project added", json);
-                } else {
-                    console.error("Error en la petición PROJECTS:", json);
-                }
-                return json;
+                return await res.json();
             }
         )
     }catch ( error) {
-        console.error("Error en la petición PROJECTS:", error);
         return error
     }
 }
@@ -157,18 +141,10 @@ export async function updateProjectToBackend(token: string | null, project:Parti
             body: JSON.stringify(project),
         }).then(
             async (res) => {
-                const json = await res.json();
-                if (json.statusCode === 200) {
-                    console.log("Project updated", json);
-                } else {
-                    console.error("Error en la petición PROJECTS:", json);
-                }
-
-                return json;
+                return await res.json();
             }
         )
     }catch ( error) {
-        console.error("Error en la petición PROJECTS:", error);
         return error
     }
 }

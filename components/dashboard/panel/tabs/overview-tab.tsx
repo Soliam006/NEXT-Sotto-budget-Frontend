@@ -53,7 +53,7 @@ export function OverviewTab({ dict }: OverviewTabProps) {
           color="primary"
             detail={
               selectedProject?.currentSpent !== undefined && selectedProject?.limit_budget !== undefined
-                ? `$${selectedProject.currentSpent} / $${selectedProject.limit_budget}`
+                ? `€${selectedProject.currentSpent} / €${selectedProject.limit_budget}`
                 : dict.dashboard?.noProjectSelected || "No hay proyecto seleccionado"
             }
             dict={dict}

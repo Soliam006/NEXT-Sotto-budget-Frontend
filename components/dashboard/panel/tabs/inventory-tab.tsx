@@ -98,8 +98,8 @@ export function InventoryTab({ dict }: MaterialsTabProps) {
                             <TableCell>
                               {item.total} {item.unit}
                             </TableCell>
-                            <TableCell>${item.unit_cost}</TableCell>
-                            <TableCell>${item.total * item.unit_cost}</TableCell>
+                            <TableCell>€{item.unit_cost}</TableCell>
+                            <TableCell>€{item.total * item.unit_cost}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Progress value={progressPercentage} className="h-2 w-24" />

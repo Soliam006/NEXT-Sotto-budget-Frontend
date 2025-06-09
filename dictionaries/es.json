@@ -357,7 +357,10 @@
     "services": "Servicios",
     "materials": "Materiales",
     "products": "Productos",
-    "labor": "Mano de Obra"
+    "labor": "Mano de Obra",
+    "generatedOn": "Generado el",
+    "inventoryReport": "Presupuesto General",
+    "reportFooter": "Este es un informe generado automáticamente"
   },
   "tasks": {
     "taskBoard": "Tablero de Tareas",

@@ -84,12 +84,6 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
             project: selectedProject?.title,
         })
 
-        // Mostrar notificación de éxito
-      /*  toast({
-            title: dict.inventory?.itemAdded || "Item Added",
-            description: `${name} ${dict.inventory?.hasBeenAddedToInventory || "has been added to inventory"}`,
-        })*/
-
         // Cerrar el diálogo y resetear el formulario
         resetForm()
         onOpenChange(false)
@@ -217,7 +211,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
                         <div className="space-y-2">
                             <Label>{dict.inventory?.totalCost || "Total Cost"}</Label>
                             <div className="p-2 border rounded-md bg-muted/30">
-                                <span className="font-medium">${(total * unit_cost).toLocaleString()}</span>
+                                <span className="font-medium">€{(total * unit_cost).toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

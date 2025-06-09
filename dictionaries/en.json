@@ -357,7 +357,10 @@
     "services": "Services",
     "materials": "Materials",
     "products": "Products",
-    "labor": "Labor"
+    "labor": "Labor",
+    "generatedOn": "Generated on",
+    "inventoryReport": "General Report",
+    "reportFooter": "This report was generated automatically"
   },
   "tasks": {
     "taskBoard": "Task Board",

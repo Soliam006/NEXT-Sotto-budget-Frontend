@@ -17,9 +17,7 @@ export async function fetchFollowers(token: string | null, translates: any|null)
         }).then(
             async (res) => {
                 const json = await res.json();
-                console .log("Followers Status", json);
                 if (json.statusCode === 200) {
-                    console.log("STATUS", json);
                     return json.data;
                 } else {
                     return null
@@ -27,7 +25,6 @@ export async function fetchFollowers(token: string | null, translates: any|null)
             }
         )
     }catch ( error) {
-        console.error("Error en la petición FOLLOWS_USER:", error);
         return null;
     }
 }
@@ -36,8 +33,6 @@ export async function fetchFollowers(token: string | null, translates: any|null)
 export async function followUserBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
-        console.log("URL Using in FOLLOW _________________________", `${api_URL}${userId}`);
-        console.log("Token Using in FOLLOW _________________________", token);
         return await fetch(`${api_URL}${userId}`, {
             method: "POST",
             headers: {
@@ -50,7 +45,6 @@ export async function followUserBD(token: string|null, userId: number, translate
             }
         )
     }catch ( error) {
-        console.error("Error en la petición FOLLOW_USER:", error);
         return null;
     }
 
@@ -72,7 +66,6 @@ export async function unfollowUserBD(token: string|null, userId: number, transla
             }
         )
     }catch ( error) {
-        console.error("Error en la petición UNFOLLOW_USER:", error);
         return null;
     }
 }
@@ -80,8 +73,6 @@ export async function unfollowUserBD(token: string|null, userId: number, transla
 export async function acceptRequestBD(token: string|null, userId: number, translates: any): Promise<any | null> {
     if (!token) return null;
     try {
-        console.log("URL Using in ACCEPT FOLLOW _________________________", `${api_URL}accept_follow/${userId}`);
-        console.log("Token Using in ACCEPT FOLLOW _________________________", token);
         return await fetch(`${api_URL}accept_follow/${userId}`, {
             method: "POST",
             headers: {
@@ -91,12 +82,10 @@ export async function acceptRequestBD(token: string|null, userId: number, transl
         }).then(
             async (res) => {
                 const json = await res.json();
-                console.log("Accept Request", json);
                 return json;
             }
         )
     }catch ( error) {
-        console.error("Error en la petición ACCEPT_FOLLOWER:", error);
         return null;
     }
 }
@@ -117,7 +106,6 @@ export async function rejectFollowerBD(token: string|null, userId: number, trans
             }
         )
     }catch ( error) {
-        console.error("Error en la petición REJECT_FOLLOWER:", error);
         return null;
     }
 }

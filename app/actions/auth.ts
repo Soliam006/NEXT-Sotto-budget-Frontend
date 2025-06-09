@@ -35,15 +35,6 @@ export async function signup(
     // Forzar el valor de countryCode (ya que lo manejamos con estado)
     formData.get("phone") && formData.set("phone", `${countryCode} ${formData.get("phone")}`)
 
-    //Enviar los datos al servidor
-    console.log("Sending request to:", api_URL);
-    console.log("Request body:", JSON.stringify({
-        name: formData.get("name"),
-        username: formData.get("username"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-        phone: formData.get("phone")
-    }));
     try{
         const response: any = await fetch(`${api_URL}`, {
             method: "POST",
@@ -160,7 +151,7 @@ function validateResult(json: any, translates: any) {
             message: json.message,
         };
     }
-    console.log("Login successful, DATA:", json.data);
+
 
     return {
         status: "success",
@@ -182,7 +173,7 @@ export async function fetchUserMe(token: string, translates: any) {
         });
 
     } catch (error) {
-        console.error('Error en la petición:', error);
+
         return {
             status: 'error',
             message: translates.serverError,
@@ -206,10 +197,13 @@ export async function updateUserInformation(updateData: User, actual_user:User|n
         if (updateData.phone !== actual_user.phone) body.phone = updateData.phone;
         if (updateData.location !== actual_user.location) body.location = updateData.location;
         if (updateData.description !== actual_user.description) body.description = updateData.description;
-        if (!isEqual(updateData.availabilities, actual_user.availabilities)) body.availabilities = updateData.availabilities;
+        if (!isEqual(updateData.client?.availabilities, actual_user.client?.availabilities)) {
+            if (!body.client) body.client = {};
+            body.client.availabilities = updateData.client?.availabilities;
+        }
     }
 
-    console.log("updateData SENDED IN PUT", body);
+
     try {
         // Realiza la petición PUT al endpoint /me
         response = await fetch(`${api_URL}${updateData.id}`, {

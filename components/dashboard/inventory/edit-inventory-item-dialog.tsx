@@ -222,7 +222,7 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
                         <div className="space-y-2">
                             <Label>{dict.inventory?.totalCost || "Total Cost"}</Label>
                             <div className="p-2 border rounded-md bg-muted/30">
-                                <span className="font-medium">${(total * unit_cost).toLocaleString()}</span>
+                                <span className="font-medium">€{(total * unit_cost).toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
