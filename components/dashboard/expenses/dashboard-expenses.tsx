@@ -26,6 +26,12 @@ import {useProject} from "@/contexts/project-context";
 import {formatDate} from "@/lib/helpers/projects";
 import {AddExpenseDialog} from "./add-expense-dialog";
 import {SaveChangesBar} from "@/components/bars/save-changes-bar";
+import dynamic from "next/dynamic"
+
+const DownloadExpensesLink = dynamic (() =>
+    import("@/components/pdf/expense/download-expenses-link"), {
+    ssr: false,
+} )
 
 interface DashboardExpensesProps {
   dict: any
@@ -180,17 +186,9 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
               </CardTitle>
 
               <div className="self-start sm:self-auto gap-2 flex items-center">
-
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-muted/50 border-border text-muted-foreground py-4"
-                    disabled={!hasExpenses}
-                >
-                  <Download className="h-4 w-4 mr-2"/>
-                  {dict.expenses?.exportReport || "Export Report"}
-                </Button>
-
+                {selectedProject && (
+                    <DownloadExpensesLink selectedProject={selectedProject } dict={dict} />
+                )}
                 <AddExpenseDialog dict={dict} />
               </div>
             </div>

@@ -214,7 +214,7 @@ export function InventoryPDFTemplate({ projectName, inventory, dict }: Inventory
                         {projectName || dict.inventory?.projectName || "Project Name"}
                     </Text>
                     <Text style={styles.subtitle} wrap={false}>
-                        {dict.inventory?.generatedOn || "Generated on"}: {new Date().toLocaleDateString()}
+                        {dict.common?.generatedOn || "Generated on"}: {new Date().toLocaleDateString()}
                     </Text>
                 </View>
 
@@ -277,7 +277,7 @@ export function InventoryPDFTemplate({ projectName, inventory, dict }: Inventory
 
                 {/* Footer */}
                 <Text style={styles.footer} wrap={false}>
-                    {dict.inventory?.reportFooter || "This report was generated automatically"} - {projectName}
+                    {dict.common?.reportFooter || "This report was generated automatically"} - {projectName}
                 </Text>
             </Page>
         </Document>

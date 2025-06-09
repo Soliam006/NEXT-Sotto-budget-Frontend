@@ -138,7 +138,9 @@
     "pickDate": "Selecciona una fecha",
     "endDate": "Finalización",
     "status": "Estado",
-    "search": "Buscar..."
+    "search": "Buscar...",
+    "generatedOn": "Generado el",
+    "reportFooter": "Este es un informe generado automáticamente"
   },
   "projects": {
     "title": "Gestión de Proyectos",
@@ -320,9 +322,7 @@
     "materials": "Materiales",
     "products": "Productos",
     "labor": "Mano de Obra",
-    "generatedOn": "Generado el",
     "inventoryReport": "Presupuesto General",
-    "reportFooter": "Este es un informe generado automáticamente",
     "totalItems": "Total de Artículos"
   },
   "tasks": {
@@ -375,6 +375,7 @@
     "title": "Gestión de Gastos",
     "expenseOverview": "Gastos",
     "overview": "Resumen",
+    "expenseReport": "Informe de Gastos",
     "expenseList": "Lista",
     "charts": "Gráficos",
     "searchExpenses": "Buscar gastos...",

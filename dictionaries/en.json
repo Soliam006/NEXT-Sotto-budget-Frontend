@@ -138,7 +138,9 @@
     "endDate": "Due Date",
     "pickDate": "Pick a date",
     "status": "Status",
-    "search": "Search ..."
+    "search": "Search ...",
+    "generatedOn": "Generated on",
+    "reportFooter": "This report was generated automatically"
   },
   "projects": {
     "title": "Project Management",
@@ -318,9 +320,7 @@
     "materials": "Materials",
     "products": "Products",
     "labor": "Labor",
-    "generatedOn": "Generated on",
     "inventoryReport": "General Report",
-    "reportFooter": "This report was generated automatically",
     "totalItems": "Total Items"
   },
   "tasks": {

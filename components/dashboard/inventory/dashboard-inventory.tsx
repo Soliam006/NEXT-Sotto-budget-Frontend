@@ -20,7 +20,7 @@ import {useUser} from "@/contexts/UserProvider";
 import dynamic from "next/dynamic";
 
 const DownLoadLinkPDF = dynamic(() =>
-    import("@/components/pdf/inventory/download-link-pdf"), {
+    import("@/components/pdf/inventory/download-inventory-link"), {
       ssr: false,
 })
 

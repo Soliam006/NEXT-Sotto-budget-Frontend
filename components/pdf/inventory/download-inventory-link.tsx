@@ -12,7 +12,7 @@ interface DownloadLinkPdfProps {
     dict: any
 }
 
-export default function DownloadLinkPDF({ inventory, selectedProject, dict }: DownloadLinkPdfProps) {
+export default function DownloadInventoryLink({ inventory, selectedProject, dict }: DownloadLinkPdfProps) {
     return (
         <div>
             <PDFDownloadLink
@@ -35,8 +35,8 @@ export default function DownloadLinkPDF({ inventory, selectedProject, dict }: Do
                         <FileDown className="h-4 w-4" />
                         <span>
                           {loading
-                              ? dict.inventory?.generatingPDF || "Generando PDF..."
-                              : dict.inventory?.exportPDF || "Exportar PDF"}
+                              ? dict.common?.generatingPDF || "Generando PDF..."
+                              : dict.common?.exportPDF || "Exportar PDF"}
                         </span>
                     </Button>
                 )}
