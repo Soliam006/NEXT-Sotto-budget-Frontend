@@ -23,6 +23,6 @@ export default function WorkersPage() {
     if (!dictionary) return <LoadingView/>;
 
 
-  return <DashboardWorkers dict={dictionary} lang={params.lang as string} />
+  return <DashboardWorkers dict={dictionary} />
 }
 
