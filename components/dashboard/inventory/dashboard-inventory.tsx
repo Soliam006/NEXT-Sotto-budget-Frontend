@@ -132,7 +132,6 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
         return category
     }
   }
-  const canGeneratePDF = selectedProject && filteredItems.length > 0;
 
   return (
       <div className="space-y-4">
@@ -243,7 +242,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             {(currentUser?.role === "admin") && (
               <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
 
-                <DownLoadLinkPDF dict= {dict} inventory={filteredItems} selectedProject={selectedProject} />
+                <DownLoadLinkPDF dict= {dict} inventory={inventory} selectedProject={selectedProject} />
 
                 <Button
                     variant="default"
