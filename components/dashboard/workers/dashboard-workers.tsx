@@ -1,18 +1,23 @@
 "use client"
 
-import {CheckCircle, Clock, MapPin, Phone, Star, Users} from "lucide-react"
+import {CheckCircle, Clock, MapPin, Phone, RefreshCw, Star, Users} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import {useUser} from "@/contexts/UserProvider";
+import { Button } from "@/components/ui/button";
 
 interface DashboardWorkersProps {
   dict: any
 }
 
 export function DashboardWorkers({ dict }: DashboardWorkersProps) {
-  const {user} = useUser()
+  const {user, reload} = useUser()
   const WORKERS = user?.admin?.workers || []
+
+  function handleReload() {
+    reload()
+  }
 
   return (
       <div className="space-y-6 p-4 md:p-6">
@@ -25,9 +30,22 @@ export function DashboardWorkers({ dict }: DashboardWorkersProps) {
                 <Users className="mr-2 h-5 w-5 text-primary" />
                 {dict.workers?.teamMembers || "Team Members"}
               </CardTitle>
-              <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
-                {WORKERS.length} {dict.workers?.workers || "Workers"}
-              </Badge>
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
+                  {WORKERS.length} {dict.workers?.workers || "Workers"}
+                </Badge>
+
+                <Button
+                    onClick={handleReload}
+                    variant="ghost"
+                    className={
+                        "bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer"+
+                        "hover:from-cyan-600 hover:to-blue-600"}
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  {dict.workers?.reload || "Reload Workers"}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

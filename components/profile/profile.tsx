@@ -26,13 +26,13 @@ import {getStatusTranslation} from "@/lib/helpers/projects";
 export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
   const router = useRouter()
-  const {user, setUser,
+  const {user, setFollowers,
     acceptFollower,
     rejectFollower,
     followUser,
     unfollowUser,
     isSaving,
-    saveProfile
+    saveProfile,
   } = useUser();
 
   const {projects} = useProject()
@@ -42,16 +42,8 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
   const [isFollowingDialogOpen, setIsFollowingDialogOpen] = useState(false)
   const [isRequestsDialogOpen, setIsRequestsDialogOpen] = useState(false)
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
-  const [followers, setFollowers] = useState(user?.followers || [])
   const [following, setFollowing] = useState(user?.following || [])
   const [requests, setRequests] = useState(user?.requests || [])
-
-  useEffect(() => {
-    console.log("User data updated:", user)
-    setFollowers(user?.followers || [])
-    setFollowing(user?.following || [])
-    setRequests(user?.requests || [])
-  }, [user, setUser])
 
   /**
    * Handle follow/unfollow toggle
@@ -418,7 +410,6 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
       <FollowersProfileDialog
         isFollowersDialogOpen={isFollowersDialogOpen}
         setIsFollowersDialogOpenAction={setIsFollowersDialogOpen}
-        followers={followers}
         setFollowersAction={setFollowers}
         handleFollowToggleAction={handleFollowToggle}
         dict={dict}

@@ -20,12 +20,15 @@ interface UserContextType {
   setToken: (token: string | null, rememberMe: boolean, lang:string) => void;
   updateUser: (updatedFields: Partial<User>) => void;
   saveProfile: (updatedFields: User) => Promise<number>;
+  setFollowers: (followers: UserFollower[]) => void;
   acceptFollower: (followerId: number) => void;
   removeFollower: (followerId: number) => void;
   rejectFollower: (followerId: number) => void;
   followUser: (followingId: number) => void;
   unfollowUser: (followingId: number) => void;
   isSaving: boolean;
+  logout: () => void;
+  reload: () => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -41,8 +44,7 @@ export const UserProvider = ({ children }: Props) => {
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null);
 
-  // NUEVO: Inicializa el token desde coockies al montar
-  useEffect(() => {
+  function cargarUser() {
     const storedToken = getTokenFromStorage();
     if (storedToken) {
       // Cargar usuario desde backend
@@ -62,6 +64,30 @@ export const UserProvider = ({ children }: Props) => {
         }
       });
     }
+  }
+
+  // NUEVO: Inicializa el token desde coockies al montar
+  useEffect(() => {
+    cargarUser()
+  }, []);
+
+  const reload = useCallback(() => {
+    cargarUser()
+  }, []);
+
+  const logout = useCallback(() => {
+    // Limpiar estado
+    setUser(null);
+    setTokenState(null);
+    setError(null);
+    setInfo(null);
+
+    // Eliminar cookies
+    deleteCookie('access_token', { path: '/' });
+    deleteCookie('lang', { path: '/' });
+
+    // Redirigir a la página de login (opcional)
+    redirect(`/es/login`);
   }, []);
 
   const setToken = (newToken: string | null, rememberMe: boolean, lang: string) => {
@@ -111,6 +137,11 @@ export const UserProvider = ({ children }: Props) => {
       setIsSaving(false);
     }
   };
+
+    const setFollowers = (followers: UserFollower[]) => {
+        if (!user) return;
+        setUser({ ...user, followers });
+    };
 
 
   const acceptFollower = async (followerId: number) => {
@@ -274,12 +305,15 @@ export const UserProvider = ({ children }: Props) => {
     setToken,
     updateUser,
     saveProfile,
+    setFollowers,
     acceptFollower,
     removeFollower,
     rejectFollower,
     followUser,
     unfollowUser,
-    isSaving
+    isSaving,
+    logout,
+    reload
   };
 
   return (

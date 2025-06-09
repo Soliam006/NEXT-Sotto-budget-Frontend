@@ -1,6 +1,6 @@
 "use client"
 
-import {useState, useEffect, useMemo} from "react"
+import {useState, useMemo} from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,10 +15,14 @@ import {InventoryItem} from "@/lib/types/inventory-item";
 import {ProjectsSelector} from "@/components/projects/projects-selector";
 import {AddInventoryItemDialog} from "@/components/dashboard/inventory/add-inventory-item-dialog";
 import {EditInventoryItemDialog} from "@/components/dashboard/inventory/edit-inventory-item-dialog";
-import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
+import {SaveChangesBar} from "@/components/bars/save-changes-bar";
 import {useUser} from "@/contexts/UserProvider";
-import {InventoryPDFTemplate} from "@/components/pdf/inventory-pdf";
-import {PDFDownloadLink, PDFViewer} from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+
+const DownLoadLinkPDF = dynamic(() =>
+    import("@/components/pdf/inventory/download-link-pdf"), {
+      ssr: false,
+})
 
 interface DashboardInventoryProps {
   dict: any
@@ -238,34 +242,12 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             {/* Contenedor de botones - Se mantiene a la derecha */}
             {(currentUser?.role === "admin") && (
               <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <PDFDownloadLink
-                document={
-                  <InventoryPDFTemplate
-                      inventory={inventory}
-                      projectName={selectedProject?.title}
-                      dict={dict}
-                  />}
-                fileName={`inventory-${selectedProject?.title || "project"}.pdf`}
-                className="w-full sm:w-auto"
-              >
-                {({ loading }) => (
-                  <Button
-                    variant="outline"
-                    className="gap-1 w-full sm:w-auto cursor-pointer"
-                    disabled={!selectedProject || loading}
-                  >
-                    <FileDown className="h-4 w-4" />
-                    <span>
-                      {loading
-                        ? dict.inventory?.generatingPDF || "Generando PDF..."
-                        : dict.inventory?.exportPDF || "Exportar PDF"}
-                    </span>
-                  </Button>
-                )}
-              </PDFDownloadLink>
+
+                <DownLoadLinkPDF dict= {dict} inventory={filteredItems} selectedProject={selectedProject} />
 
                 <Button
-                    className="gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500
+                    variant="default"
+                    className="text-white gap-1 w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500
                     hover:from-cyan-600 hover:to-blue-600 cursor-pointer"
                     onClick={() => setShowAddDialog(true)}
                     disabled={!selectedProject}

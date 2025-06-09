@@ -227,7 +227,6 @@
     "done": "Completado",
     "inProgress": "En Progreso",
     "todo": "Por Hacer",
-    "taskBreakdown": "Desglose de Tareas",
     "projectStart": "Inicio del Proyecto",
     "projectEnd": "Fin del Proyecto",
     "systemStatus": "Estado del Sistema",
@@ -323,7 +322,8 @@
     "labor": "Mano de Obra",
     "generatedOn": "Generado el",
     "inventoryReport": "Presupuesto General",
-    "reportFooter": "Este es un informe generado automáticamente"
+    "reportFooter": "Este es un informe generado automáticamente",
+    "totalItems": "Total de Artículos"
   },
   "tasks": {
     "taskBoard": "Tablero de Tareas",

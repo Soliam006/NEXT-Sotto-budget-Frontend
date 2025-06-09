@@ -5,7 +5,6 @@ import { DashboardShellWrapper } from "@/components/dashboard/dashboard-shell-wr
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";
-import {ProjectProvider} from "@/contexts/project-context";
 import {NotificationProvider} from "@/contexts/notification-context";
 
 export default function DashboardLayout({
@@ -31,12 +30,8 @@ export default function DashboardLayout({
     if (!dictionary) return <LoadingView/>;
 
     return (
-        <NotificationProvider dictionary={dictionary}>
-            <ProjectProvider dictionary={dictionary}>
-                <DashboardShellWrapper dictionary={dictionary} lang={paramers.lang as string}>
-                    {children}
-                </DashboardShellWrapper>
-            </ProjectProvider>
-        </NotificationProvider>
+        <DashboardShellWrapper dictionary={dictionary} lang={paramers.lang as string}>
+            {children}
+        </DashboardShellWrapper>
     );
 }

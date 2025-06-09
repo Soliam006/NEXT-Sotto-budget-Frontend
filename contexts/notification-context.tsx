@@ -4,7 +4,7 @@ import type React from "react"
 import {createContext, useCallback, useContext, useEffect, useState} from "react"
 import {Activity, Notification } from "@/lib/types/notification";
 import {fetchNotificationsBD} from "@/app/actions/notifications";
-import {getTokenFromStorage} from "@/contexts/UserProvider";
+import {getTokenFromStorage, useUser} from "@/contexts/UserProvider";
 import {generateTitle, generateDescription, mapActivityTypeToUIType, generateDetails} from "@/lib/helpers/notifications";
 import Swal from 'sweetalert2';
 
@@ -70,6 +70,8 @@ interface NotificationProviderProps {
 }
 
 export function NotificationProvider({ children, dictionary }: NotificationProviderProps) {
+    const { user, token } = useUser(); // <-- Obtener user y token del UserProvider
+
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -109,8 +111,9 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
 
     // Initial fetch
     useEffect(() => {
+        if(!user?.id || !token) return // Ensure user and token are available
         fetchNotifications()
-    }, [fetchNotifications])
+    }, [user?.id, token])
 
     // Mark notification as read
     const markAsRead = useCallback(async (id: string) => {

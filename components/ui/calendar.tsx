@@ -10,19 +10,43 @@ import {
     isSameMonth,
     isSameDay
 } from "date-fns";
+import { ca, es, enUS } from "date-fns/locale";
 
 interface CustomCalendarProps {
     selected?: Date | null;
     onSelect?: (date: Date | null) => void;
     disabled?: (date: Date) => boolean;
+    lang?: 'ca' | 'es' | 'en'; // Nuevo prop para el idioma
 }
 
 export function Calendar({
-                                           selected = null,
-                                           onSelect = () => {},
-                                           disabled = () => false
-                                       }: CustomCalendarProps) {
+                             selected = null,
+                             onSelect = () => {},
+                             disabled = () => false,
+                             lang = 'es' // Valor por defecto español
+                         }: CustomCalendarProps) {
+
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+
+    // Seleccionar locale según el idioma
+    const getLocale = () => {
+        switch (lang) {
+            case 'ca': return ca;
+            case 'es': return es;
+            case 'en': return enUS;
+            default: return es;
+        }
+    };
+
+    // Nombres de los días según el idioma
+    const getDayNames = () => {
+        switch (lang) {
+            case 'ca': return ['Dg', 'Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds'];
+            case 'es': return ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            case 'en': return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            default: return ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        }
+    };
 
     // Generar días del mes
     const monthStart = startOfMonth(currentMonth);
@@ -44,7 +68,7 @@ export function Calendar({
                     &lt;
                 </button>
                 <h2 className="text-lg font-semibold text-foreground">
-                    {format(currentMonth, 'MMMM yyyy')}
+                    {format(currentMonth, 'MMMM yyyy', { locale: getLocale() })}
                 </h2>
                 <button
                     onClick={nextMonth}
@@ -56,7 +80,7 @@ export function Calendar({
 
             {/* Días de la semana */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
+                {getDayNames().map(day => (
                     <div key={day} className="text-center font-medium text-sm py-1 text-muted-foreground">
                         {day}
                     </div>

@@ -1,3 +1,4 @@
+"use client";
 import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer"
 import type { InventoryItem } from "@/lib/types/inventory-item"
 
@@ -224,7 +225,7 @@ export function InventoryPDFTemplate({ projectName, inventory, dict }: Inventory
                         <Text style={styles.infoValue}>{totalItems}</Text>
                     </View>
                     <View style={styles.infoItem}>
-                        <Text style={styles.infoLabel}>{dict.inventory?.totalValue || "Total Value"}</Text>
+                        <Text style={styles.infoLabel}>{dict.inventory?.totalCost || "Total Value"}</Text>
                         <Text style={styles.infoValue}>€{totalCost.toLocaleString()}</Text>
                     </View>
                 </View>

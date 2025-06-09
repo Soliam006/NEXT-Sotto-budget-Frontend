@@ -226,7 +226,6 @@
     "done": "Done",
     "inProgress": "In Progress",
     "todo": "To Do",
-    "taskBreakdown": "Task Breakdown",
     "projectStart": "Project Start",
     "projectEnd": "Project End",
     "systemStatus": "System Status",
@@ -321,7 +320,8 @@
     "labor": "Labor",
     "generatedOn": "Generated on",
     "inventoryReport": "General Report",
-    "reportFooter": "This report was generated automatically"
+    "reportFooter": "This report was generated automatically",
+    "totalItems": "Total Items"
   },
   "tasks": {
     "taskBoard": "Task Board",

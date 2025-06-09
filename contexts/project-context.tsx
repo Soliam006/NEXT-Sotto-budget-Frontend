@@ -1,18 +1,19 @@
 "use client"
 
 import React, {createContext, useContext, useState, useEffect, type ReactNode, useCallback} from "react"
-import type { Project } from "@/components/projects/projects-selector"
-import { isEqual } from "lodash"
 import {addProjectToBackend, fetchProjects, updateProjectToBackend} from "@/app/actions/project";
 import {getCookie} from "cookies-next";
 import Swal from "sweetalert2";
+import {Project, ProjectBackend} from "@/lib/types/project.types";
+import {InventoryItemBackend} from "@/lib/types/inventory-item";
+import {useUser} from "@/contexts/UserProvider";
 
 // Tipos para el contexto
 interface ProjectContextType {
   projects: Project[]
   selectedProject: Project | null
   originalSelectedProject: Project | null
-  pendingChanges: Partial<Project> | null // Nuevo: cambios pendientes
+  pendingChanges: Partial<ProjectBackend> | null // Nuevo: cambios pendientes
   setAllProjects: (projects: Project[]) => void
   setSelectedProjectById: (id: number) => void
 
@@ -70,12 +71,15 @@ interface ProjectProviderProps {
 }
 // Provider component
 export function ProjectProvider({ children, dictionary }: ProjectProviderProps) {
+  const { user, token } = useUser(); // <-- Obtener user y token del UserProvider
+
+
   const [projects, setProjects] = useState<Project[]>([])
   // Estado para el proyecto seleccionado y su versión original
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [originalSelectedProject, setOriginalSelectedProject] = useState<Project | null>(null)
-  const [pendingChanges, setPendingChanges] = useState<Partial<Project> | null>(null) // Nuevo: cambios pendientes
+  const [pendingChanges, setPendingChanges] = useState<Partial<ProjectBackend> | null>(null) // Nuevo: cambios pendientes
   // Estado para rastrear cambios y guardado
   const [hasChanges, setHasChanges] = useState<boolean>(false)
   const [isSaving, setIsSaving] = useState<boolean>(false)
@@ -86,11 +90,24 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   function cargarProjectos() {
     setLoading(true) // Iniciar el estado de carga
     setError(null) // Reiniciar el error
+    setAllProjects([])
+    setSelectedProjectId(null)
+    setSelectedProject(null)
+    setOriginalSelectedProject(null)
+    setPendingChanges(null)
+    setHasChanges(false) // No hay cambios pendientes si no hay proyectos
 
     try {
       // Llamar a la API para obtener proyectos
       fetchProjects(getToken()).then((response) => {
         if (response.statusCode === 200) {
+          console.log("RESPONSE: ", response)
+          if (!response.data || response.data.length === 0) {
+            setInfo("¡No hay proyectos disponibles!")
+
+            return
+          }
+
           console.log("Proyectos cargados con éxito:", response.data)
           setAllProjects(response.data)
           if (response.data.length > 0) {
@@ -115,7 +132,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   // Cargar de proyectos desde una API
   useEffect(() => {
     cargarProjectos()
-  }, [])
+  }, [user?.id, token])
 
   // Actualizar el proyecto seleccionado cuando cambia el ID
   useEffect(() => {
@@ -223,7 +240,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   }
 
   // Helper function para actualizar cambios pendientes
-  const updatePendingChanges = (updates: Partial<Project>) => {
+  const updatePendingChanges = (updates: Partial<ProjectBackend>) => {
     setPendingChanges(prev => ({
       ...prev,
       ...updates
@@ -390,9 +407,22 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       inventory: updatedInventory,
     } : prev);
 
-    updatePendingChanges({
-      inventory: updatedInventory
-    });
+    const itemToDelete = selectedProject.inventory?.find((item) => item.id === itemId);
+    if (!itemToDelete) {
+      setError("Item to delete not found in inventory");
+      return;
+    }
+
+    // Crear el item con deleted true y guardar los cambios pendientes
+    const itemWithDeleted: InventoryItemBackend = {
+        ...itemToDelete,
+        deleted: true
+    }
+
+   updatePendingChanges({
+     inventory: [...(pendingChanges?.inventory ?? []), itemWithDeleted]
+   });
+
   }
 
   // Actualizar el estado de un item del inventario
@@ -446,6 +476,8 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     updatePendingChanges({
       expenses: updatedExpenses
     });
+
+    setInfo("Expense added successfully");
   }
 
 // Actualizar un gasto
@@ -619,7 +651,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     discardChanges,
     isSaving,
     loadingState: loading,
-    errorState: error,
+    errorState: error
   }
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>

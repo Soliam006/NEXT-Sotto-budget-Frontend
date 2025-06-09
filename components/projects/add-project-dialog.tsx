@@ -28,7 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { UserFollower } from "@/lib/types/user.types"
 import {useUser} from "@/contexts/UserProvider";
-import {Project} from "@/components/projects/projects-selector";
+import {Project} from "@/lib/types/project.types";
 
 interface AddProjectDialogProps {
   open: boolean

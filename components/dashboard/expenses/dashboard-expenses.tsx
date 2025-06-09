@@ -24,6 +24,8 @@ import {
 import {ProjectsSelector} from "@/components/projects/projects-selector"
 import {useProject} from "@/contexts/project-context";
 import {formatDate} from "@/lib/helpers/projects";
+import {AddExpenseDialog} from "./add-expense-dialog";
+import {SaveChangesBar} from "@/components/bars/save-changes-bar";
 
 interface DashboardExpensesProps {
   dict: any
@@ -163,6 +165,11 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
         {/* Project selector */}
         <ProjectsSelector dict={dict} />
 
+        {/* Save Changes Bar */}
+        {hasChanges && (
+            <SaveChangesBar dict={dict} />
+        )}
+
         {/* Expense Overview */}
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
           <CardHeader className="border-b border-border/50 pb-3">
@@ -172,16 +179,19 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                 {dict.expenses?.expenseOverview || "Expense Overview"}
               </CardTitle>
 
-              <div className="self-start sm:self-auto">
+              <div className="self-start sm:self-auto gap-2 flex items-center">
+
                 <Button
                     variant="outline"
                     size="sm"
-                    className="bg-muted/50 border-border text-muted-foreground"
+                    className="bg-muted/50 border-border text-muted-foreground py-4"
                     disabled={!hasExpenses}
                 >
                   <Download className="h-4 w-4 mr-2"/>
                   {dict.expenses?.exportReport || "Export Report"}
                 </Button>
+
+                <AddExpenseDialog dict={dict} />
               </div>
             </div>
           </CardHeader>

@@ -1,4 +1,4 @@
-import { CheckCircle2, DollarSign, LineChart, BarChart3, Timer } from "lucide-react";
+import { CheckCircle2, DollarSign, Timer } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import CustomPieChart from "@/components/custom-pie-chart";

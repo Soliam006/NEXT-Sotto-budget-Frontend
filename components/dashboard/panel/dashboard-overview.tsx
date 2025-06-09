@@ -9,7 +9,7 @@ import {OverviewTab} from "@/components/dashboard/panel/tabs/overview-tab"
 import {TasksTab} from "@/components/dashboard/panel/tabs/tasks-tab"
 import {TeamTab} from "@/components/dashboard/panel/tabs/team-tab"
 import {InventoryTab} from "@/components/dashboard/panel/tabs/inventory-tab"
-import {SaveChangesBar} from "@/components/dashboard/save-changes-bar";
+import {SaveChangesBar} from "@/components/bars/save-changes-bar";
 import {useProject} from "@/contexts/project-context";
 
 interface DashboardOverviewProps {

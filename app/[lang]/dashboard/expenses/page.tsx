@@ -1,6 +1,6 @@
 "use client";
 import { getDictionary } from "@/lib/dictionary"
-import { DashboardExpenses } from "@/components/dashboard/dashboard-expenses"
+import { DashboardExpenses } from "@/components/dashboard/expenses/dashboard-expenses"
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import LoadingView from "@/components/loading-view";

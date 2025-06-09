@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import "../globals.css"
 import { ThemeProvider } from "@/contexts/theme-provider"
+import ClientLayout from "@/app/client-layout";
 
 export const metadata: Metadata = {
   title: "Construction Management Dashboard",
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body>
+      <ClientLayout>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
         </ThemeProvider>
+      </ClientLayout>
       </body>
     </html>
   )

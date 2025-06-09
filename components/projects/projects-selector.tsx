@@ -10,44 +10,9 @@ import { useState } from "react"
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
 import { Button } from "@/components/ui/button"
 import { AddProjectDialog } from "@/components/projects/add-project-dialog"
-import {InventoryItem} from "@/lib/types/inventory-item";
-import {Task} from "@/lib/types/tasks";
-import {Expenses} from "@/lib/types/expenses";
 import {useUser} from "@/contexts/UserProvider";
+import {Project} from "@/lib/types/project.types";
 
-export interface Project {
-  id: number
-  title: string
-  description: string
-  admin: string
-  limit_budget: number
-  currentSpent: number
-  progress: {
-    done: number
-    inProgress: number
-    todo: number
-  }
-  location: string
-  start_date: string
-  end_date: string
-  status: string
-  clients_ids?: number[]
-  clients?: {
-    id: number
-    name: string
-    username: string
-    role: string
-    avatar?: string
-  }[]
-  tasks?: Task []
-  team?: any
-  workers?: any
-  expenses: Expenses[]
-  expenseCategories?: {
-    [key: string]: number
-  }
-  inventory: InventoryItem[]
-}
 
 interface ProjectsSelectorProps {
   dict: any

@@ -45,7 +45,7 @@ export function TopBar({
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<User_Search[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const { token, followUser, unfollowUser, user:currentUser, setToken} = useUser()
+  const { token, followUser, unfollowUser, user:currentUser, logout} = useUser()
 
   // Cargar todos los usuarios al abrir el diálogo de búsqueda
   useEffect(() => {
@@ -59,7 +59,6 @@ export function TopBar({
       setIsSearching(true)
       const users = await fetchFollowers(token, dictionary)
       if (users) {
-        console.log("Fetched users IN TOP BAR", users)
         setSearchResults(users)
       }
     } catch (error) {
@@ -130,9 +129,8 @@ export function TopBar({
     }
   }
 
-  function logout() {
-    setToken(null, false, lang)
-    router.push(`/${lang}/login`)
+  function logOut() {
+    logout()
   }
 
   return (
@@ -230,7 +228,7 @@ export function TopBar({
                   <span>{dictionary.nav?.dashboard || "Dashboard"}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => logout()}>
+                <DropdownMenuItem onClick={() => logOut()}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>{dictionary.nav?.logout || "Log out"}</span>
                 </DropdownMenuItem>

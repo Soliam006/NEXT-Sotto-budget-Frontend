@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { TaskBoard } from "@/components/dashboard/tasks/task-board"
-import type { Project } from "@/components/projects/projects-selector"
 
 interface TasksTabProps {
   dict: any

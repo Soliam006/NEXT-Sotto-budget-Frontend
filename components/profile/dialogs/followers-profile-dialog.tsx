@@ -13,8 +13,7 @@ interface FollowersProps {
     setIsFollowersDialogOpenAction: (open: boolean) => void;
     dict: any;
     handleFollowToggleAction: (userId: number, follow: boolean) => void;
-    setFollowersAction: Dispatch<SetStateAction<UserFollower[]>>;
-    followers: UserFollower[];
+    setFollowersAction: (followers: UserFollower[]) => void;
 }
 
 export function FollowersProfileDialog({
@@ -22,8 +21,7 @@ export function FollowersProfileDialog({
                                            setIsFollowersDialogOpenAction,
                                            dict,
                                            handleFollowToggleAction,
-                                           setFollowersAction,
-                                           followers,
+                                           setFollowersAction
                                        }: FollowersProps) {
 
     const {user} = useUser()
@@ -48,16 +46,17 @@ export function FollowersProfileDialog({
                         onChange={(e) => {
                             const query = e.target.value
                             if (query.trim() === "") {
-                                setFollowersAction(followers)
+                                setFollowersAction(user?.followers || [])
                             } else {
-                                setFollowersAction(
-                                    followers.filter(
-                                        (user) =>
-                                            user.name.toLowerCase().includes(query.toLowerCase()) ||
-                                            user.username.toLowerCase().includes(query.toLowerCase()) ||
-                                            user.role.toLowerCase().includes(query.toLowerCase()),
-                                    ) || []
-                                )
+                                if(user?.followers)
+                                    setFollowersAction(
+                                        user?.followers.filter(
+                                            (user) =>
+                                                user.name.toLowerCase().includes(query.toLowerCase()) ||
+                                                user.username.toLowerCase().includes(query.toLowerCase()) ||
+                                                user.role.toLowerCase().includes(query.toLowerCase()),
+                                        ) || []
+                                    )
                             }
                         }}
                     />
@@ -65,7 +64,7 @@ export function FollowersProfileDialog({
                     <ScrollArea className="h-[400px] pr-4">
                         <div className="space-y-4">
                             {user?.followers && user.followers.length > 0 ? (
-                                followers.map((follower) => (
+                                user?.followers.map((follower) => (
                                     <div
                                         key={follower.id}
                                         className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary/50"
