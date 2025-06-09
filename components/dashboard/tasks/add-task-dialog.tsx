@@ -109,7 +109,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
           </DialogTrigger>
           <DialogContent className="sm:max-w-[550px] bg-card/95 backdrop-blur-sm border-border/50">
               <DialogHeader>
-                  <DialogTitle>{dict.tasks?.addNewTask || "Add New Task"}</DialogTitle>
+                  <DialogTitle>{dict.tasks?.addTask || "Add New Task"}</DialogTitle>
                   <DialogDescription>
                       {dict.tasks?.addTaskDescription || "Fill in the details to create a new task for your project."}
                   </DialogDescription>
@@ -121,10 +121,10 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                              <FormLabel>{dict.tasks?.taskTitle || "Task Title"}</FormLabel>
+                              <FormLabel>{dict.projects?.taskForm.title || "Task Title"}</FormLabel>
                               <FormControl>
                                   <Input
-                                    placeholder={dict.tasks?.taskTitlePlaceholder || "Enter task title"}
+                                    placeholder={dict.projects?.taskForm?.titlePlaceholder || "Enter task title"}
                                     {...field}
                                     className="bg-muted/50"
                                   />
@@ -139,10 +139,10 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                              <FormLabel>{dict.tasks?.description || "Description"}</FormLabel>
+                              <FormLabel>{dict.projects?.description || "Description"}</FormLabel>
                               <FormControl>
                                   <Textarea
-                                    placeholder={dict.tasks?.descriptionPlaceholder || "Enter task description"}
+                                    placeholder={dict.projects.taskForm?.descriptionPlaceholder || "Enter task description"}
                                     {...field}
                                     className="bg-muted/50 min-h-[100px]"
                                   />
@@ -158,7 +158,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                             name="assignee"
                             render={({ field }) => (
                               <FormItem className="flex flex-col">
-                                  <FormLabel>{dict.tasks?.assignee || "Assignee"}</FormLabel>
+                                  <FormLabel>{dict.projects.taskForm?.assignTo || "Assignee"}</FormLabel>
                                   <Popover>
                                       <PopoverTrigger asChild>
                                           <FormControl>
@@ -172,7 +172,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                                               >
                                                   {field.value
                                                     ? teamMembers.find((member) => member.id === field.value)?.name
-                                                    : dict.tasks?.selectAssignee || "Select assignee"}
+                                                    : dict.projects.taskForm?.selectAssignee || "Select assignee"}
                                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                               </Button>
                                           </FormControl>
@@ -218,7 +218,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                             name="dueDate"
                             render={({ field }) => (
                               <FormItem className="flex flex-col">
-                                  <FormLabel>{dict.tasks?.dueDate || "Due Date"}</FormLabel>
+                                  <FormLabel>{dict.common?.endDate || "Due Date"}</FormLabel>
                                   <Popover>
                                       <PopoverTrigger asChild>
                                           <FormControl>
@@ -232,7 +232,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                                                   {field.value ? (
                                                     format(new Date(field.value), "PPP", { locale: dateLocale })
                                                   ) : (
-                                                    <span>{dict.tasks?.pickDate || "Pick a date"}</span>
+                                                    <span>{dict.common?.pickDate || "Pick a date"}</span>
                                                   )}
                                                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                               </Button>
@@ -262,7 +262,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                               {dict.common?.cancel || "Cancel"}
                           </Button>
                           <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600 cursor-pointer">
-                              {isSubmitting ? dict.common?.processing || "Processing..." : dict.tasks?.createTask || "Create Task"}
+                              {isSubmitting ? dict.common?.processing || "Processing..." : dict.tasks?.addTask || "Create Task"}
                           </Button>
                       </DialogFooter>
                   </form>

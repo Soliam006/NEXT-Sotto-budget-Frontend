@@ -107,7 +107,7 @@ export default function SignUpForm({
 
                           <div className="space-y-2">
                               <Label htmlFor="username" className="text-foreground">
-                                  {t.username}
+                                  {dictionary.profile.username}
                               </Label>
                               <Input
                                 id="username"
@@ -123,7 +123,7 @@ export default function SignUpForm({
 
                           <div className="space-y-2">
                               <Label htmlFor="phone" className="text-foreground">
-                                  {t.phoneNumber}
+                                  {dictionary.profile.phoneNumber}
                               </Label>
                               <div className="flex space-x-2">
                                   <input type="hidden" name="countryCode" value={countryCode} />

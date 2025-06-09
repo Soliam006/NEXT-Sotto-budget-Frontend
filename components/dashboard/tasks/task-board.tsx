@@ -18,9 +18,6 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
       useProject()
     const { user:currentUser } = useUser()
 
-    useEffect(() => {
-        console.log("Selected Project IN TAAAAABS:", selectedProject)
-    }, []);
     // Filtrar tareas por estado
     const pendingTasks = selectedProject?.tasks?.filter((task:Task) => task.status === "todo") || []
     const inProgressTasks = selectedProject?.tasks?.filter((task:Task) => task.status === "in_progress") || []
@@ -101,7 +98,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                         </div>
                       ))}
 
-                      {pendingTasks.length === 0 && (
+                      {pendingTasks.length === 0 && currentUser?.role === 'admin' && (
                         <div className="flex flex-col items-center justify-center h-[100px] text-muted-foreground">
                             <p className="text-sm mb-2">{dict.tasks?.noTasks || "No tasks yet"}</p>
                             <Button

@@ -135,7 +135,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] bg-card/95 backdrop-blur-sm border-border/50">
         <DialogHeader>
-          <DialogTitle>{dict.tasks?.editTask || "Edit Task"}</DialogTitle>
+          <DialogTitle>{dict.common?.edit || "Edit Task"}</DialogTitle>
           <DialogDescription>{dict.tasks?.editTaskDescription || "Make changes to this task."}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -145,10 +145,10 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.tasks?.taskTitle || "Task Title"}</FormLabel>
+                  <FormLabel>{dict.projects?.taskForm?.title || "Task Title"}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={dict.tasks?.taskTitlePlaceholder || "Enter task title"}
+                      placeholder={dict.projects?.taskForm?.titlePlaceholder || "Enter task title"}
                       {...field}
                       className="bg-muted/50"
                     />
@@ -163,10 +163,10 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.tasks?.description || "Description"}</FormLabel>
+                  <FormLabel>{dict.projects?.description || "Description"}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={dict.tasks?.descriptionPlaceholder || "Enter task description"}
+                      placeholder={dict.projects?.taskForm.descriptionPlaceholder || "Enter task description"}
                       {...field}
                       className="bg-muted/50 min-h-[100px]"
                     />
@@ -182,7 +182,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                 name="assignee"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{dict.tasks?.assignee || "Assignee"}</FormLabel>
+                    <FormLabel>{dict.projects?.taskForm.assignTo || "Assignee"}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -196,7 +196,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                           >
                             {field.value
                               ? team.find((member: any) => member.id === field.value)?.name
-                              : dict.tasks?.selectAssignee || "Select assignee"}
+                              : dict.projects?.taskForm.selectAssignee || "Select assignee"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </FormControl>
@@ -204,7 +204,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                       <PopoverContent className="w-full p-0" align="start">
                         <Command>
                           <CommandInput
-                            placeholder={dict.tasks?.searchMembers || "Search team members..."}
+                            placeholder={dict.common?.search || "Search team members..."}
                             className="h-9"
                           />
                           <CommandList>
@@ -242,7 +242,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                 name="due_date"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>{dict.tasks?.due_date || "Due Date"}</FormLabel>
+                    <FormLabel>{dict.common?.endDate || "Due Date"}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -281,7 +281,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.tasks?.status || "Status"}</FormLabel>
+                  <FormLabel>{dict.common?.status || "Status"}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="bg-muted/50">
@@ -345,7 +345,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                   {dict.common?.cancel || "Cancel"}
                 </Button>
                 <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90 cursor-pointer">
-                  {isSubmitting ? dict.common?.processing || "Processing..." : dict.tasks?.saveTask || "Save Task"}
+                  {isSubmitting ? dict.common?.processing || "Processing..." : dict.common?.edit || "Save Task"}
                 </Button>
               </div>
             </DialogFooter>

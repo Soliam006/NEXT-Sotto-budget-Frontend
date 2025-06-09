@@ -3,8 +3,6 @@
     "createAccount": "Create an account",
     "subtitle": "Manage your renovation projects with ease, track budgets and schedules",
     "fullName": "Full Name",
-    "username": "Username",
-    "phoneNumber": "Phone Number",
     "email": "Email",
     "password": "Password",
     "signUp": "Sign Up",
@@ -109,7 +107,6 @@
       "from": "From",
       "to": "To"
     },
-    "share": "Share",
     "projects": "Projects",
     "followers": "Followers",
     "following": "Following",
@@ -122,13 +119,7 @@
     "recentActivity": "Recent Activity",
     "searchUsers": "Search users...",
     "searchFollowers": "Search followers...",
-    "searchFollowing": "Search following...",
-    "roles": {
-      "admin": "Administrator",
-      "manager": "Manager",
-      "worker": "Worker",
-      "client": "Client"
-    }
+    "searchFollowing": "Search following..."
   },
   "common": {
     "add": "Add",
@@ -142,7 +133,12 @@
     "switchToEnglish": "EN",
     "processing": "Processing...",
     "serverError": "Server error, please try again later",
-    "errorTitle": "System Error"
+    "errorTitle": "System Error",
+    "startDate": "Start Date",
+    "endDate": "Due Date",
+    "pickDate": "Pick a date",
+    "status": "Status",
+    "search": "Search ..."
   },
   "projects": {
     "title": "Project Management",
@@ -185,52 +181,17 @@
       "planning": "Planning"
     },
     "allProjects": "All projects {name} is involved in",
-    "taskStatus": {
-      "completed": "Completed",
-      "inProgress": "In Progress",
-      "pending": "Pending",
-      "cancelled": "Cancelled"
-    },
-    "taskPriority": {
-      "high": "High",
-      "medium": "Medium",
-      "low": "Low"
-    },
     "taskActions": {
       "edit": "Edit Task",
-      "delete": "Delete Task",
-      "markComplete": "Mark as Complete",
-      "markInProgress": "Mark as In Progress",
-      "markPending": "Mark as Pending",
-      "assignTo": "Assign to"
-    },
-    "taskDetails": {
-      "title": "Task Details",
-      "description": "Description",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "priority": "Priority",
-      "status": "Status",
-      "assignedTo": "Assigned To",
-      "attachments": "Attachments",
-      "comments": "Comments",
-      "addComment": "Add Comment",
-      "noComments": "No comments yet"
+      "delete": "Delete Task"
     },
     "taskForm": {
+      "details": "Task Details",
       "title": "Task Title",
       "titlePlaceholder": "Enter task title",
-      "description": "Description",
       "descriptionPlaceholder": "Enter task description",
-      "startDate": "Start Date",
-      "endDate": "Due Date",
-      "priority": "Priority",
-      "status": "Status",
       "assignTo": "Assign To",
-      "attachments": "Attachments",
-      "addAttachment": "Add Attachment",
-      "save": "Save Task",
-      "cancel": "Cancel"
+      "selectAssignee": "Select assignee"
     }
   },
   "dashboard": {
@@ -277,7 +238,8 @@
     "totalProjects": "Total Projects",
     "activeProjects": "Active Projects",
     "totalBudget": "Total Budget",
-    "noProjectSelected": "No project selected"
+    "noProjectSelected": "No project selected",
+    "noProjectsAvailable": "No projects available"
   },
   "calendar": {
     "title": "Budget Calendar",
@@ -290,7 +252,6 @@
     "expensesFor": "Expenses for",
     "detailedBreakdown": "Detailed breakdown of tasks, materials, and expenses",
     "totalSpent": "Total Spent",
-    "status": "Status",
     "tasks": "Tasks",
     "task": "Task",
     "worker": "Worker",
@@ -365,44 +326,25 @@
   "tasks": {
     "taskBoard": "Task Board",
     "addTask": "Add Task",
-    "editTask": "Edit Task",
-    "deleteTask": "Delete Task",
-    "taskName": "Task Name",
-    "taskDescription": "Task Description",
-    "taskStatus": "Status",
-    "taskPriority": "Priority",
-    "taskDueDate": "Due Date",
-    "taskAssignee": "Assignee",
-    "taskProject": "Project",
-    "taskTags": "Tags",
-    "taskAttachments": "Attachments",
-    "taskComments": "Comments",
+    "addTaskDescription": "Fill in the details to create a new task for your project.",
+    "editTaskDescription": "Edit the details of the task to keep your project on track.",
     "taskCreatedBy": "Created by",
     "taskCreatedAt": "Created at",
     "taskUpdatedAt": "Updated at",
     "taskCompletedAt": "Completed at",
     "taskCompletedBy": "Completed by",
-    "taskSave": "Save Task",
-    "taskCancel": "Cancel",
-    "taskDelete": "Delete Task",
     "taskDeleteConfirm": "Are you sure you want to delete this task?",
     "taskDeleteDescription": "This action cannot be undone. This will permanently delete the task and all associated data.",
-    "taskDeleteCancel": "Cancel",
     "taskDeleteConfirmButton": "Delete Task",
     "taskCreated": "Task created successfully",
     "taskUpdated": "Task updated successfully",
     "taskDeleted": "Task deleted successfully",
-    "taskError": "An error occurred",
     "taskErrorDescription": "An error occurred while processing your request. Please try again later.",
     "taskErrorRetry": "Retry",
     "taskErrorCancel": "Cancel",
     "statusPending": "Pending",
     "statusInProgress": "In Progress",
     "statusCompleted": "Completed",
-    "priorityLow": "Low",
-    "priorityMedium": "Medium",
-    "priorityHigh": "High",
-    "priorityUrgent": "Urgent",
     "noTasks": "No tasks yet",
     "noTasksInProgress": "No tasks in progress",
     "noTasksCompleted": "No completed tasks",

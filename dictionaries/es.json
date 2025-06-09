@@ -3,8 +3,6 @@
     "createAccount": "Crear una cuenta",
     "subtitle": "Gestiona tus proyectos de renovación con facilidad, controla presupuestos y cronogramas",
     "fullName": "Nombre completo",
-    "username": "Nombre de usuario",
-    "phoneNumber": "Número de teléfono",
     "email": "Correo electrónico",
     "password": "Contraseña",
     "signUp": "Registrarse",
@@ -109,7 +107,6 @@
       "from": "Desde",
       "to": "Hasta"
     },
-    "share": "Compartir",
     "projects": "Proyectos",
     "followers": "Seguidores",
     "following": "Siguiendo",
@@ -122,27 +119,26 @@
     "recentActivity": "Actividad Reciente",
     "searchUsers": "Buscar usuarios...",
     "searchFollowers": "Buscar seguidores...",
-    "searchFollowing": "Buscar usuarios seguidos...",
-    "roles": {
-      "admin": "Administrador",
-      "manager": "Gerente",
-      "worker": "Trabajador",
-      "client": "Cliente"
-    }
+    "searchFollowing": "Buscar usuarios seguidos..."
   },
   "common": {
     "add": "Añadir",
+    "edit": "Editar",
     "save": "Guardar",
     "loading": "Cargando...",
     "acept": "Aceptar",
-    "edit": "Editar",
     "delete": "Eliminar",
     "cancel": "Cancelar",
     "switchToSpanish": "ES",
     "switchToEnglish": "EN",
     "processing": "Procesando...",
     "serverError": "Error del servidor, por favor intenta de nuevo más tarde",
-    "errorTitle": "Error del sistema"
+    "errorTitle": "Error del sistema",
+    "startDate": "Inicio",
+    "pickDate": "Selecciona una fecha",
+    "endDate": "Finalización",
+    "status": "Estado",
+    "search": "Buscar..."
   },
   "projects": {
     "title": "Gestión de Proyectos",
@@ -185,52 +181,18 @@
     "completion": "Completado",
     "role": "Rol",
     "allProjects": "Todos los proyectos en los que {name} está involucrado",
-    "taskStatus": {
-      "completed": "Completada",
-      "inProgress": "En Progreso",
-      "pending": "Pendiente",
-      "cancelled": "Cancelada"
-    },
-    "taskPriority": {
-      "high": "Alta",
-      "medium": "Media",
-      "low": "Baja"
-    },
     "taskActions": {
       "edit": "Editar Tarea",
-      "delete": "Eliminar Tarea",
-      "markComplete": "Marcar como Completada",
-      "markInProgress": "Marcar como En Progreso",
-      "markPending": "Marcar como Pendiente",
-      "assignTo": "Asignar a"
-    },
-    "taskDetails": {
-      "title": "Detalles de la Tarea",
-      "description": "Descripción",
-      "startDate": "Fecha de Inicio",
-      "endDate": "Fecha de Finalización",
-      "priority": "Prioridad",
-      "status": "Estado",
-      "assignedTo": "Asignada a",
-      "attachments": "Archivos Adjuntos",
-      "comments": "Comentarios",
-      "addComment": "Añadir Comentario",
-      "noComments": "Aún no hay comentarios"
+      "delete": "Eliminar Tarea"
     },
     "taskForm": {
       "title": "Título de la Tarea",
       "titlePlaceholder": "Ingresa el título de la tarea",
-      "description": "Descripción",
+      "details": "Detalles de la Tarea",
+      "assignedTo": "Asignada a",
       "descriptionPlaceholder": "Ingresa la descripción de la tarea",
-      "startDate": "Fecha de Inicio",
-      "endDate": "Fecha de Vencimiento",
-      "priority": "Prioridad",
-      "status": "Estado",
       "assignTo": "Asignar a",
-      "attachments": "Archivos Adjuntos",
-      "addAttachment": "Añadir Archivo",
-      "save": "Guardar Tarea",
-      "cancel": "Cancelar"
+      "selectAssignee": "Selecciona un trabajador"
     }
   },
   "dashboard": {
@@ -277,7 +239,8 @@
     "totalProjects": "Proyectos Totales",
     "activeProjects": "Proyectos Activos",
     "totalBudget": "Presupuesto Total",
-    "noProjectSelected" : "No se ha seleccionado ningún proyecto"
+    "noProjectSelected" : "No se ha seleccionado ningún proyecto",
+    "noProjectsAvailable": "No hay proyectos disponibles"
   },
   "calendar": {
     "title": "Calendario de Presupuesto",
@@ -365,44 +328,25 @@
   "tasks": {
     "taskBoard": "Tablero de Tareas",
     "addTask": "Añadir Tarea",
-    "editTask": "Editar Tarea",
-    "deleteTask": "Eliminar Tarea",
-    "taskName": "Nombre de la Tarea",
-    "taskDescription": "Descripción de la Tarea",
-    "taskStatus": "Estado",
-    "taskPriority": "Prioridad",
-    "taskDueDate": "Fecha de Vencimiento",
-    "taskAssignee": "Asignado a",
-    "taskProject": "Proyecto",
-    "taskTags": "Etiquetas",
-    "taskAttachments": "Adjuntos",
-    "taskComments": "Comentarios",
+    "addTaskDescription": "Complete los detalles para crear una nueva tarea para el proyecto.",
+    "editTaskDescription": "Edita los detalles de la tarea para actualizar su información.",
     "taskCreatedBy": "Creado por",
     "taskCreatedAt": "Creado el",
     "taskUpdatedAt": "Actualizado el",
     "taskCompletedAt": "Completado el",
     "taskCompletedBy": "Completado por",
-    "taskSave": "Guardar Tarea",
-    "taskCancel": "Cancelar",
-    "taskDelete": "Eliminar Tarea",
     "taskDeleteConfirm": "¿Estás seguro de que quieres eliminar esta tarea?",
     "taskDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la tarea y todos los datos asociados.",
-    "taskDeleteCancel": "Cancelar",
     "taskDeleteConfirmButton": "Eliminar Tarea",
     "taskCreated": "Tarea creada exitosamente",
     "taskUpdated": "Tarea actualizada exitosamente",
     "taskDeleted": "Tarea eliminada exitosamente",
-    "taskError": "Ocurrió un error",
     "taskErrorDescription": "Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.",
     "taskErrorRetry": "Reintentar",
     "taskErrorCancel": "Cancelar",
     "statusPending": "Pendiente",
     "statusInProgress": "En Progreso",
     "statusCompleted": "Completada",
-    "priorityLow": "Baja",
-    "priorityMedium": "Media",
-    "priorityHigh": "Alta",
-    "priorityUrgent": "Urgente",
     "noTasks": "No hay tareas aún",
     "noTasksInProgress": "No hay tareas en progreso",
     "noTasksCompleted": "No hay tareas completadas",
