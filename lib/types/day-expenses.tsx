@@ -13,7 +13,7 @@ export interface Material {
 }
 
 export interface DailyExpense {
-    date: string;
+    expense_date: string;
     spent: number;
     limit: number;
     tasks: Task[];
