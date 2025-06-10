@@ -230,7 +230,9 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       setSelectedProject(updatedProject)
       setOriginalSelectedProject(updatedProject)
       setPendingChanges(null) // Limpiar cambios pendientes
-      console.log("Cambios guardados con éxito")
+
+      setInfo( dictionary?.info?.changesSaved || "Changes saved successfully")
+
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error al guardar los cambios")
       console.error("Error al guardar los cambios:", error)
@@ -476,8 +478,6 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
     updatePendingChanges({
       expenses: updatedExpenses
     });
-
-    setInfo("Expense added successfully");
   }
 
 // Actualizar un gasto

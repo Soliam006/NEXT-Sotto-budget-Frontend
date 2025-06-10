@@ -1,4 +1,8 @@
 {
+  "info": {
+    "expenseAdded": "Expense added successfully",
+    "changesSaved": "Changes saved successfully"
+  },
   "signup": {
     "createAccount": "Create an account",
     "subtitle": "Manage your renovation projects with ease, track budgets and schedules",
@@ -140,7 +144,11 @@
     "status": "Status",
     "search": "Search ...",
     "generatedOn": "Generated on",
-    "reportFooter": "This report was generated automatically"
+    "reportFooter": "This report was generated automatically",
+    "selectCategory": "Select a category",
+    "notes": "Notes",
+    "notesPlaceholder": "Add any additional notes here",
+    "optional": "Optional"
   },
   "projects": {
     "title": "Project Management",
@@ -377,6 +385,8 @@
     "charts": "Charts",
     "searchExpenses": "Search expenses...",
     "addExpense": "Add Expense",
+    "addExpenseDescription": "Fill in the details to add a new expense for your project.",
+    "descriptionPlaceholder": "Enter a brief description of the expense",
     "expenseInfo": "Expense Information",
     "category": "Category",
     "amount": "Amount",
@@ -416,13 +426,6 @@
       "materials": "Materials",
       "transport": "Transport",
       "others": "Others"
-    },
-    "paymentMethods": {
-      "cash": "Cash",
-      "creditCard": "Credit Card",
-      "bankTransfer": "Bank Transfer",
-      "check": "Check",
-      "other": "Other"
     },
     "expenseBreakdown": "Expense Breakdown",
     "budgetComparison": "Budget vs. Actual",

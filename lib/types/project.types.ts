@@ -27,8 +27,7 @@ export interface Project {
         avatar?: string
     }[]
     tasks?: Task []
-    team?: any
-    workers?: any
+    team?: Worker[]
     expenses: Expenses[]
     expenseCategories?: {
         [key: string]: number
@@ -36,6 +35,20 @@ export interface Project {
     inventory: InventoryItem[]
 }
 
+export interface Worker {
+    id: number
+    name: string
+    role: string
+    contact: string
+    phone: string
+    availability: null | string
+    efficiency: number
+    projects: string[]
+    tasksCompleted: number
+    tasksInProgress: number
+    skills?: string[]
+    avatar?: string
+}
 export interface ProjectBackend {
     id: number
     title: string

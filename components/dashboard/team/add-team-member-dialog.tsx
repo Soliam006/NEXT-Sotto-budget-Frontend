@@ -94,7 +94,7 @@ interface AddTeamMemberDialogProps {
 }
 
 export function AddTeamMemberDialog({ dict, existingTeamIds, buttonVariant = "ghost" }: AddTeamMemberDialogProps) {
-  const { addTeamMember } = useProject()
+  const { addTeamMember, selectedProject } = useProject()
   const [open, setOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedWorker, setSelectedWorker] = useState<any | null>(null)

@@ -1,4 +1,8 @@
 {
+  "info": {
+    "expenseAdded": "Se ha añadido un nuevo gasto",
+    "changesSaved": "Cambios guardados exitosamente"
+  },
   "signup": {
     "createAccount": "Crear una cuenta",
     "subtitle": "Gestiona tus proyectos de renovación con facilidad, controla presupuestos y cronogramas",
@@ -140,7 +144,11 @@
     "status": "Estado",
     "search": "Buscar...",
     "generatedOn": "Generado el",
-    "reportFooter": "Este es un informe generado automáticamente"
+    "reportFooter": "Este es un informe generado automáticamente",
+    "selectCategory": "Selecciona una categoría",
+    "notes": "Notas",
+    "notesPlaceholder": "Añade notas o comentarios aquí",
+    "optional": "Opcional"
   },
   "projects": {
     "title": "Gestión de Proyectos",
@@ -380,6 +388,8 @@
     "charts": "Gráficos",
     "searchExpenses": "Buscar gastos...",
     "addExpense": "Añadir Gasto",
+    "addExpenseDescription": "Completa los detalles para añadir un nuevo gasto al proyecto.",
+    "descriptionPlaceholder": "Ingresa una descripción del gasto",
     "expenseInfo": "Información del Gasto",
     "category": "Categoría",
     "amount": "Monto",

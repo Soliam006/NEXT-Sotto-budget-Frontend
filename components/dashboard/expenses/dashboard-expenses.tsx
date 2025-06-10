@@ -1,7 +1,7 @@
 "use client"
 
-import {useState} from "react"
-import {DollarSign, Search, BarChart3, PieChartIcon, Download, PlusCircle, FileText} from "lucide-react"
+import React, {useState} from "react"
+import {DollarSign, Search, BarChart3, PieChartIcon, PlusCircle, FileText} from "lucide-react"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
@@ -26,6 +26,7 @@ import {useProject} from "@/contexts/project-context";
 import {formatDate} from "@/lib/helpers/projects";
 import {AddExpenseDialog} from "./add-expense-dialog";
 import {SaveChangesBar} from "@/components/bars/save-changes-bar";
+import {getNameTraduction} from "@/lib/helpers/expense";
 import dynamic from "next/dynamic"
 
 const DownloadExpensesLink = dynamic (() =>
@@ -39,7 +40,7 @@ interface DashboardExpensesProps {
 }
 
 export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
-  const {selectedProject, hasChanges, discardChanges, saveChanges} = useProject()
+  const {selectedProject, hasChanges} = useProject()
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -92,29 +93,13 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
     }
   }
 
-  function getNameTraduction(category: string) {
-    switch (category) {
-      case "Materials":
-        return dict.expenses?.categories.materials || "Materials"
-      case "Labour":
-        return dict.expenses?.categories.labour || "Labour"
-      case "Products":
-        return dict.expenses?.categories.products || "Products"
-      case "Transport":
-        return dict.expenses?.categories.transport || "Transport"
-      case "Others":
-        return dict.expenses?.categories.others || "Others"
-      default:
-        return category
-    }
-  }
 
   // Calculate total expenses
   const totalExpenses = selectedProject?.currentSpent || 0;
 
   // Prepare data for pie chart
   const pieChartData = hasExpenses ? Object.entries(selectedProject?.expenseCategories || {}).map(([category, amount]) => ({
-    name: getNameTraduction(category),
+    name: getNameTraduction(category , dict),
     value: amount,
     color: getCategoryColor(category),
   })) : []
@@ -278,6 +263,42 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
 
                       {hasExpenses ? (
                           <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+
+                            <Card className="bg-muted/30 border-border/50">
+                              <CardHeader className="pb-2">
+                                <CardTitle className="text-base flex items-center">
+                                  <BarChart3 className="h-4 w-4 mr-2 text-primary"/>
+                                  {dict.expenses?.recentExpenses || "Recent Expenses"}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow className="border-border">
+                                      <TableHead className="text-muted-foreground">{dict.expenses?.expense_date || "Date"}</TableHead>
+                                      <TableHead className="text-muted-foreground">
+                                        {dict.expenses?.category || "Category"}
+                                      </TableHead>
+                                      <TableHead className="text-muted-foreground">{dict.expenses?.amount || "Amount"}</TableHead>
+                                      <TableHead className="text-muted-foreground">{dict.expenses?.status || "Status"}</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {selectedProject.expenses.slice(0, 5).map((expense) => (
+                                        <TableRow key={expense.id} className="border-border">
+                                          <TableCell>{formatDate(expense.expense_date) || expense.expense_date}</TableCell>
+                                          <TableCell>{expense.category}</TableCell>
+                                          <TableCell>€{expense.amount}</TableCell>
+                                          <TableCell>
+                                            <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
+                                          </TableCell>
+                                        </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </CardContent>
+                            </Card>
+
                             <Card className="bg-muted/30 border-border/50">
                               <CardHeader className="pb-2">
                                 <CardTitle className="text-base flex items-center">
@@ -317,41 +338,6 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                       </div>
                                   ))}
                                 </div>
-                              </CardContent>
-                            </Card>
-
-                            <Card className="bg-muted/30 border-border/50">
-                              <CardHeader className="pb-2">
-                                <CardTitle className="text-base flex items-center">
-                                  <BarChart3 className="h-4 w-4 mr-2 text-primary"/>
-                                  {dict.expenses?.recentExpenses || "Recent Expenses"}
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow className="border-border">
-                                      <TableHead className="text-muted-foreground">{dict.expenses?.expense_date || "Date"}</TableHead>
-                                      <TableHead className="text-muted-foreground">
-                                        {dict.expenses?.category || "Category"}
-                                      </TableHead>
-                                      <TableHead className="text-muted-foreground">{dict.expenses?.amount || "Amount"}</TableHead>
-                                      <TableHead className="text-muted-foreground">{dict.expenses?.status || "Status"}</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {selectedProject.expenses.slice(0, 5).map((expense) => (
-                                        <TableRow key={expense.id} className="border-border">
-                                          <TableCell>{formatDate(expense.expense_date) || expense.expense_date}</TableCell>
-                                          <TableCell>{expense.category}</TableCell>
-                                          <TableCell>€{expense.amount}</TableCell>
-                                          <TableCell>
-                                            <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
-                                          </TableCell>
-                                        </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
                               </CardContent>
                             </Card>
                           </div>
@@ -396,11 +382,11 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="all">{dict.expenses?.allCategories || "All Categories"}</SelectItem>
-                                <SelectItem value="Materials">{getNameTraduction("Materials")}</SelectItem>
-                                <SelectItem value="Labour"> {getNameTraduction("Labour")}</SelectItem>
-                                <SelectItem value="Products"> {getNameTraduction("Products")}</SelectItem>
-                                <SelectItem value="Transport"> {getNameTraduction("Transport")}</SelectItem>
-                                <SelectItem value="Others"> {getNameTraduction("Others")}</SelectItem>
+                                <SelectItem value="Materials">{getNameTraduction("Materials", dict)}</SelectItem>
+                                <SelectItem value="Labour"> {getNameTraduction("Labour", dict)}</SelectItem>
+                                <SelectItem value="Products"> {getNameTraduction("Products", dict)}</SelectItem>
+                                <SelectItem value="Transport"> {getNameTraduction("Transport", dict)}</SelectItem>
+                                <SelectItem value="Others"> {getNameTraduction("Others", dict)}</SelectItem>
                               </SelectContent>
                             </Select>
 
@@ -419,11 +405,6 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                 <SelectItem value="Rejected">Rejected</SelectItem>
                               </SelectContent>
                             </Select>
-
-                            <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90">
-                              <DollarSign className="h-4 w-4 mr-2" />
-                              {dict.expenses?.addExpense || "Add Expense"}
-                            </Button>
                           </div>
                         </div>
 
