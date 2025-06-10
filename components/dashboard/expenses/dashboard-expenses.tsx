@@ -27,6 +27,7 @@ import {formatDate} from "@/lib/helpers/projects";
 import {AddExpenseDialog} from "./add-expense-dialog";
 import {SaveChangesBar} from "@/components/bars/save-changes-bar";
 import {getNameTraduction} from "@/lib/helpers/expense";
+import {EditExpenseDialog} from "@/components/dashboard/expenses/edit-expense-dialog";
 
 interface DashboardExpensesProps {
   dict: any
@@ -149,11 +150,6 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
 
         {/* Project selector */}
         <ProjectsSelector dict={dict} />
-
-        {/* Save Changes Bar */}
-        {hasChanges && (
-            <SaveChangesBar dict={dict} />
-        )}
 
         {/* Expense Overview */}
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
@@ -416,15 +412,17 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                                 <TableBody>
                                   {hasFilteredExpenses ? (
                                       filteredExpenses.map((expense) => (
-                                          <TableRow key={expense.id} className="border-border">
-                                            <TableCell>{formatDate(expense.expense_date) || expense.expense_date}</TableCell>
-                                            <TableCell>{expense.category}</TableCell>
-                                            <TableCell>{expense.description}</TableCell>
-                                            <TableCell>€{expense.amount}</TableCell>
-                                            <TableCell>
-                                              <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
-                                            </TableCell>
-                                          </TableRow>
+                                          <EditExpenseDialog key={expense.id} expense={expense} dict={dict}>
+                                            <TableRow className="cursor-pointer hover:bg-muted/50 transition-colors border-border">
+                                              <TableCell>{formatDate(expense.expense_date) || expense.expense_date}</TableCell>
+                                              <TableCell>{expense.category}</TableCell>
+                                              <TableCell>{expense.description}</TableCell>
+                                              <TableCell>€{expense.amount}</TableCell>
+                                              <TableCell>
+                                                <Badge className={getStatusColor(expense.status)}>{expense.status}</Badge>
+                                              </TableCell>
+                                            </TableRow>
+                                          </EditExpenseDialog>
                                       ))
                                   ) : (
                                       <TableRow>
@@ -527,6 +525,12 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Save Changes Bar */}
+        {hasChanges && (
+            <SaveChangesBar dict={dict} />
+        )}
+
       </div>
   )
 }

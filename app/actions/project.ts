@@ -47,6 +47,7 @@ export async function fetchProjects(token: string |null): Promise<any | null> {
                                 expenses: expenses?.map((expense: Expenses) => {
                                     return {
                                         id: expense.id,
+                                        title: expense.title,
                                         expense_date: expense.expense_date,
                                         category: expense.category,
                                         description: expense.description,

@@ -11,6 +11,7 @@ import { useNotifications } from "@/contexts/notification-context"
 import { CheckCircle2, AlertCircle, Info, Activity } from "lucide-react"
 import {formatRelativeTime} from "@/lib/helpers/notifications";
 import { NotificationItem } from "@/components/notifications/notification-item"
+import {useProject} from "@/contexts/project-context";
 
 // Helper functions for notification styling
 const getNotificationTypeStyles = (type: string) => {
@@ -56,6 +57,7 @@ interface NotificationDialogProps {
 
 export function NotificationDialog({ open, onOpenChange, dictionary }: NotificationDialogProps) {
     const { notifications, markAsRead, markAllAsRead, selectedNotification, setSelectedNotification } = useNotifications()
+    const {selectedProject} = useProject()
     const [activeTab, setActiveTab] = useState<string>("all")
 
     // Reset selected notification when dialog closes
@@ -69,7 +71,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
     const allNotifications = notifications
     const unreadNotifications = notifications.filter((n) => !n.read)
 
-    const handleNotificationClick = (id: string) => {
+    const handleNotificationClick = (id: number) => {
         const notification = notifications.find((n) => n.id === id)
         if (notification) {
             setSelectedNotification(notification)
@@ -185,7 +187,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={markAllAsRead}
+                                    onClick={() => selectedProject?.id && markAllAsRead(selectedProject.id)}
                                     className="text-xs text-cyan-400 hover:text-cyan-300"
                                 >
                                     {dictionary.notifications?.markAllRead || "Mark all as read"}

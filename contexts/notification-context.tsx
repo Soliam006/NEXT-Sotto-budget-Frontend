@@ -3,7 +3,11 @@
 import type React from "react"
 import {createContext, useCallback, useContext, useEffect, useState} from "react"
 import {Activity, Notification } from "@/lib/types/notification";
-import {fetchNotificationsBD} from "@/app/actions/notifications";
+import {
+    fetchNotificationsBD,
+    mark_all_notifications_as_read,
+    markNotificationAsRead
+} from "@/app/actions/notifications";
 import {getTokenFromStorage, useUser} from "@/contexts/UserProvider";
 import {generateTitle, generateDescription, mapActivityTypeToUIType, generateDetails} from "@/lib/helpers/notifications";
 import Swal from 'sweetalert2';
@@ -12,8 +16,8 @@ interface NotificationContextType {
     notifications: Notification[]
     loading: boolean
     error: string | null
-    markAsRead: (id: string) => void
-    markAllAsRead: () => void
+    markAsRead: (id: number) => void
+    markAllAsRead: (project_id: number) => void
     selectedNotification: Notification | null
     setSelectedNotification: (notification: Notification | null) => void
     refreshNotifications: () => Promise<void>
@@ -48,7 +52,7 @@ const generateLink = (activity: Activity): string => {
 // Convert backend activity to UI notification
 const convertToNotification = (activity: Activity, dictionary?: any): Notification => {
     return {
-        id: activity.id.toString(),
+        id: activity.id,
         title: generateTitle(activity, dictionary),
         description: generateDescription(activity, dictionary),
         time: activity.created_at,
@@ -116,13 +120,9 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
     }, [user?.id, token])
 
     // Mark notification as read
-    const markAsRead = useCallback(async (id: string) => {
+    const markAsRead = useCallback(async (id: number) => {
         try {
-            // TODO: Replace with actual API call
-            // await fetch(`/api/activities/${id}/read`, { method: 'PATCH' })
-
-            // For now, simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 50))
+            await markNotificationAsRead( getTokenFromStorage(), id)
 
             setNotifications((prev) =>
                 prev.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
@@ -133,19 +133,23 @@ export function NotificationProvider({ children, dictionary }: NotificationProvi
     }, [])
 
     // Mark all notifications as read
-    const markAllAsRead = useCallback(async () => {
+    const markAllAsRead = async (projec_id: number) => {
         try {
-            // TODO: Replace with actual API call
-            // await fetch('/api/activities/read-all', { method: 'PATCH' })
+            const response = await mark_all_notifications_as_read(getTokenFromStorage(), projec_id)
 
-            // For now, simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            if (response.statusCode === 500) {
+                console.error("Error marking all notifications as read:", response)
+                throw new Error(response.message || "Failed to mark all notifications as read")
+            }
 
-            setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
+            setNotifications((prev) =>
+                prev.map((notification) => ({...notification, read: true})),
+            )
         } catch (err) {
             console.error("Error marking all notifications as read:", err)
+            setError(dictionary.notifications.failedToMarkAllRead || "Failed to mark all notifications as read")
         }
-    }, [])
+    }
 
     // Función para mostrar errores
     const showErrorAlert = useCallback((errorMessage: string) => {

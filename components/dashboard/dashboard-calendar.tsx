@@ -27,7 +27,7 @@ const generateDailyExpenses = () => {
     const spent = Math.floor(Math.random() * 1000)
 
     dailyExpenses[date.toISOString().split("T")[0]] = {
-      date: date.toISOString().split("T")[0],
+      expense_date: date.toISOString().split("T")[0],
       spent: spent,
       limit: dailyLimit,
       tasks: [

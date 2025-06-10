@@ -71,40 +71,55 @@ const styles = StyleSheet.create({
         backgroundColor: "#f1f5f9",
         paddingVertical: 6,
         paddingHorizontal: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: "#e2e8f0",
+        marginTop: 8,
+        marginBottom: 4,
     },
     tableRow: {
         flexDirection: "row",
-        paddingVertical: 8,
+        paddingVertical: 10,
         paddingHorizontal: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: "#e2e8f0",
+        backgroundColor: "#ffffff", // por defecto
     },
+    tableRowEven: {
+        backgroundColor: "#f9fafb", // gris muy claro
+    },
+
+    // Columnas
     colName: {
         width: "30%",
         fontSize: 10,
+        color: "#0f172a",
+    },
+    provider: {
+        width: "20%",
+        fontSize: 10,
+        color: "#475569",
     },
     colQuantity: {
         width: "15%",
         fontSize: 10,
         textAlign: "right",
+        color: "#334155",
     },
     colUnitCost: {
         width: "15%",
         fontSize: 10,
         textAlign: "right",
+        color: "#334155",
     },
     colTotalCost: {
         width: "20%",
         fontSize: 10,
         textAlign: "right",
+        fontWeight: "bold",
+        color: "#0f172a",
     },
     colStatus: {
         width: "20%",
         fontSize: 10,
         textAlign: "center",
     },
+
     statusBadge: {
         padding: "3 12",
         borderRadius: 10,
@@ -233,6 +248,7 @@ export function InventoryPDFTemplate({ projectName, inventory, dict }: Inventory
                 {/* Encabezados de tabla */}
                 <View style={styles.tableHeader}>
                     <Text style={styles.colName}>{dict.inventory?.item || "Item"}</Text>
+                    <Text style={styles.provider}>{dict.inventory?.supplier || "Provider"}</Text>
                     <Text style={styles.colQuantity}>{dict.inventory?.quantity || "Quantity"}</Text>
                     <Text style={styles.colUnitCost}>{dict.inventory?.unit_cost || "Unit Cost"}</Text>
                     <Text style={styles.colTotalCost}>{dict.inventory?.totalCost || "Total Cost"}</Text>
@@ -250,10 +266,17 @@ export function InventoryPDFTemplate({ projectName, inventory, dict }: Inventory
                         {/* Tabla */}
                         <View style={styles.table}>
                             {/* Filas de tabla */}
-                            {items.map((item) => (
-                                <View key={item.id} style={styles.tableRow} wrap={false}>
+                            {items.map((item, index) => (
+                                <View
+                                    key={item.id}
+                                    style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}
+                                    wrap={false}
+                                >
                                     <Text style={styles.colName}>
                                         {item.name}
+                                    </Text>
+                                    <Text style={styles.provider}>
+                                        {item.supplier || dict.inventory?.unknownSupplier || "Unknown Supplier"}
                                     </Text>
                                     <Text style={styles.colQuantity}>
                                         {item.total} {item.unit}

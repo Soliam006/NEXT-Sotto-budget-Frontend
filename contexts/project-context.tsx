@@ -38,7 +38,7 @@ interface ProjectContextType {
   addExpense: (expense: any) => void
   updateExpense: (expenseId: number, updatedExpense: any) => void
   deleteExpense: (expenseId: number) => void
-  updateExpenseStatus: (expenseId: number, newStatus: "approved" | "pending" | "rejected") => void
+  updateExpenseStatus: (expenseId: number, newStatus: "Approved" | "Pending" | "Rejected") => void
 
   // Métodos para guardar/descartar cambios
   hasChanges: boolean
@@ -268,13 +268,18 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
       const workerback: WorkerDataBackend = {
           ...member,
+          projects: [selectedProject.title], // Asegurarse de que el proyecto esté asociado
           updated: false, // Indica que no ha sido actualizado
           deleted: false, // Indica que no está eliminado
           created: true // Indica que es un nuevo miembro
       }
+      // Filtrar duplicados en pendingChanges
+      const filteredPendingTeam = (pendingChanges?.team || []).filter(
+            (m: WorkerDataBackend) => m.id !== member.id
+      );
 
       updatePendingChanges({
-          team: [...(pendingChanges?.team || []), workerback]
+            team: [...(filteredPendingTeam || []), workerback]
       });
   }
 
@@ -680,7 +685,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
         // Calcular nuevo currentSpent
         const newCurrentSpent = updatedExpenses
-            .filter(e => e.status === 'approved')
+            .filter(e => e.status === 'Approved')
             .reduce((sum, e) => sum + (e.amount || 0), 0);
 
         // Actualizar categorías de gastos
@@ -700,7 +705,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
         // Preparar el gasto para pendingChanges
         const expenseWithCreated: ExpensesBackend = {
           ...newExpense,
-          approved_by: newExpense.project_info?.approved_by || "", // Asegurarse de que approved_by esté presente
+          approved_by: newExpense.project_info.approved_by || "", // Asegurarse de que approved_by esté presente
           notes: newExpense.project_info.notes || "", // Asegurarse de que notes esté presente
           updated: false, // Indica que no ha sido actualizado
           deleted: false, // Indica que no está eliminado
@@ -730,7 +735,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
         if (updatedExpense.amount || updatedExpense.status || updatedExpense.category) {
           newCurrentSpent = updatedExpenses
-              .filter(e => e.status === 'approved')
+              .filter(e => e.status === 'Approved')
               .reduce((sum, e) => sum + (e.amount || 0), 0);
 
           // Recalcular todas las categorías desde cero
@@ -793,7 +798,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
       // Recalcular currentSpent y categorías de gastos
       const newCurrentSpent = updatedExpenses
-          .filter(e => e.status === 'approved')
+          .filter(e => e.status === 'Approved')
           .reduce((sum, e) => sum + (e.amount || 0), 0);
 
       const updatedExpenseCategories = {...selectedProject.expenseCategories};
@@ -837,7 +842,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       }
   }
 // Actualizar el estado de un gasto
-  const updateExpenseStatus = (expenseId: number, newStatus: "approved" | "pending" | "rejected") => {
+  const updateExpenseStatus = (expenseId: number, newStatus: "Approved" | "Pending" | "Rejected") => {
         if (!selectedProject) return;
 
         const updatedExpenses = selectedProject.expenses?.map((expense) =>
@@ -846,7 +851,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
         // Recalcular currentSpent basado en gastos aprobados
         const newCurrentSpent = updatedExpenses
-          .filter(e => e.status === 'approved')
+          .filter(e => e.status === 'Approved')
           .reduce((sum, e) => sum + (e.amount || 0), 0);
 
         setSelectedProject(prev => prev ? {

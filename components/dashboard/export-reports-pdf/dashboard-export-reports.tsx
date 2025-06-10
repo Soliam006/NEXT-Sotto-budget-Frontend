@@ -38,10 +38,12 @@ export function DashboardExportReports({ dictionary }: DashboardExportReportsPro
 
     const expenseStats = {
         totalExpenses: expenses.length,
-        totalAmount: expenses.reduce((sum, expense) => sum + expense.amount, 0),
+        totalAmount: expenses.filter(expense => expense.status === "Approved")
+            .reduce((sum, expense) => sum + expense.amount, 0),
         categories: [...new Set(expenses.map((expense) => expense.category))].length,
         budgetUsed: currentProject
-            ? (expenses.reduce((sum, expense) => sum + expense.amount, 0) / currentProject.limit_budget) * 100
+            ? (expenses.filter(expense => expense.status === "Approved")
+            .reduce((sum, expense) => sum + expense.amount, 0) / currentProject.limit_budget) * 100
             : 0,
     }
 
@@ -122,7 +124,7 @@ export function DashboardExportReports({ dictionary }: DashboardExportReportsPro
                                 </div>
                                 <div className="text-center p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
                                     <div className="text-2xl font-bold text-green-600">€{inventoryStats.totalValue.toLocaleString()}</div>
-                                    <div className="text-sm text-muted-foreground">{dictionary.inventory?.totalValue || "Total Value"}</div>
+                                    <div className="text-sm text-muted-foreground">{dictionary.inventory?.totalCost || "Total Value"}</div>
                                 </div>
                             </div>
 

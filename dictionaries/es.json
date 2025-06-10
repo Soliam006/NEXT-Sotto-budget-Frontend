@@ -249,7 +249,22 @@
     "activeProjects": "Proyectos Activos",
     "totalBudget": "Presupuesto Total",
     "noProjectSelected" : "No se ha seleccionado ningún proyecto",
-    "noProjectsAvailable": "No hay proyectos disponibles"
+    "noProjectsAvailable": "No hay proyectos disponibles",
+    "exportReports": "Exportar Informes",
+    "exportReportsDescription": "Genera y descarga informes PDF detallados con los datos de tu proyecto",
+    "currentProject": "Proyecto Actual",
+    "selectProjectToExport": "Por favor, selecciona un proyecto para exportar los informes",
+    "inventoryReportDescription": "Exporta un informe completo del inventario con todos los elementos, categorías y costes",
+    "reportIncludes": "El informe incluye:",
+    "itemsByCategory": "Elementos organizados por categoría",
+    "costBreakdown": "Desglose detallado de costes",
+    "statusTracking": "Seguimiento de estado (En presupuesto, Pendiente, Instalado)",
+    "supplierInfo": "Información de proveedores",
+    "expenseReportDescription": "Exporta un informe detallado de los gastos con análisis de presupuesto y desglose por categoría",
+    "budgetOverview": "Resumen y análisis del presupuesto",
+    "categoryCharts": "Gráficas por categoría",
+    "expensesByCategory": "Gastos agrupados por categoría",
+    "recentExpenses": "Listado de gastos recientes"
   },
   "calendar": {
     "title": "Calendario de Presupuesto",

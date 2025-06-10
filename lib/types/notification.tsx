@@ -3,14 +3,14 @@
 import type React from "react";
 
 export interface ActivityItemProps {
-    id: string
+    id: number
     icon?: React.ReactNode
     title: string
     description: string
     time: string
     type: "info" | "warning" | "error" | "success" | "update"
     read: boolean
-    onClick?: (id: string) => void
+    onClick?: (id: number) => void
 }
 export type ActivityType =
     | "task_created" | "task_updated" | "task_completed" | "task_deleted"
@@ -92,7 +92,7 @@ export interface Activity {
 export type UINotificationType = "info" | "warning" | "error" | "success" | "update"
 
 export interface Notification {
-    id: string
+    id: number
     title: string
     description: string
     time: string // ISO string

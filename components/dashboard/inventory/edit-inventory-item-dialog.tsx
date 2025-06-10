@@ -174,7 +174,7 @@ export function EditInventoryItemDialog({ open, onOpenChange, item, dict }: Edit
                                     id="used"
                                     type="number"
                                     min="0"
-                                    step="0.01"
+                                    step="0.1"
                                     max={total}
                                     value={used}
                                     onChange={(e) => setUsed(Number.parseFloat(e.target.value) || 0)}
