@@ -17,12 +17,6 @@ import {AddInventoryItemDialog} from "@/components/dashboard/inventory/add-inven
 import {EditInventoryItemDialog} from "@/components/dashboard/inventory/edit-inventory-item-dialog";
 import {SaveChangesBar} from "@/components/bars/save-changes-bar";
 import {useUser} from "@/contexts/UserProvider";
-import dynamic from "next/dynamic";
-
-const DownLoadLinkPDF = dynamic(() =>
-    import("@/components/pdf/inventory/download-inventory-link"), {
-      ssr: false,
-})
 
 interface DashboardInventoryProps {
   dict: any
@@ -241,8 +235,6 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             {/* Contenedor de botones - Se mantiene a la derecha */}
             {(currentUser?.role === "admin") && (
               <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-
-                <DownLoadLinkPDF dict= {dict} inventory={inventory} selectedProject={selectedProject} />
 
                 <Button
                     variant="default"

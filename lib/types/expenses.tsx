@@ -18,16 +18,6 @@ export interface Expenses {
     project_info: ProjectInfo
 }
 
-export interface ExpensesCreate {
-    expense_date: string
-    category: Category
-    description: string
-    amount: number
-    status: string
-    approved_by: string
-    notes: string
-}
-
 export interface ExpensesBackend {
     id: number
     expense_date: string
@@ -36,7 +26,8 @@ export interface ExpensesBackend {
     amount: number
     status: string
     updated_at: string
-    project_info: ProjectInfo
+    approved_by: string
+    notes: string
     deleted?: boolean
     updated?: boolean
     created?: boolean

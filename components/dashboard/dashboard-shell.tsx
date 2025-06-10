@@ -53,6 +53,7 @@ export function DashboardShell({ children, dictionary, lang }: DashboardShellPro
     if (pathname?.includes("/dashboard/projects")) return "projects"
     if (pathname?.includes("/dashboard/expenses")) return "expenses"
     if (pathname?.includes("/dashboard/tasks")) return "tasks"
+    if (pathname?.includes("/dashboard/export-reports")) return "export-reports"
 
     const path = user?.role === "admin" ? "dashboard" : "dashboard/tasks"
 

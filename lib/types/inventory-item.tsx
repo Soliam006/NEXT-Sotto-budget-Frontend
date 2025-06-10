@@ -27,7 +27,7 @@ export interface InventoryItemBackend {
     unit_cost: number
     supplier: string
     status: "Installed" | "Pending" | "In_Budget"
-    project: string
+    project_id: number
     deleted?: boolean
     updated?: boolean
     created?: boolean

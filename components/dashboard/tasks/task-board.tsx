@@ -7,6 +7,7 @@ import { useProject } from "@/contexts/project-context"
 import {useEffect} from "react";
 import { Task } from "@/lib/types/tasks"
 import {useUser} from "@/contexts/UserProvider";
+import {ConfirmationDialog} from "@/components/ui/confirmation-dialog";
 
 interface TaskBoardProps {
     dict: any
@@ -172,6 +173,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                   </div>
               </div>
           </div>
+
       </div>
     )
 }

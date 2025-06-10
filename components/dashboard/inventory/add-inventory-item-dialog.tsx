@@ -34,7 +34,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
     const [unit, setUnit] = useState("")
     const [unit_cost, setUnitCost] = useState<number>(0)
     const [supplier, setSupplier] = useState("")
-    const [status, setStatus] = useState<"in_budget" | "Pending" | "Installed">("in_budget")
+    const [status, setStatus] = useState<"In_Budget" | "Pending" | "Installed">("In_Budget")
 
     const resetForm = () => {
         setName("")
@@ -44,7 +44,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
         setUnit("")
         setUnitCost(0)
         setSupplier("")
-        setStatus("in_budget")
+        setStatus("In_Budget")
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -135,7 +135,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
                                         <SelectValue placeholder={dict.inventory?.selectStatus || "Select status"} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="in_budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
+                                        <SelectItem value="In_Budget">{dict.inventory?.inBudget || "In Budget"}</SelectItem>
                                         <SelectItem value="Pending">{dict.inventory?.pending || "Pending"}</SelectItem>
                                         <SelectItem value="Installed">{dict.inventory?.installed || "Installed"}</SelectItem>
                                     </SelectContent>

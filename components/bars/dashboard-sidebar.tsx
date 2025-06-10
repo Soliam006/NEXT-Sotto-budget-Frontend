@@ -4,7 +4,7 @@ import {Card, CardContent} from "@/components/ui/card"
 import {useEffect, useState} from "react";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {LayoutDashboard, Calendar, Users, Package, DollarSign, Settings, BookType,} from "lucide-react"
+import {LayoutDashboard, Calendar, Users, Package, DollarSign, Settings, BookType, FileText,} from "lucide-react"
 import { UserRole } from "@/lib/types/user.types"
 import {useUser} from "@/contexts/UserProvider";
 
@@ -76,7 +76,15 @@ export function DashboardSidebar({ dictionary, currentSection, onNavigate }: Das
       path: "/dashboard/expenses",
       active: currentSection === "expenses",
       roles: ['admin'] as UserRole[] // Solo admin puede ver expenses
-    }
+    },
+    {
+      id: "export-reports",
+      label: dictionary.dashboard?.exportReports || "Export",
+      icon: FileText,
+      path: "/dashboard/export-reports",
+      active: currentSection === "export-reports",
+      roles: ['admin', 'client'] as UserRole[] // Admin y client pueden ver export reports
+    },
   ]
 
   // Filtrar los items basados en el rol del usuario

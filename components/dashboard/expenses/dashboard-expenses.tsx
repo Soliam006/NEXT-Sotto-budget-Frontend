@@ -27,12 +27,6 @@ import {formatDate} from "@/lib/helpers/projects";
 import {AddExpenseDialog} from "./add-expense-dialog";
 import {SaveChangesBar} from "@/components/bars/save-changes-bar";
 import {getNameTraduction} from "@/lib/helpers/expense";
-import dynamic from "next/dynamic"
-
-const DownloadExpensesLink = dynamic (() =>
-    import("@/components/pdf/expense/download-expenses-link"), {
-    ssr: false,
-} )
 
 interface DashboardExpensesProps {
   dict: any
@@ -170,10 +164,7 @@ export function DashboardExpenses({dict, lang}: DashboardExpensesProps) {
                 {dict.expenses?.expenseOverview || "Expense Overview"}
               </CardTitle>
 
-              <div className="self-start sm:self-auto gap-2 flex items-center">
-                {selectedProject && (
-                    <DownloadExpensesLink selectedProject={selectedProject } dict={dict} />
-                )}
+              <div className="self-start sm:self-auto">
                 <AddExpenseDialog dict={dict} />
               </div>
             </div>

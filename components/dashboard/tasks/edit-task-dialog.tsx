@@ -298,7 +298,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
               <div>
                 {showDeleteConfirm ? (
                   <div className="flex items-center gap-2 md:pt-0 pt-2">
-                    <span className="text-sm text-destructive">{dict.tasks?.confirmDelete || "Are you sure?"}</span>
+                    <span className="text-sm text-destructive">{dict.tasks?.taskDeleteConfirm || "Are you sure?"}</span>
                     <Button
                       type="button"
                       variant="destructive"

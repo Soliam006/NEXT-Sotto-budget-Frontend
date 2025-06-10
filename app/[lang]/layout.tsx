@@ -16,15 +16,13 @@ export default function RootLayout({
   params: Promise<{ lang: string }>
 }) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body>
+    <div>
       <ClientLayout>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
         </ThemeProvider>
       </ClientLayout>
-      </body>
-    </html>
+    </div>
   )
 }
 

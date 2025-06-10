@@ -5,10 +5,11 @@ import {addProjectToBackend, fetchProjects, updateProjectToBackend} from "@/app/
 import {getCookie} from "cookies-next";
 import Swal from "sweetalert2";
 import {Project, ProjectBackend} from "@/lib/types/project.types";
-import {InventoryItemBackend} from "@/lib/types/inventory-item";
+import {InventoryItem, InventoryItemBackend} from "@/lib/types/inventory-item";
 import {useUser} from "@/contexts/UserProvider";
 import {WorkerData, WorkerDataBackend} from "@/lib/types/user.types";
 import {Task, TaskBackend} from "@/lib/types/tasks";
+import {Expenses, ExpensesBackend} from "@/lib/types/expenses";
 
 // Tipos para el contexto
 interface ProjectContextType {
@@ -220,6 +221,8 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
         console.log("Guardando cambios para el proyecto:", changesToSend)
 
         const response = await updateProjectToBackend(getToken(), changesToSend)
+
+          console.log("Response from backend:", response)
         if (response.statusCode !== 200) {
           console.error("Error al guardar los cambios:", response)
           throw new Error("Error al guardar los cambios")
@@ -371,20 +374,13 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
         inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
       };
 
-      setSelectedProject(prev => prev ? {
-        ...prev,
-        tasks: newTasks,
-        progress,
-      } : prev);
-
       const originalTaskList = originalSelectedProject?.tasks
       const taskToDelete = originalTaskList?.find((task: Task) => task.id === taskId);
+
       if (!taskToDelete) {
-        console.log("PendingTasks : ", pendingChanges?.tasks)
-        console.log("TASKID : ", taskId)
         //Filtrar tareas pendientes para eliminar la tarea
         const updatedPendingTasks = pendingChanges?.tasks?.filter((task: Task) => task.id !== taskId) || [];
-        console.log("UpdatedPendingTasks : ", updatedPendingTasks)
+
         updatePendingChanges({
           tasks: [...(updatedPendingTasks || [])]
         })
@@ -406,280 +402,500 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
           tasks: [...filteredPendingTasks, taskWithDeleted]
         });
       }
+
+      // Actualizar el estado del proyecto seleccionado
+      setSelectedProject(prev => prev ? {
+          ...prev,
+          tasks: newTasks,
+          progress,
+      } : prev);
   }
 
   // Actualizar el estado de una tarea
-  const updateTaskStatus = (taskId: number, newStatus:  "todo" | "in_progress" | "done") => {
-    if (!selectedProject) return;
+  const updateTaskStatus = (taskId: number, newStatus: "todo" | "in_progress" | "done") => {
+      if (!selectedProject) return;
 
-    const updatedTasks = selectedProject.tasks?.map((task: any) =>
+      // Actualiza el estado de la tarea en la lista de tareas
+      const updatedTasks = selectedProject.tasks?.map((task: Task) =>
         task.id === taskId ? { ...task, status: newStatus } : task
-    ) || [];
+      ) || [];
 
-    const progress = {
-      ...selectedProject.progress,
-      todo: updatedTasks.filter((task: Task) => task.status === "todo").length || 0,
-      done: updatedTasks.filter((task: Task) => task.status === "done").length || 0,
-      inProgress: updatedTasks.filter((task: Task) => task.status === "in_progress").length || 0,
-    };
+      // Recalcula el progreso
+      const progress = {
+        ...selectedProject.progress,
+        todo: updatedTasks.filter((task: Task) => task.status === "todo").length,
+        done: updatedTasks.filter((task: Task) => task.status === "done").length,
+        inProgress: updatedTasks.filter((task: Task) => task.status === "in_progress").length,
+      };
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      tasks: updatedTasks,
-      progress,
-    } : prev);
+      setSelectedProject(prev => prev ? {
+        ...prev,
+        tasks: updatedTasks,
+        progress,
+      } : prev);
 
-    const originalTaskList = originalSelectedProject?.tasks
-    const taskToUpdate = originalTaskList?.find((task: Task) => task.id === taskId);
-    if (!taskToUpdate) {
-      updatePendingChanges({ // Si la tarea no existe en el original, actualizar directamente
-        tasks: updatedTasks
+      // Busca la tarea original para saber si es nueva o existente
+      const taskInOriginal = (originalSelectedProject?.tasks || [])
+                  .find((task: Task) => task.id === taskId);
+
+      // Prepara la tarea para pendingChanges
+      let updatedTaskBackend: TaskBackend;
+      if (taskInOriginal) {
+        updatedTaskBackend = {
+          ...taskInOriginal,
+          status: newStatus,
+          updated: true,
+          created: false,
+          deleted: false,
+        };
+      } else {
+        const newTask = updatedTasks.find((task: Task) => task.id === taskId);
+        updatedTaskBackend = {
+          ...(newTask as Task),
+          updated: false,
+          created: true,
+          deleted: false,
+        };
+      }
+
+      // Filtra duplicados en pendingChanges
+      const filteredPendingTasks = (pendingChanges?.tasks || []).filter(
+        (task: TaskBackend) => task.id !== taskId
+      );
+
+      updatePendingChanges({
+        tasks: [...filteredPendingTasks, updatedTaskBackend],
       });
-      return;
-    } else {
-        // En cambio, si ya estaba en el Original, debo actualizar el Backend
-        const taskWithUpdatedStatus: TaskBackend = {
-            ...taskToUpdate,
-            status: newStatus,
-            updated: true, // Indica que la tarea ha sido actualizada
-            created: false,
-            deleted: false
-        }
-
-        updatePendingChanges({
-            tasks: [...(pendingChanges?.tasks || []), taskWithUpdatedStatus]
-        });
-    }
-
-    updatePendingChanges({
-      tasks: updatedTasks
-    });
   }
 
   // Métodos para gestionar el inventario -----------------------------------------------------------------------------
 
   // Añadir un item al inventario
   const addInventoryItem = (item: any) => {
-    if (!selectedProject) return;
+      if (!selectedProject) return;
 
-    try {
-      const newItem = {
-        ...item,
-        id: Math.max(0, ...(selectedProject.inventory?.map(i => i.id ?? 0) || [])) + 1
-      };
+      try {
+        const newItem = {
+          ...item,
+          id: Math.max(0, ...(selectedProject.inventory?.map(i => i.id ?? 0) || [])) + 1
+        };
 
-      const updatedInventory = [...(selectedProject.inventory || []), newItem];
+        const updatedInventory = [...(selectedProject.inventory || []), newItem];
 
-      setSelectedProject(prev => prev ? {
-        ...prev,
-        inventory: updatedInventory,
-      } : prev);
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          inventory: updatedInventory,
+        } : prev);
 
-      updatePendingChanges({
-        inventory: updatedInventory
-      });
-    } catch (error) {
-        console.error("Error al añadir el item al inventario:", error);
-        setError(error instanceof Error ? error.message : "Error al añadir el item al inventario");
-    } finally {
-      setInfo("Item added to inventory successfully");
-    }
+        // Verificar si ya existia en el Original
+        const itemInOriginal = (originalSelectedProject?.inventory || [])
+              .find((i: InventoryItem) => i.id === newItem.id);
+
+        // Preparar el item para pendingChanges
+        let updatedItemBackend: InventoryItemBackend;
+          if (itemInOriginal) {
+              updatedItemBackend  = {
+                  ...newItem,
+                  project_id: selectedProject.id, // Asegurarse de que el project_id esté presente
+                  updated: true, // Es una actualización
+                  created: false,
+                  deleted: false
+              };
+          } else {
+              updatedItemBackend = {
+                  ...newItem,
+                  project_id: selectedProject.id,
+                  updated: false, // No es una actualización
+                  created: true, // Es un nuevo item
+                  deleted: false // No está eliminado
+              };
+          }
+            // Filtrar duplicados en pendingChanges
+        const filteredPendingInventory = (pendingChanges?.inventory || []).filter(
+            (i: InventoryItemBackend) => i.id !== newItem.id);
+
+        // Actualizar los cambios pendientes
+        updatePendingChanges({
+          inventory: [...filteredPendingInventory, updatedItemBackend]
+        });
+
+      } catch (error) {
+          console.error("Error al añadir el item al inventario:", error);
+          setError(error instanceof Error ? error.message : "Error al añadir el item al inventario");
+      }
   }
 
   // Actualizar un item del inventario
   const updateInventoryItem = (itemId: number, updatedItem: any) => {
-    if (!selectedProject) return;
+        if (!selectedProject) return;
 
-    const updatedInventory = selectedProject.inventory?.map((item) =>
-        item.id === itemId ? { ...item, ...updatedItem } : item
-    ) || [];
+        const updatedInventory = selectedProject.inventory?.map((item) =>
+            item.id === itemId ? { ...item, ...updatedItem } : item
+        ) || [];
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      inventory: updatedInventory,
-    } : prev);
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          inventory: updatedInventory,
+        } : prev);
 
-    updatePendingChanges({
-      inventory: updatedInventory
-    });
+        // Verificar si ya existia en el Original
+        const itemInOriginal = (originalSelectedProject?.inventory || [])
+              .find((i: InventoryItem) => i.id === itemId);
+
+        // Preparar el item para pendingChanges
+        let itemWithUpdated: InventoryItemBackend;
+        if (itemInOriginal) {
+            itemWithUpdated = {
+                ...itemInOriginal,
+                ...updatedItem,
+                project_id: selectedProject.id, // Asegurarse de que el project_id esté presente
+                updated: true, // Es una actualización
+                created: false,
+                deleted: false
+            };
+        } else {
+            itemWithUpdated = {
+                ...updatedItem,
+                id: itemId,
+                project_id: selectedProject.id, // Asegurarse de que el project_id esté presente
+                updated: false, // No es una actualización
+                created: true, // Es un nuevo item
+                deleted: false // No está eliminado
+            };
+        }
+        // Filtrar duplicados en pendingChanges
+        const filteredPendingInventory = (pendingChanges?.inventory || []).filter(
+            (i: InventoryItemBackend) => i.id !== itemId);
+
+        // Actualizar los cambios pendientes
+        updatePendingChanges({
+          inventory: [...filteredPendingInventory, itemWithUpdated]
+        });
   }
 
   // Eliminar un item del inventario
   const deleteInventoryItem = (itemId: number) => {
-    if (!selectedProject) return;
+        if (!selectedProject) return;
 
-    const updatedInventory = selectedProject.inventory?.filter((item) => item.id !== itemId) || [];
+        const updatedInventory = selectedProject.inventory?.filter((item) => item.id !== itemId) || [];
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      inventory: updatedInventory,
-    } : prev);
+        // Verificar si el item existe en el original
+        const itemToDelete = (originalSelectedProject?.inventory || [])
+            .find((i: InventoryItem) => i.id === itemId);
 
-    const itemToDelete = selectedProject.inventory?.find((item) => item.id === itemId);
-    if (!itemToDelete) {
-      setError("Item to delete not found in inventory");
-      return;
-    }
-
-    // Crear el item con deleted true y guardar los cambios pendientes
-    const itemWithDeleted: InventoryItemBackend = {
-        ...itemToDelete,
-        deleted: true
-    }
-
-   updatePendingChanges({
-     inventory: [...(pendingChanges?.inventory ?? []), itemWithDeleted]
-   });
+        // Si el item no existe en el original, no hacemos nada
+        if (!itemToDelete) {
+            // Filtrar duplicados en pendingChanges
+            const filteredPendingInventory = (pendingChanges?.inventory || []).filter(
+                (i: InventoryItemBackend) => i.id !== itemId
+            );
+            // Actualizar los cambios pendientes
+            updatePendingChanges({
+              inventory: [...filteredPendingInventory]
+            });
+        } else {
+          // Si el item existe en el original, lo marcamos como eliminado
+            const itemWithDeleted: InventoryItemBackend = {
+                ...itemToDelete,
+                project_id: selectedProject.id, // Asegurarse de que el project_id esté presente
+                deleted: true, // Indica que el item ha sido eliminado
+                updated: false,
+                created: false
+            };
+            // Filtrar duplicados en pendingChanges
+            const filteredPendingInventory = (pendingChanges?.inventory || []).filter(
+                (i: InventoryItemBackend) => i.id !== itemId
+            );
+            // Actualizar los cambios pendientes
+            updatePendingChanges({
+              inventory: [...filteredPendingInventory, itemWithDeleted]
+            });
+        }
+        // Actualizar el estado del proyecto seleccionado
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          inventory: updatedInventory,
+        } : prev);
 
   }
 
   // Actualizar el estado de un item del inventario
   const updateInventoryItemStatus = (itemId: number, newStatus: "Installed" | "Pending" | "In_Budget") => {
-    if (!selectedProject) return;
+        if (!selectedProject) return;
 
-    const updatedInventory = selectedProject.inventory?.map((item) =>
-        item.id === itemId ? { ...item, status: newStatus } : item
-    ) || [];
+        const updatedInventory = selectedProject.inventory?.map((item) =>
+            item.id === itemId ? { ...item, status: newStatus } : item
+        ) || [];
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      inventory: updatedInventory,
-    } : prev);
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          inventory: updatedInventory,
+        } : prev);
 
-    updatePendingChanges({
-      inventory: updatedInventory
-    });
+        // Verificar si ya existia en el Original
+        const itemInOriginal = (originalSelectedProject?.inventory || [])
+            .find((i: InventoryItem) => i.id === itemId);
+        // Preparar el item para pendingChanges
+        let itemWithUpdatedStatus: InventoryItemBackend;
+        if (itemInOriginal) {
+            itemWithUpdatedStatus = {
+                ...itemInOriginal,
+                status: newStatus,
+                project_id: selectedProject.id, // Asegurarse de que el project_id esté presente
+                updated: true, // Es una actualización
+                created: false,
+                deleted: false
+            };
+        } else {
+            const newItem = updatedInventory.find((item: InventoryItem) => item.id === itemId);
+            itemWithUpdatedStatus = {
+                ...(newItem as InventoryItem),
+                status: newStatus,
+                project_id: selectedProject.id, // Asegurarse de que el project_id esté presente
+                updated: false, // No es una actualización
+                created: true, // Es un nuevo item
+                deleted: false // No está eliminado
+            };
+        }
+        // Filtrar duplicados en pendingChanges
+        const filteredPendingInventory = (pendingChanges?.inventory || []).filter(
+            (i: InventoryItemBackend) => i.id !== itemId
+        );
+        // Actualizar los cambios pendientes
+        updatePendingChanges({
+          inventory: [...filteredPendingInventory, itemWithUpdatedStatus]
+        });
   }
 
   // Añadir un gasto
-  const addExpense = (expense: any) => {
-    if (!selectedProject) return;
+  const addExpense = (expense: Expenses) => {
+        if (!selectedProject) return;
 
-    const newExpense = {
-      ...expense,
-      id: Math.max(0, ...(selectedProject.expenses?.map(e => e.id ?? 0) || [])) + 1
-    };
+        const newExpense = {
+          ...expense,
+          id: Math.max(0, ...(selectedProject.expenses?.map(e => e.id ?? 0) || [])) + 1
+        };
 
-    const updatedExpenses = [...(selectedProject.expenses || []), newExpense];
+        const updatedExpenses = [...(selectedProject.expenses || []), newExpense];
 
-    // Calcular nuevo currentSpent
-    const newCurrentSpent = updatedExpenses
-        .filter(e => e.status === 'approved')
-        .reduce((sum, e) => sum + (e.amount || 0), 0);
+        // Calcular nuevo currentSpent
+        const newCurrentSpent = updatedExpenses
+            .filter(e => e.status === 'approved')
+            .reduce((sum, e) => sum + (e.amount || 0), 0);
 
-    // Actualizar categorías de gastos
-    const updatedExpenseCategories = { ...selectedProject.expenseCategories };
-    if (expense.category) {
-      updatedExpenseCategories[expense.category] =
-          (updatedExpenseCategories[expense.category] || 0) + (expense.amount || 0);
-    }
+        // Actualizar categorías de gastos
+        const updatedExpenseCategories = { ...selectedProject.expenseCategories };
+        if (expense.category) {
+          updatedExpenseCategories[expense.category] =
+              (updatedExpenseCategories[expense.category] || 0) + (expense.amount || 0);
+        }
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      expenses: updatedExpenses,
-      currentSpent: newCurrentSpent,
-      expenseCategories: updatedExpenseCategories
-    } : prev);
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          expenses: updatedExpenses,
+          currentSpent: newCurrentSpent,
+          expenseCategories: updatedExpenseCategories
+        } : prev);
 
-    updatePendingChanges({
-      expenses: updatedExpenses
-    });
+        // Preparar el gasto para pendingChanges
+        const expenseWithCreated: ExpensesBackend = {
+          ...newExpense,
+          approved_by: newExpense.project_info?.approved_by || "", // Asegurarse de que approved_by esté presente
+          notes: newExpense.project_info.notes || "", // Asegurarse de que notes esté presente
+          updated: false, // Indica que no ha sido actualizado
+          deleted: false, // Indica que no está eliminado
+          created: true // Indica que es un nuevo gasto
+        };
+        // Filtrar duplicados en pendingChanges
+        const filteredPendingExpenses = (pendingChanges?.expenses || []).filter(
+            (e: any) => e.id !== newExpense.id
+        );
+        // Actualizar los cambios pendientes
+        updatePendingChanges({
+          expenses: [...filteredPendingExpenses, expenseWithCreated]
+        });
   }
 
-// Actualizar un gasto
+    // Actualizar un gasto
   const updateExpense = (expenseId: number, updatedExpense: any) => {
-    if (!selectedProject) return;
+        if (!selectedProject) return;
 
-    const updatedExpenses = selectedProject.expenses?.map((expense) =>
-        expense.id === expenseId ? { ...expense, ...updatedExpense } : expense
-    ) || [];
+        const updatedExpenses = selectedProject.expenses?.map((expense) =>
+            expense.id === expenseId ? { ...expense, ...updatedExpense } : expense
+        ) || [];
 
-    // Recalcular currentSpent y categorías si cambió el amount o status
-    let newCurrentSpent = selectedProject.currentSpent;
-    let updatedExpenseCategories = { ...selectedProject.expenseCategories };
+        // Recalcular currentSpent y categorías si cambió el amount o status
+        let newCurrentSpent = selectedProject.currentSpent;
+        let updatedExpenseCategories = { ...selectedProject.expenseCategories };
 
-    if (updatedExpense.amount || updatedExpense.status || updatedExpense.category) {
-      newCurrentSpent = updatedExpenses
-          .filter(e => e.status === 'approved')
-          .reduce((sum, e) => sum + (e.amount || 0), 0);
+        if (updatedExpense.amount || updatedExpense.status || updatedExpense.category) {
+          newCurrentSpent = updatedExpenses
+              .filter(e => e.status === 'approved')
+              .reduce((sum, e) => sum + (e.amount || 0), 0);
 
-      // Recalcular todas las categorías desde cero
-      updatedExpenseCategories = {};
-      updatedExpenses.forEach(expense => {
-        if (expense.category && expense.amount) {
-          updatedExpenseCategories[expense.category] =
-              (updatedExpenseCategories[expense.category] || 0) + expense.amount;
+          // Recalcular todas las categorías desde cero
+          updatedExpenseCategories = {};
+          updatedExpenses.forEach(expense => {
+            if (expense.category && expense.amount) {
+              updatedExpenseCategories[expense.category] =
+                  (updatedExpenseCategories[expense.category] || 0) + expense.amount;
+            }
+          });
         }
-      });
-    }
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      expenses: updatedExpenses,
-      currentSpent: newCurrentSpent,
-      expenseCategories: updatedExpenseCategories
-    } : prev);
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          expenses: updatedExpenses,
+          currentSpent: newCurrentSpent,
+          expenseCategories: updatedExpenseCategories
+        } : prev);
 
-    updatePendingChanges({
-      expenses: updatedExpenses
-    });
+        // Preparar el gasto para pendingChanges
+        const originalExpense = originalSelectedProject?.expenses?.find(e => e.id === expenseId);
+        let expenseWithUpdated: ExpensesBackend;
+        if (originalExpense) {
+          expenseWithUpdated = {
+            ...originalExpense,
+            ...updatedExpense,
+            updated: true, // Indica que el gasto ha sido actualizado
+            created: false, // No es un nuevo gasto
+            deleted: false // No está eliminado
+          };
+        } else {
+          expenseWithUpdated = {
+            ...updatedExpense,
+            id: expenseId,
+            updated: false, // No es una actualización
+            created: true, // Es un nuevo gasto
+            deleted: false // No está eliminado
+          };
+        }
+        // Filtrar duplicados en pendingChanges
+        const filteredPendingExpenses = (pendingChanges?.expenses || []).filter(
+            (e: ExpensesBackend) => e.id !== expenseId
+        );
+        // Actualizar los cambios pendientes
+        updatePendingChanges({
+          expenses: [...filteredPendingExpenses, expenseWithUpdated]
+        });
   }
 
 // Eliminar un gasto
   const deleteExpense = (expenseId: number) => {
-    if (!selectedProject) return;
+      if (!selectedProject) return;
 
-    const expenseToDelete = selectedProject.expenses?.find(e => e.id === expenseId);
-    const updatedExpenses = selectedProject.expenses?.filter((expense) => expense.id !== expenseId) || [];
+      // Buscar el gasto a eliminar
+      const expenseToDelete = selectedProject.expenses?.find(e => e.id === expenseId);
+      if (!expenseToDelete) return;
 
-    // Calcular nuevo currentSpent
-    const newCurrentSpent = updatedExpenses
-        .filter(e => e.status === 'approved')
-        .reduce((sum, e) => sum + (e.amount || 0), 0);
+      // Actualizar la lista de gastos
+      const updatedExpenses = selectedProject.expenses?.filter(e => e.id !== expenseId) || [];
 
-    // Actualizar categorías de gastos
-    const updatedExpenseCategories = { ...selectedProject.expenseCategories };
-    if (expenseToDelete?.category && expenseToDelete.amount) {
-      updatedExpenseCategories[expenseToDelete.category] =
-          Math.max(0, (updatedExpenseCategories[expenseToDelete.category] || 0) - expenseToDelete.amount);
-    }
+      // Recalcular currentSpent y categorías de gastos
+      const newCurrentSpent = updatedExpenses
+          .filter(e => e.status === 'approved')
+          .reduce((sum, e) => sum + (e.amount || 0), 0);
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      expenses: updatedExpenses,
-      currentSpent: newCurrentSpent,
-      expenseCategories: updatedExpenseCategories
-    } : prev);
+      const updatedExpenseCategories = {...selectedProject.expenseCategories};
+      if (expenseToDelete.category && expenseToDelete.amount) {
+          updatedExpenseCategories[expenseToDelete.category] = Math.max(
+              0,
+              (updatedExpenseCategories[expenseToDelete.category] || 0) - expenseToDelete.amount
+          );
+      }
 
-    updatePendingChanges({
-      expenses: updatedExpenses
-    });
+      setSelectedProject(prev => prev ? {
+          ...prev,
+          expenses: updatedExpenses,
+          currentSpent: newCurrentSpent,
+          expenseCategories: updatedExpenseCategories
+      } : prev);
+
+      // Verificar si el gasto existe en el original
+      const expenseInOriginal = (originalSelectedProject?.expenses || []).find(e => e.id === expenseId);
+
+      const filteredPendingExpenses = (pendingChanges?.expenses || []).filter(e => e.id !== expenseId);
+
+      if (expenseInOriginal) {
+          // Si existe en el original, marcar como eliminado
+          const expenseWithDeleted: ExpensesBackend = {
+              ...expenseInOriginal,
+              approved_by : expenseInOriginal.project_info?.approved_by || "", // Asegurarse de que approved_by esté presente
+                notes: expenseInOriginal.project_info?.notes || "", // Asegurarse de que notes esté presente
+              deleted: true,
+              updated: false,
+              created: false
+          };
+          updatePendingChanges({
+              expenses: [...filteredPendingExpenses, expenseWithDeleted]
+          });
+      } else {
+          // Si no existe en el original, solo actualizar los cambios pendientes
+          updatePendingChanges({
+              expenses: [...filteredPendingExpenses]
+          });
+      }
   }
-
 // Actualizar el estado de un gasto
   const updateExpenseStatus = (expenseId: number, newStatus: "approved" | "pending" | "rejected") => {
-    if (!selectedProject) return;
+        if (!selectedProject) return;
 
-    const updatedExpenses = selectedProject.expenses?.map((expense) =>
-        expense.id === expenseId ? { ...expense, status: newStatus } : expense
-    ) || [];
+        const updatedExpenses = selectedProject.expenses?.map((expense) =>
+          expense.id === expenseId ? { ...expense, status: newStatus } : expense
+        ) || [];
 
-    // Recalcular currentSpent basado en gastos aprobados
-    const newCurrentSpent = updatedExpenses
-        .filter(e => e.status === 'approved')
-        .reduce((sum, e) => sum + (e.amount || 0), 0);
+        // Recalcular currentSpent basado en gastos aprobados
+        const newCurrentSpent = updatedExpenses
+          .filter(e => e.status === 'approved')
+          .reduce((sum, e) => sum + (e.amount || 0), 0);
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      expenses: updatedExpenses,
-      currentSpent: newCurrentSpent
-    } : prev);
+        setSelectedProject(prev => prev ? {
+          ...prev,
+          expenses: updatedExpenses,
+          currentSpent: newCurrentSpent
+        } : prev);
 
-    updatePendingChanges({
-      expenses: updatedExpenses
-    });
+        // Verificar si ya existía en el original
+        const expenseInOriginal = (originalSelectedProject?.expenses || [])
+          .find((e: Expenses) => e.id === expenseId);
+
+        // Preparar el gasto para pendingChanges
+        let expenseWithUpdatedStatus: ExpensesBackend | undefined;
+        if (expenseInOriginal) {
+          expenseWithUpdatedStatus = {
+            ...expenseInOriginal,
+            approved_by: expenseInOriginal.project_info?.approved_by ?? "",
+            notes: expenseInOriginal.project_info?.notes ?? "",
+            status: newStatus,
+            updated: true,
+            created: false,
+            deleted: false
+          };
+        } else {
+          const newExpense = updatedExpenses.find((e: Expenses) => e.id === expenseId);
+          if (!newExpense) return;
+          expenseWithUpdatedStatus = {
+            ...(newExpense as Expenses),
+            approved_by: newExpense.project_info?.approved_by ?? "",
+            notes: newExpense.project_info?.notes ?? "",
+            status: newStatus,
+            updated: false,
+            created: true,
+            deleted: false
+          };
+        }
+
+        if (!expenseWithUpdatedStatus) return;
+
+        // Filtrar duplicados en pendingChanges
+        const filteredPendingExpenses = (pendingChanges?.expenses || []).filter(
+          (e: ExpensesBackend) => e.id !== expenseId
+        );
+        // Actualizar los cambios pendientes
+        updatePendingChanges({
+          expenses: [...filteredPendingExpenses, expenseWithUpdatedStatus]
+        });
   }
-
 
   // Función para mostrar errores
   const showErrorAlert = useCallback((errorMessage: string) => {

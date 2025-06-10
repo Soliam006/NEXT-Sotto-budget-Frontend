@@ -25,28 +25,28 @@ export function DashboardWorkers({ dict }: DashboardWorkersProps) {
 
         <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center text-base">
-                <Users className="mr-2 h-5 w-5 text-primary" />
-                {dict.workers?.teamMembers || "Team Members"}
-              </CardTitle>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
-                  {WORKERS.length} {dict.workers?.workers || "Workers"}
-                </Badge>
+            <div className="flex items-center justify-between flex-col md:flex-row space-y-2 md:space-y-0">
+                <div  className="flex items-center space-x-2">
+                  <CardTitle className="flex items-center text-base">
+                    <Users className="mr-2 h-5 w-5 text-primary" />
+                    {dict.workers?.teamMembers || "Team Members"}
+                  </CardTitle>
+                  <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
+                    {WORKERS.length} {dict.workers?.workers || "Workers"}
+                  </Badge>
+                </div>
 
-                <Button
-                    onClick={handleReload}
-                    variant="ghost"
-                    className={
-                        "bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer"+
-                        "hover:from-cyan-600 hover:to-blue-600"}
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  {dict.workers?.reload || "Reload Workers"}
-                </Button>
+                  <Button
+                      onClick={handleReload}
+                      variant="default"
+                      className={
+                          "bg-gradient-to-r from-cyan-500 to-blue-500 text-white cursor-pointer"+
+                          "hover:from-cyan-600 hover:to-blue-600"}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    {dict.workers?.reload || "Reload Workers"}
+                  </Button>
               </div>
-            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4 grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -1,6 +1,6 @@
 "use client"
 
-import {CalendarIcon, Command, Package, Users, DollarSign, BookType} from "lucide-react"
+import {CalendarIcon, Command, Package, Users, DollarSign, BookType, FileText} from "lucide-react"
 import {cn} from "@/lib/utils";
 import React from "react";
 import {useUser} from "@/contexts/UserProvider";
@@ -64,6 +64,14 @@ export function DashboardBottomBar({ dictionary, currentSection, onNavigate }: D
       active: currentSection === "expenses",
       roles: ['admin'] // Solo admin puede ver expenses
     },
+    {
+      id: "export-reports",
+      label: dictionary.dashboard?.exportReports || "Export",
+      icon: FileText,
+      path: "/dashboard/export-reports",
+      active: currentSection === "export-reports",
+      roles: ['admin', 'client'] // Admin y client pueden ver export-reports
+    },
   ]
 
   const navItems = allNavs.filter(item => {
@@ -85,7 +93,7 @@ export function DashboardBottomBar({ dictionary, currentSection, onNavigate }: D
                     )}
                     onClick={() => onNavigate(item.path)}
                 >
-                    {React.createElement(item.icon, { size: 24 })}
+                    {React.createElement(item.icon, { size: 15 })}
                   <span className="text-xs mt-1">{item.label}</span>
                 </button>
             ))}
