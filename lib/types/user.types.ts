@@ -59,6 +59,23 @@ export interface WorkerData {
   efficiency: number
 }
 
+export interface WorkerDataBackend {
+    id: number
+    name: string
+    role: string
+    phone: string
+    skills: string[]
+    availability: string
+    contact: string
+    projects: string[]
+    tasksCompleted: number
+    tasksInProgress: number
+    efficiency: number
+    deleted?: boolean
+    updated?: boolean
+    created?: boolean
+}
+
 export interface User_Search {
     id: number
     name: string

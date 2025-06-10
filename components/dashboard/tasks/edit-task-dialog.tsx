@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import {Task} from "@/lib/types/tasks";
+import {WorkerData} from "@/lib/types/user.types";
 
 // Esquema de validación para el formulario
 const taskFormSchema = z.object({
@@ -59,18 +60,12 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  // Encontrar el ID del trabajador basado en el nombre del asignado
-  const findWorkerId = (assigneeName: string) => {
-    const member = team.find((m: any) => m.name === assigneeName)
-    return member?.id || ""
-  }
-
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
       title: task.title,
       description: task.description || "",
-      assignee: task.worker_id || findWorkerId(task.assignee),
+      assignee: task.assignee ,
       status: task.status,
       due_date: task.due_date,
     },
@@ -81,7 +76,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
     form.reset({
       title: task.title,
       description: task.description || "",
-      assignee: task.worker_id || findWorkerId(task.assignee),
+      assignee: task.assignee ,
       status: task.status,
       due_date: task.due_date,
     })
@@ -94,8 +89,8 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
       const updatedTask: Partial<Task> = {
         title: data.title,
         description: data.description,
-        assignee: team.find((member: any) => member.id === data.assignee)?.name || task.assignee,
-        worker_id: team.find ((member: any) => member.id === data.assignee)?.id || task.worker_id,
+        assignee: team.find((member: WorkerData) => member.name === data.assignee)?.name || task.assignee,
+        worker_id: team.find ((member: WorkerData) => member.name === data.assignee)?.id || task.worker_id,
         status: data.status,
         due_date: data.due_date,
         updated_at: new Date().toISOString(),
@@ -195,7 +190,7 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                             )}
                           >
                             {field.value
-                              ? team.find((member: any) => member.id === field.value)?.name
+                              ? team.find((member: WorkerData) => member.name === field.value)?.name
                               : dict.projects?.taskForm.selectAssignee || "Select assignee"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -215,14 +210,14 @@ export function EditTaskDialog({ task, dict, lang, onEditTask, onDeleteTask, tea
                                   value={member.name}
                                   key={member.id}
                                   onSelect={() => {
-                                    form.setValue("assignee", member.id)
+                                    form.setValue("assignee", member.name)
                                   }}
                                 >
                                   {member.name}
                                   <Check
                                     className={cn(
                                       "ml-auto h-4 w-4",
-                                      member.id === field.value ? "opacity-100" : "opacity-0",
+                                      member.name === field.value ? "opacity-100" : "opacity-0",
                                     )}
                                   />
                                 </CommandItem>

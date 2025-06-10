@@ -44,10 +44,8 @@ export function TeamTab({ dict }: TeamTabProps) {
                         <Badge variant="outline" className="bg-muted/50 text-primary border-primary/50">
                             {selectedProject.team?.length || 0} {dict.dashboard?.members || "Members"}
                         </Badge>
-                        <AddTeamMemberDialog
-                            dict={dict}
-                            existingTeamIds={selectedProject.team?.map((member: any) => member.id) || []}
-                        />
+
+                        <AddTeamMemberDialog dict={dict}/> {/* Button to add team members */}
                     </div>
                 </div>
             </CardHeader>
@@ -61,9 +59,8 @@ export function TeamTab({ dict }: TeamTabProps) {
                         </p>
                         <AddTeamMemberDialog
                             dict={dict}
-                            existingTeamIds={selectedProject.team?.map((member: any) => member.id) || []}
                             buttonVariant="default"
-                        />
+                        /> {/* Button to add team members */}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

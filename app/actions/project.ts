@@ -134,6 +134,23 @@ export async function updateProjectToBackend(token: string | null, project:Parti
     if (!token)
         redirect("/es/login")
 
+    const new_project: any = {};
+    if (project.id !== undefined) new_project.id = project.id;
+    if (project.title !== undefined) new_project.title = project.title;
+    if (project.description !== undefined) new_project.description = project.description;
+    if (project.limit_budget !== undefined) new_project.limit_budget = project.limit_budget;
+    if (project.location !== undefined) new_project.location = project.location;
+    if (project.start_date !== undefined) new_project.start_date = project.start_date;
+    if (project.end_date !== undefined) new_project.end_date = project.end_date;
+    if (project.status !== undefined) new_project.status = project.status;
+    if (project.clients_ids !== undefined) new_project.clients_ids = project.clients_ids;
+    if (project.expenses !== undefined) new_project.expenses_backend = project.expenses;
+    if (project.inventory !== undefined) new_project.inventory_backend = project.inventory;
+    if (project.team !== undefined) new_project.team_backend = project.team;
+    if (project.tasks !== undefined) new_project.tasks_backend = project.tasks;
+
+    console.log("Updating project with data: ", new_project);
+
     try {
         return await fetch(`${project_URL}${project.id}`, {
             method: "PUT",
@@ -141,7 +158,7 @@ export async function updateProjectToBackend(token: string | null, project:Parti
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(project),
+            body: JSON.stringify(new_project),
         }).then(
             async (res) => {
                 return await res.json();

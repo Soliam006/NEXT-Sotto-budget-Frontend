@@ -26,6 +26,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import {useProject} from "@/contexts/project-context";
+import {Task} from "@/lib/types/tasks";
+import {WorkerData} from "@/lib/types/user.types";
 
 // Esquema de validación para el formulario
 const taskFormSchema = z.object({
@@ -36,10 +38,10 @@ const taskFormSchema = z.object({
     assignee: z.string({
         required_error: "Por favor selecciona un responsable",
     }),
-    status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED"], {
+    status: z.enum(["todo", "in_progress", "done"], {
         required_error: "Por favor selecciona un estado",
     }),
-    dueDate: z.any().optional(),
+    due_date: z.any().optional(),
 })
 
 type TaskFormValues = z.infer<typeof taskFormSchema>
@@ -61,8 +63,8 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
         defaultValues: {
             title: "",
             description: "",
-            status: "PENDING",
-            dueDate: undefined,
+            status: "todo",
+            due_date: undefined,
         },
     })
 
@@ -70,17 +72,16 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
         setIsSubmitting(true)
 
         try {
-            const selectedMember = teamMembers.find((member) => member.id === data.assignee)
+            const selectedMember = teamMembers.find((member:WorkerData) => member.name === data.assignee)
 
-            const newTask = {
-                id: `task-${Date.now()}`,
+            const newTask: Task = {
+                id: selectedProject?.tasks?.length ? selectedProject.tasks.length + 1 : 1, // Simple ID generation
                 title: data.title,
                 description: data.description || "",
                 assignee: selectedMember?.name || "",
-                assigneeAvatar: selectedMember?.avatar,
-                worker_id: data.assignee,
                 status: data.status,
-                dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+                worker_id: selectedMember?.id || 0, // Assuming worker_id is the same as team member ID
+                due_date: data.due_date ? new Date(data.due_date).toISOString() : "",
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             }
@@ -171,7 +172,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                                                 )}
                                               >
                                                   {field.value
-                                                    ? teamMembers.find((member) => member.id === field.value)?.name
+                                                    ? teamMembers.find((member) => member.name === field.value)?.name
                                                     : dict.projects.taskForm?.selectAssignee || "Select assignee"}
                                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                               </Button>
@@ -186,19 +187,19 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
                                               <CommandList>
                                                   <CommandEmpty>{dict.tasks?.noResults || "No results found."}</CommandEmpty>
                                                   <CommandGroup>
-                                                      {teamMembers.map((member) => (
+                                                      {teamMembers.map((member:WorkerData) => (
                                                         <CommandItem
                                                           value={member.name}
                                                           key={member.id}
                                                           onSelect={() => {
-                                                              form.setValue("assignee", member.id)
+                                                              form.setValue("assignee", member.name)
                                                           }}
                                                         >
                                                             {member.name}
                                                             <Check
                                                               className={cn(
                                                                 "ml-auto h-4 w-4",
-                                                                member.id === field.value ? "opacity-100" : "opacity-0",
+                                                                member.name === field.value ? "opacity-100" : "opacity-0",
                                                               )}
                                                             />
                                                         </CommandItem>
@@ -215,7 +216,7 @@ export function AddTaskDialog({ dict, lang, onAddTask, teamMembers }: AddTaskDia
 
                           <FormField
                             control={form.control}
-                            name="dueDate"
+                            name="due_date"
                             render={({ field }) => (
                               <FormItem className="flex flex-col">
                                   <FormLabel>{dict.common?.endDate || "Due Date"}</FormLabel>

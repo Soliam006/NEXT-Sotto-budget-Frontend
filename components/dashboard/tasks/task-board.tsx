@@ -39,7 +39,7 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
     }
 
     // Función para añadir una nueva tarea
-    const handleAddTask = (newTask: any) => {
+    const handleAddTask = (newTask: Task) => {
         addTask(newTask)
     }
 
@@ -101,26 +101,12 @@ export function TaskBoard({ dict, lang }: TaskBoardProps) {
                       {pendingTasks.length === 0 && currentUser?.role === 'admin' && (
                         <div className="flex flex-col items-center justify-center h-[100px] text-muted-foreground">
                             <p className="text-sm mb-2">{dict.tasks?.noTasks || "No tasks yet"}</p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-xs"
-                              disabled={!selectedProject}
-                              onClick={() => {
-                                  const newTask = {
-                                      id: `task-${Date.now()}`,
-                                      title: dict.tasks?.newTask || "New Task",
-                                      assignee: "Unassigned",
-                                      status: "todo",
-                                      created_at: new Date().toISOString(),
-                                      updated_at: new Date().toISOString(),
-                                  }
-                                  handleAddTask(newTask)
-                              }}
-                            >
-                                <PlusCircle className="h-4 w-4 mr-1" />
-                                {dict.tasks?.addTask || "Add Task"}
-                            </Button>
+                            <AddTaskDialog
+                                dict={dict}
+                                lang={lang}
+                                onAddTask={handleAddTask}
+                                teamMembers={selectedProject?.team || []}
+                            />
                         </div>
                       )}
                   </div>

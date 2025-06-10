@@ -1,6 +1,7 @@
 import {Task, TaskBackend} from "@/lib/types/tasks";
 import {Expenses, ExpensesBackend} from "@/lib/types/expenses";
 import {InventoryItem, InventoryItemBackend} from "@/lib/types/inventory-item";
+import {WorkerData, WorkerDataBackend} from "@/lib/types/user.types";
 
 export interface Project {
     id: number
@@ -27,7 +28,7 @@ export interface Project {
         avatar?: string
     }[]
     tasks?: Task []
-    team?: Worker[]
+    team?: WorkerData[]
     expenses: Expenses[]
     expenseCategories?: {
         [key: string]: number
@@ -35,20 +36,6 @@ export interface Project {
     inventory: InventoryItem[]
 }
 
-export interface Worker {
-    id: number
-    name: string
-    role: string
-    contact: string
-    phone: string
-    availability: null | string
-    efficiency: number
-    projects: string[]
-    tasksCompleted: number
-    tasksInProgress: number
-    skills?: string[]
-    avatar?: string
-}
 export interface ProjectBackend {
     id: number
     title: string
@@ -67,7 +54,7 @@ export interface ProjectBackend {
         avatar?: string
     }[]
     tasks?: TaskBackend []
-    team?: any
+    team?: WorkerDataBackend[]
     workers?: any
     expenses: ExpensesBackend[]
     inventory: InventoryItemBackend[]

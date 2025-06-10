@@ -7,6 +7,8 @@ import Swal from "sweetalert2";
 import {Project, ProjectBackend} from "@/lib/types/project.types";
 import {InventoryItemBackend} from "@/lib/types/inventory-item";
 import {useUser} from "@/contexts/UserProvider";
+import {WorkerData, WorkerDataBackend} from "@/lib/types/user.types";
+import {Task, TaskBackend} from "@/lib/types/tasks";
 
 // Tipos para el contexto
 interface ProjectContextType {
@@ -19,11 +21,11 @@ interface ProjectContextType {
 
   // Métodos para modificar el proyecto
   addProject: (project: Partial<Project>) => Promise<void>
-  addTeamMember: (member: any) => void
-  addTask: (task: any) => void
+  addTeamMember: (member: WorkerData) => void
+  addTask: (task: Task) => void
   updateTask: (taskId: number, updatedTask: any) => void
   deleteTask: (taskId: number) => void
-  updateTaskStatus: (taskId: number, newStatus: string) => void
+  updateTaskStatus: (taskId: number, newStatus:  "todo" | "in_progress" | "done") => void
 
   // Métodos para el inventario
   addInventoryItem: (item: any) => void
@@ -148,184 +150,266 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
   // Detectar cambios en el proyecto seleccionado
   useEffect(() => {
-    if (pendingChanges) {
-      setHasChanges(true)
-    } else {
-      setHasChanges(false)
-    }
+    console.log("ACTUALIZANDO PENDING CHANGES : ", pendingChanges)
+      if ((pendingChanges?.team && pendingChanges.team.length > 0) ||
+            (pendingChanges?.tasks && pendingChanges.tasks.length > 0) ||
+            (pendingChanges?.inventory && pendingChanges.inventory.length > 0) ||
+            (pendingChanges?.expenses && pendingChanges.expenses.length > 0)) {
+        setHasChanges(true)
+      } else {
+        setHasChanges(false)
+      }
   }, [pendingChanges])
 
   // Función para seleccionar un proyecto por ID
   const setSelectedProjectById = (id: number) => {
-    setSelectedProjectId(id)
+      setSelectedProjectId(id)
   }
 
   // Función para establecer todos los proyectos
   const setAllProjects = (projects: Project[]) => {
-    setProjects(projects)
-    if (projects.length > 0) {
-      setSelectedProjectId(projects[0].id)
-    }
+      setProjects(projects)
+      if (projects.length > 0) {
+        setSelectedProjectId(projects[0].id)
+      }
   }
 
   // Función para añadir un nuevo proyecto
   const addProject = async (project: Partial<Project>) => {
-    setIsSaving(true)
+      setIsSaving(true)
 
-    console.log("Añadiendo proyecto:", project)
+      console.log("Añadiendo proyecto:", project)
 
-    try {
-      // Enviar el proyecto al backend
-      addProjectToBackend(getToken(), project).then((response) => {
-        if (response.statusCode === 200) {
-          console.log("Proyecto añadido con éxito:", response.data)
+      try {
+        // Enviar el proyecto al backend
+        addProjectToBackend(getToken(), project).then((response) => {
+          if (response.statusCode === 200) {
+            console.log("Proyecto añadido con éxito:", response.data)
 
-          const newProject = response.data;
-          // Añadir el proyecto a la lista
-          setProjects(prev => [...prev, newProject])
-          // Seleccionar el nuevo proyecto
-          setSelectedProjectId(newProject.id)
-          return newProject
-        } else {
-          console.error("Error al añadir el proyecto:", response)
-          setError(response.message || "Error al añadir el proyecto")
-        }
-      })
-    } catch (error) {
-      console.error("Error al añadir el proyecto:", error)
-      setError(error instanceof Error ? error.message : "Error al añadir el proyecto")
-    } finally {
-      setIsSaving(false)
-    }
+            const newProject = response.data;
+            // Añadir el proyecto a la lista
+            setProjects(prev => [...prev, newProject])
+            // Seleccionar el nuevo proyecto
+            setSelectedProjectId(newProject.id)
+            return newProject
+          } else {
+            console.error("Error al añadir el proyecto:", response)
+            setError(response.message || "Error al añadir el proyecto")
+          }
+        })
+      } catch (error) {
+        console.error("Error al añadir el proyecto:", error)
+        setError(error instanceof Error ? error.message : "Error al añadir el proyecto")
+      } finally {
+        setIsSaving(false)
+      }
   }
 
   // Guardar cambios
   const saveChanges = async () => {
-    if (!hasChanges || !selectedProject || !pendingChanges) return
-    setIsSaving(true) // Iniciar el estado de guardado
+      if (!hasChanges || !selectedProject || !pendingChanges) return
+      setIsSaving(true) // Iniciar el estado de guardado
 
-    try {
-      // Crear el objeto con los cambios para enviar al backend
-      const changesToSend = {
-        id: selectedProject.id,
-        ...pendingChanges
-      };
+      try {
+        // Crear el objeto con los cambios para enviar al backend
+        const changesToSend = {
+          id: selectedProject.id,
+          ...pendingChanges
+        };
 
-      const response = await updateProjectToBackend(getToken(), changesToSend)
-      if (response.statusCode !== 200) {
-        console.error("Error al guardar los cambios:", response)
-        throw new Error("Error al guardar los cambios")
+        console.log("Guardando cambios para el proyecto:", changesToSend)
+
+        const response = await updateProjectToBackend(getToken(), changesToSend)
+        if (response.statusCode !== 200) {
+          console.error("Error al guardar los cambios:", response)
+          throw new Error("Error al guardar los cambios")
+        }
+
+        const updatedProject = response.data;
+
+        console.log("Proyecto actualizado con éxito:", response.data)
+
+        // Actualizar la lista de proyectos con el proyecto modificado
+        setProjects(prev =>
+            prev.map(p => p.id === updatedProject.id ? updatedProject : p)
+        )
+
+        // Actualizar la versión original del proyecto seleccionado
+        setSelectedProject(updatedProject)
+        setOriginalSelectedProject(updatedProject)
+        setPendingChanges(null) // Limpiar cambios pendientes
+
+        setInfo( dictionary?.info?.changesSaved || "Changes saved successfully")
+
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Error al guardar los cambios")
+        console.error("Error al guardar los cambios:", error)
+      } finally {
+        setIsSaving(false)
       }
-
-      const updatedProject = response.data;
-
-      console.log("Proyecto actualizado con éxito:", response.data)
-
-      // Actualizar la lista de proyectos con el proyecto modificado
-      setProjects(prev =>
-          prev.map(p => p.id === updatedProject.id ? updatedProject : p)
-      )
-
-      // Actualizar la versión original del proyecto seleccionado
-      setSelectedProject(updatedProject)
-      setOriginalSelectedProject(updatedProject)
-      setPendingChanges(null) // Limpiar cambios pendientes
-
-      setInfo( dictionary?.info?.changesSaved || "Changes saved successfully")
-
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Error al guardar los cambios")
-      console.error("Error al guardar los cambios:", error)
-    } finally {
-      setIsSaving(false)
-    }
   }
 
   // Helper function para actualizar cambios pendientes
   const updatePendingChanges = (updates: Partial<ProjectBackend>) => {
-    setPendingChanges(prev => ({
-      ...prev,
-      ...updates
-    }));
+      setPendingChanges(prev => ({
+        ...prev,
+        ...updates
+      }));
   }
 
-  const addTeamMember = (member: any) => {
-    if (!selectedProject) return;
+  const addTeamMember = (member: WorkerData) => {
+      if (!selectedProject) return;
 
-    const updatedTeam = [...(selectedProject.team || []), member];
-    setSelectedProject(prev => prev ? {...prev, team: updatedTeam} : prev);
+      const updatedTeam = [...(selectedProject.team || []), member];
+      setSelectedProject(prev => prev ? {...prev, team: updatedTeam} : prev);
 
-    updatePendingChanges({
-      team: updatedTeam
-    });
+      const workerback: WorkerDataBackend = {
+          ...member,
+          updated: false, // Indica que no ha sido actualizado
+          deleted: false, // Indica que no está eliminado
+          created: true // Indica que es un nuevo miembro
+      }
+
+      updatePendingChanges({
+          team: [...(pendingChanges?.team || []), workerback]
+      });
   }
 
   // Añadir una tarea
-  const addTask = (task: any) => {
-    if (!selectedProject) return;
+  const addTask = (task: Task) => {
+      if (!selectedProject) return;
 
-    const newTasks = [...(selectedProject.tasks || []), task];
-    const progress = {
-      ...selectedProject.progress,
-      todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
-      done: newTasks.filter((t: any) => t.status === "done").length || 0,
-      inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
-    };
+      const newTasks = [...(selectedProject.tasks || []), task];
+      const progress = {
+        ...selectedProject.progress,
+        todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
+        done: newTasks.filter((t: any) => t.status === "done").length || 0,
+        inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
+      };
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      tasks: newTasks,
-      progress,
-    } : prev);
+      setSelectedProject(prev => prev ? {
+        ...prev,
+        tasks: newTasks,
+        progress,
+      } : prev);
 
-    updatePendingChanges({
-      tasks: newTasks
-    });
+      const newTask: TaskBackend = {
+          ...task,
+          deleted: false,
+          updated: false,
+          created: true // Indica que es una nueva tarea
+      }
+
+      updatePendingChanges({
+          tasks: [...(pendingChanges?.tasks || []), newTask]
+      });
   }
 
   // Actualizar una tarea
-  const updateTask = (taskId: number, updatedTask: any) => {
-    if (!selectedProject) return;
+  const updateTask = (taskId: number, updatedTask: Task) => {
+      if (!selectedProject) return;
 
-    const updatedTasks = selectedProject.tasks?.map((task: any) =>
-        task.id === taskId ? { ...task, ...updatedTask } : task
-    ) || [];
+      const updatedTasks = selectedProject.tasks?.map((task: Task) =>
+          task.id === taskId ? { ...task, ...updatedTask } : task
+      ) || [];
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      tasks: updatedTasks,
-    } : prev);
+      setSelectedProject(prev => prev ? {
+        ...prev,
+        tasks: updatedTasks,
+      } : prev);
 
-    updatePendingChanges({
-      tasks: updatedTasks
-    });
+      const originalTaskList = originalSelectedProject?.tasks
+      const taskToUpdate = originalTaskList?.find((task: Task) => task.id === taskId);
+      if (!taskToUpdate) {
+        // Si la tarea existe en el original, creamos una versión actualizada
+        const updatedTaskWithId: TaskBackend = {
+          ...updatedTask,
+          id: taskId,
+          updated: false ,
+          created: true, // Si no estaba en el original, la consideramos creada
+          deleted: false // No está eliminada
+        };
+
+        // Filtramos las tareas pendientes para evitar duplicados
+        const filteredPendingTasks = (pendingChanges?.tasks || []).filter(
+            (task: TaskBackend) => task.id !== taskId
+        );
+
+        updatePendingChanges({
+          tasks: [...filteredPendingTasks, updatedTaskWithId]
+        });
+      } else {
+        // En cambio, si ya estaba en el Original, debo actualizar el Backend
+        const taskWithUpdated: TaskBackend = {
+          ...taskToUpdate,
+          ...updatedTask,
+          updated: true, // Indica que la tarea ha sido actualizada
+          created: false,
+          deleted: false
+        }
+
+        // Filtramos las tareas pendientes para evitar duplicados
+        const filteredPendingTasks = (pendingChanges?.tasks || []).filter(
+            (task: TaskBackend) => task.id !== taskId
+        );
+
+        updatePendingChanges({
+          tasks: [...filteredPendingTasks , taskWithUpdated]
+        });
+      }
   }
 
   // Eliminar una tarea
   const deleteTask = (taskId: number) => {
-    if (!selectedProject) return;
+      if (!selectedProject) return;
 
-    const newTasks = selectedProject.tasks?.filter((task: any) => task.id !== taskId) || [];
-    const progress = {
-      ...selectedProject.progress,
-      todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
-      done: newTasks.filter((t: any) => t.status === "done").length || 0,
-      inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
-    };
+      const newTasks = selectedProject.tasks?.filter((task: Task) => task.id !== taskId) || [];
+      const progress = {
+        ...selectedProject.progress,
+        todo: newTasks.filter((t: any) => t.status === "todo").length || 0,
+        done: newTasks.filter((t: any) => t.status === "done").length || 0,
+        inProgress: newTasks.filter((t: any) => t.status === "in_progress").length || 0,
+      };
 
-    setSelectedProject(prev => prev ? {
-      ...prev,
-      tasks: newTasks,
-      progress,
-    } : prev);
+      setSelectedProject(prev => prev ? {
+        ...prev,
+        tasks: newTasks,
+        progress,
+      } : prev);
 
-    updatePendingChanges({
-      tasks: newTasks
-    });
+      const originalTaskList = originalSelectedProject?.tasks
+      const taskToDelete = originalTaskList?.find((task: Task) => task.id === taskId);
+      if (!taskToDelete) {
+        console.log("PendingTasks : ", pendingChanges?.tasks)
+        console.log("TASKID : ", taskId)
+        //Filtrar tareas pendientes para eliminar la tarea
+        const updatedPendingTasks = pendingChanges?.tasks?.filter((task: Task) => task.id !== taskId) || [];
+        console.log("UpdatedPendingTasks : ", updatedPendingTasks)
+        updatePendingChanges({
+          tasks: [...(updatedPendingTasks || [])]
+        })
+      } else {
+        // Crear el task con deleted true y guardar los cambios pendientes
+        const taskWithDeleted: TaskBackend = {
+          ...taskToDelete,
+          deleted: true, // Indica que la tarea ha sido eliminada
+          updated: false,
+          created: false
+        }
+
+        // Filtramos las tareas pendientes para evitar duplicados
+        const filteredPendingTasks = (pendingChanges?.tasks || []).filter(
+            (task: TaskBackend) => task.id !== taskId
+        );
+
+        updatePendingChanges({
+          tasks: [...filteredPendingTasks, taskWithDeleted]
+        });
+      }
   }
 
   // Actualizar el estado de una tarea
-  const updateTaskStatus = (taskId: number, newStatus: string) => {
+  const updateTaskStatus = (taskId: number, newStatus:  "todo" | "in_progress" | "done") => {
     if (!selectedProject) return;
 
     const updatedTasks = selectedProject.tasks?.map((task: any) =>
@@ -334,9 +418,9 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
 
     const progress = {
       ...selectedProject.progress,
-      todo: updatedTasks.filter((task: any) => task.status === "todo").length || 0,
-      done: updatedTasks.filter((task: any) => task.status === "done").length || 0,
-      inProgress: updatedTasks.filter((task: any) => task.status === "in_progress").length || 0,
+      todo: updatedTasks.filter((task: Task) => task.status === "todo").length || 0,
+      done: updatedTasks.filter((task: Task) => task.status === "done").length || 0,
+      inProgress: updatedTasks.filter((task: Task) => task.status === "in_progress").length || 0,
     };
 
     setSelectedProject(prev => prev ? {
@@ -344,6 +428,28 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
       tasks: updatedTasks,
       progress,
     } : prev);
+
+    const originalTaskList = originalSelectedProject?.tasks
+    const taskToUpdate = originalTaskList?.find((task: Task) => task.id === taskId);
+    if (!taskToUpdate) {
+      updatePendingChanges({ // Si la tarea no existe en el original, actualizar directamente
+        tasks: updatedTasks
+      });
+      return;
+    } else {
+        // En cambio, si ya estaba en el Original, debo actualizar el Backend
+        const taskWithUpdatedStatus: TaskBackend = {
+            ...taskToUpdate,
+            status: newStatus,
+            updated: true, // Indica que la tarea ha sido actualizada
+            created: false,
+            deleted: false
+        }
+
+        updatePendingChanges({
+            tasks: [...(pendingChanges?.tasks || []), taskWithUpdatedStatus]
+        });
+    }
 
     updatePendingChanges({
       tasks: updatedTasks
