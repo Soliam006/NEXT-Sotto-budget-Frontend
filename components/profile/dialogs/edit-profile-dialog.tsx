@@ -485,7 +485,7 @@ export function EditProfileDialog({
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <PlusCircle className="h-4 w-4 mr-2"/>
-                    {t.add}
+                    {dictionary.common.add}
                   </Button>
                 </div>
                 {errors.newAvailability && <p className="text-sm text-destructive">{errors.newAvailability}</p>}
@@ -505,14 +505,14 @@ export function EditProfileDialog({
                 onClick={() => onOpenChange(false)}
                 className="bg-background border-input text-foreground"
               >
-                {t.cancel}
+                {dictionary.common.cancel}
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || noChangeDetected}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                {isSubmitting ? t.saving : t.save}
+                {isSubmitting ? dictionary.common.saving : dictionary.common.save}
               </Button>
             </DialogFooter>
           </form>

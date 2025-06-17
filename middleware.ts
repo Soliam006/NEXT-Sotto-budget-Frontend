@@ -19,8 +19,8 @@ export function middleware(request: NextRequest) {
     }
 
     // Resto de tu lógica actual...
-    const isLoginPage = pathname.match(/^\/(es|en)\/(login|signup)$/) !== null;
-    const isProtectedPage = pathname.match(/^\/(es|en)\/(dashboard|profile)/) !== null;
+    const isLoginPage = pathname.match(/^\/(es|en|ca)\/(login|signup)$/) !== null;
+    const isProtectedPage = pathname.match(/^\/(es|en|ca)\/(dashboard|profile)/) !== null;
 
     if (isLoginPage && token) {
         return NextResponse.redirect(new URL(`/${lang}/dashboard`, request.url));
@@ -36,11 +36,11 @@ export function middleware(request: NextRequest) {
 // Función auxiliar para verificar rutas existentes
 function checkIfRouteExists(pathname: string): boolean {
     const validRoutes = [
-        /^\/(es|en)\/login$/,
-        /^\/(es|en)\/signup$/,
-        /^\/(es|en)\/dashboard(\/.*)?$/,
-        /^\/(es|en)\/profile(\/.*)?$/,
-        /^\/(es|en)\/404$/
+        /^\/(es|en|ca)\/login$/,
+        /^\/(es|en|ca)\/signup$/,
+        /^\/(es|en|ca)\/dashboard(\/.*)?$/,
+        /^\/(es|en|ca)\/profile(\/.*)?$/,
+        /^\/(es|en|ca)\/404$/
     ];
 
     return validRoutes.some(regex => regex.test(pathname));

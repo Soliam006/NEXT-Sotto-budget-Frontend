@@ -84,7 +84,7 @@ export function NotificationDialog({ open, onOpenChange, dictionary }: Notificat
           <DialogContent className={
                 `sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] 
             ${selectedNotification ? "w-full max-w-[95vw] h-[60vh] ld:h-[45vh]" : ""} 
-            max-h-[60vh] flex flex-col`
+            max-h-[80vh] flex flex-col`
             }>
             { /* If a notification is selected, show its details */ }
             {selectedNotification ? (

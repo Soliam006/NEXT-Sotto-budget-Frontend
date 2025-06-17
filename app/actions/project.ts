@@ -162,7 +162,9 @@ export async function updateProjectToBackend(token: string | null, project:Parti
             body: JSON.stringify(new_project),
         }).then(
             async (res) => {
-                return await res.json();
+                const json = await res.json();
+                console.log("Update Project Response: ", json);
+                return json;
             }
         )
     }catch ( error) {

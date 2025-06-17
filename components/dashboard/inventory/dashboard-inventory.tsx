@@ -80,10 +80,6 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
   // Manejar cambio de estado
   const handleStatusChange = (item: InventoryItem, newStatus: InventoryItem["status"]) => {
     updateInventoryItemStatus(item.id, newStatus)
-    /*toast({
-      title: dict.inventory?.statusUpdated || "Status Updated",
-      description: `${item.name} ${dict.inventory?.movedTo || "moved to"} ${newStatus}`,
-    })*/
   }
 
   // Manejar eliminación
@@ -92,10 +88,6 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
       deleteInventoryItem(currentItem.id)
       setShowDeleteDialog(false)
       setCurrentItem(null)
-      /*toast({
-        title: dict.inventory?.itemDeleted || "Item Deleted",
-        description: `${currentItem.name} ${dict.inventory?.hasBeenDeleted || "has been deleted"}`,
-      })*/
     }
   }
 
@@ -450,7 +442,7 @@ export function DashboardInventory({ dict }: DashboardInventoryProps) {
             open={showDeleteDialog}
             onOpenChange={setShowDeleteDialog}
             onCancel={() => setShowDeleteDialog(false)}
-            title={dict.inventory?.deleteItem || "Delete Item"}
+            title={dict.common?.delete || "Delete Item"}
             description={
                 dict.inventory?.deleteItemConfirmation ||
                 "Are you sure you want to delete this item? This action cannot be undone."

@@ -116,7 +116,7 @@ export function TopBar({
     if (onLanguageChange) {
       onLanguageChange(newLang)
     } else if (newLang !== lang) {
-      const path = window.location.pathname.replace(/^\/(en|es)/, "")
+      const path = window.location.pathname.replace(/^\/(en|es|ca)/, "")
       router.push(`/${newLang}${path}`)
     }
   }
@@ -134,7 +134,7 @@ export function TopBar({
   }
 
   return (
-      <header className="flex items-center justify-between border-b border-border mb-6 px-2 md:px-6 py-2 md:py-4 fixed top-0 left-0 right-0 z-50 bg-background">
+      <header className="flex items-center justify-between border-b border-border mb-6 px-2 md:px-6 py-2 md:py-4 fixed top-0 left-0 right-0 z-50 bg-background shadow-md">
         <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push(`/${lang}/dashboard`)}>
           <Image src="/favicon.ico" alt="SottoBudget" width={50} height={50} className="rounded-lg"/>
           <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:block hidden">
@@ -166,12 +166,13 @@ export function TopBar({
 
           <div className="flex items-center space-x-3">
             <Select value={lang} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-[70px] md:w-[100px] bg-secondary border-border text-muted-foreground cursor-pointer">
+              <SelectTrigger className="w-[90px] md:w-[100px] bg-secondary border-border text-muted-foreground cursor-pointer">
                 <SelectValue placeholder={dictionary.language[lang]}/>
               </SelectTrigger>
               <SelectContent className="bg-popover border-border">
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="en">{dictionary.language.en}</SelectItem>
+                <SelectItem value="es">{dictionary.language.es}</SelectItem>
+                <SelectItem value="ca">{dictionary.language.ca}</SelectItem>
               </SelectContent>
             </Select>
 

@@ -37,7 +37,7 @@ export function DashboardOverview({dict, lang}: DashboardOverviewProps) {
               className="absolute inset-2 border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
           </div>
           <div className="mt-4 text-primary font-mono text-sm tracking-wider">
-            {dict.dashboard?.loading || "LOADING"}
+            {dict.common?.loading || "LOADING"}
           </div>
         </div>
       </div>

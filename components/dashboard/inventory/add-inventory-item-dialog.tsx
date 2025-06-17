@@ -145,7 +145,7 @@ export function AddInventoryItemDialog({ open, onOpenChange, dict }: AddInventor
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="total">{dict.inventory?.totalQuantity || "Total Quantity"} *</Label>
+                                <Label htmlFor="total">{dict.inventory?.quantity || "Total Quantity"} *</Label>
                                 <Input
                                     id="total"
                                     type="number"

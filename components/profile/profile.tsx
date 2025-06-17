@@ -22,6 +22,7 @@ import {RequestsProfileDialog} from "@/components/profile/dialogs/request-profil
 import {ProjectsProfileDialog} from "@/components/profile/dialogs/projects-details-profile-dialog";
 import {useProject} from "@/contexts/project-context";
 import {getStatusTranslation} from "@/lib/helpers/projects";
+import {NotificationsOverview} from "@/components/notifications/recents-notifications";
 
 export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
 
@@ -291,13 +292,15 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
                       <Building className="h-5 w-5 mr-2 text-cyan-500"/>
                       {dict.profile.recentProjects}
                     </CardTitle>
-                    <Button
-                      variant="ghost"
-                      className="text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
-                      onClick={() => setIsProjectsDialogOpen(true)}
-                    >
-                      {dict.profile.viewAll}
-                    </Button>
+                    {projects.length> 4 && (
+                      <Button
+                        variant="ghost"
+                        className="text-cyan-400 hover:text-cyan-300 hover:bg-secondary"
+                        onClick={() => setIsProjectsDialogOpen(true)}
+                      >
+                        {dict.common.viewAll}
+                      </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -341,50 +344,8 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
               </Card>
 
               <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center">
-                    <Activity className="h-5 w-5 mr-2 text-cyan-500"/>
-                    {dict.profile.recentActivity}
-                  </CardTitle>
-                </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <ActivityItem
-                      icon={<FileText className="h-4 w-4"/>}
-                      title="Updated project documentation"
-                      description="Modern Residential Complex"
-                      time="2 hours ago"
-                      iconColor="bg-blue-500/20 text-blue-400"
-                    />
-                    <ActivityItem
-                      icon={<MessageSquare className="h-4 w-4"/>}
-                      title="Commented on a task"
-                      description="Electrical wiring needs to be completed by Friday"
-                      time="Yesterday"
-                      iconColor="bg-purple-500/20 text-purple-400"
-                    />
-                    <ActivityItem
-                      icon={<Check className="h-4 w-4"/>}
-                      title="Completed milestone"
-                      description="Foundation work for Eco-Friendly School Building"
-                      time="3 days ago"
-                      iconColor="bg-green-500/20 text-green-400"
-                    />
-                    <ActivityItem
-                      icon={<Users className="h-4 w-4"/>}
-                      title="Added new team members"
-                      description="3 new members added to Hospital Wing Addition"
-                      time="1 week ago"
-                      iconColor="bg-cyan-500/20 text-cyan-400"
-                    />
-                    <ActivityItem
-                      icon={<AlertCircle className="h-4 w-4"/>}
-                      title="Reported an issue"
-                      description="Material delivery delay for Commercial Office Renovation"
-                      time="1 week ago"
-                      iconColor="bg-amber-500/20 text-amber-400"
-                    />
-                  </div>
+                  <NotificationsOverview dictionary={ dict } />
                 </CardContent>
               </Card>
             </div>
@@ -430,22 +391,6 @@ export default function ProfilePage({dict, lang}: { dict: any; lang: string }) {
         handleRejectRequestAction={handleRejectRequest}
         dict={dict}
         />
-    </div>
-  )
-}
-
-// Activity item component
-function ActivityItem({icon, title, description, time, iconColor}: any) {
-  return (
-    <div className="flex items-start space-x-3">
-      <div className={`mt-0.5 p-1.5 rounded-full ${iconColor}`}>{icon}</div>
-      <div>
-        <div className="flex items-center">
-          <div className="text-sm font-medium text-foreground/90">{title}</div>
-          <div className="ml-2 text-xs text-muted-foreground">{time}</div>
-        </div>
-        <div className="text-xs text-muted-foreground">{description}</div>
-      </div>
     </div>
   )
 }

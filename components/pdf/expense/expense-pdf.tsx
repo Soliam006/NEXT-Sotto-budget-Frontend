@@ -449,7 +449,7 @@ export function ExpensesPDFTemplate({ selectedProject, dict }: ExpensesPDFTempla
                     {/* Table Header */}
                     <View style={styles.tableHeader}>
                         <Text style={styles.colDate}>{dict.expenses?.date || "Date"}</Text>
-                        <Text style={styles.colDescription}>{dict.expenses?.description || "Description"}</Text>
+                        <Text style={styles.colDescription}>{dict.projects?.description || "Description"}</Text>
                         <Text style={styles.colCategory}>{dict.expenses?.category || "Category"}</Text>
                         <Text style={styles.colAmount}>{dict.expenses?.amount || "Amount"}</Text>
                         <Text style={styles.colStatus}>{dict.expenses?.status || "Status"}</Text>

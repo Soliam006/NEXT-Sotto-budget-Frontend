@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bell } from "lucide-react"
+import {Activity, Bell} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ActivityItem } from "./activity-item"
 import { useNotifications } from "@/contexts/notification-context"
@@ -26,8 +26,8 @@ export function NotificationsOverview({ dictionary }: NotificationsOverviewProps
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h3 className="font-semibold flex items-center">
-                    <Bell className="mr-2 h-4 w-4" />
-                    {dictionary.notifications?.recent || "Recent Notifications"}
+                    <Activity className="h-5 w-5 mr-2 text-cyan-500"/>
+                    {dictionary.notifications.recentNotifications || "Recent Activity"}
                 </h3>
                 <Button
                     variant="ghost"
@@ -35,7 +35,7 @@ export function NotificationsOverview({ dictionary }: NotificationsOverviewProps
                     onClick={() => setDialogOpen(true)}
                     className="text-xs text-primary hover:text-primary/80 cursor-pointer"
                 >
-                    {dictionary.notifications?.viewAll || "View All"}
+                    {dictionary.common?.viewAll || "View All"}
                 </Button>
             </div>
 

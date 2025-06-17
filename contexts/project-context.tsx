@@ -135,7 +135,7 @@ export function ProjectProvider({ children, dictionary }: ProjectProviderProps) 
   // Cargar de proyectos desde una API
   useEffect(() => {
     cargarProjectos()
-  }, [user?.id, token])
+  }, [user?.id, token]) // Dependencias: cargar proyectos al montar el componente o cambiar el usuario/token
 
   // Actualizar el proyecto seleccionado cuando cambia el ID
   useEffect(() => {
