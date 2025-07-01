@@ -136,7 +136,7 @@ export function TopBar({
   return (
       <header className="flex items-center justify-between border-b border-border mb-6 px-2 md:px-6 py-2 md:py-4 fixed top-0 left-0 right-0 z-50 bg-background shadow-md">
         <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push(`/${lang}/dashboard`)}>
-          <Image src="/favicon.ico" alt="SottoBudget" width={50} height={50} className="rounded-lg"/>
+          <Image src="/favicon.jpg" alt="SottoBudget" width={50} height={50} className="rounded-lg"/>
           <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent md:block hidden">
           SottoBudget
         </span>
