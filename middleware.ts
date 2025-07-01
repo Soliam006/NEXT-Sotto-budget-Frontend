@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
     const lang = request.cookies.get("lang")?.value || 'es'; // Valor por defecto si no se encuentra el cookie
     const pathname = request.nextUrl.pathname;
     // Revisar si es una ruta de Next.js o una API
-    if (pathname.includes('/_next/') || pathname.includes('/api/')) {
+    if (pathname.includes('/_next/') || pathname.includes('/api/') || pathname.match(/\.(jpg|jpeg|png|svg|ico|webp|css|js|woff2?)$/)) {
         return NextResponse.next();
     }
 
